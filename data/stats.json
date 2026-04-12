@@ -1,0 +1,131 @@
+{
+  "generated_at": "2026-04-12T09:55:29.754521",
+  "totals": {
+    "collisions": 685,
+    "hypotheses": 59,
+    "curated": 59,
+    "fire_hypotheses": 7,
+    "briefs": 9
+  },
+  "quality": {
+    "avg_novelty_score": 0.783,
+    "avg_panel_consensus": 6.62,
+    "fire_rate": 0.119
+  },
+  "cost": {
+    "total_usd": 18.236,
+    "per_brief_usd": 2.0262
+  },
+  "activity_30d": {
+    "collisions_by_day": [
+      {
+        "day": "2026-04-04",
+        "count": 58
+      },
+      {
+        "day": "2026-04-05",
+        "count": 150
+      },
+      {
+        "day": "2026-04-06",
+        "count": 100
+      },
+      {
+        "day": "2026-04-07",
+        "count": 55
+      },
+      {
+        "day": "2026-04-08",
+        "count": 100
+      },
+      {
+        "day": "2026-04-09",
+        "count": 102
+      },
+      {
+        "day": "2026-04-11",
+        "count": 20
+      },
+      {
+        "day": "2026-04-12",
+        "count": 100
+      }
+    ],
+    "briefs_by_day": [
+      {
+        "day": "2026-04-11",
+        "count": 1
+      },
+      {
+        "day": "2026-04-12",
+        "count": 8
+      }
+    ]
+  },
+  "reviewer_distribution": {
+    "intéressant": 38,
+    "a_tester": 7
+  },
+  "top_domains": [
+    {
+      "domain": "Chemical Engineering",
+      "count": 2
+    },
+    {
+      "domain": "Catalytic Materials",
+      "count": 1
+    },
+    {
+      "domain": "Surface Science",
+      "count": 1
+    },
+    {
+      "domain": "Optics",
+      "count": 1
+    },
+    {
+      "domain": "Condensed Matter Physics",
+      "count": 1
+    },
+    {
+      "domain": "Geophysics",
+      "count": 1
+    },
+    {
+      "domain": "Glaciology",
+      "count": 1
+    },
+    {
+      "domain": "Aerospace Engineering",
+      "count": 1
+    },
+    {
+      "domain": "Materials Processing",
+      "count": 1
+    },
+    {
+      "domain": "Manufacturing Engineering",
+      "count": 1
+    },
+    {
+      "domain": "Marine Biology",
+      "count": 1
+    },
+    {
+      "domain": "Environmental Engineering",
+      "count": 1
+    },
+    {
+      "domain": "Photochemistry",
+      "count": 1
+    },
+    {
+      "domain": "Molecular Biology",
+      "count": 1
+    },
+    {
+      "domain": "Nanotechnology",
+      "count": 1
+    }
+  ]
+}
