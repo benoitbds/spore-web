@@ -159,6 +159,20 @@ export interface Panel {
   meta_review: MetaReview;
 }
 
+export interface VulgarizationFr {
+  title_fr: string;
+  hypothesis_in_brief: string;
+  why_it_matters: string;
+  imagine_that: string;
+  concretely: {
+    intro: string;
+    phase1: string;
+    phase2: string;
+    phase3: string;
+  };
+  reviewers_say: string;
+}
+
 export interface Brief {
   brief_id: string;
   generated_at: string;
@@ -168,6 +182,7 @@ export interface Brief {
   sharpened: Sharpened;
   protocol: Protocol;
   panel: Panel;
+  vulgarization_fr?: VulgarizationFr;
 }
 
 // Summary stats (from export_stats.py)

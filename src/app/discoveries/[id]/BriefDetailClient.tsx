@@ -15,11 +15,18 @@ interface Props {
 }
 
 type Tab = 'comprendre' | 'recherche';
+type Lang = 'fr' | 'en';
 
 export default function BriefDetailClient({ brief, markdown }: Props) {
   const [tab, setTab] = useState<Tab>('comprendre');
+  // Default: FR on Comprendre tab, EN on Recherche tab — but the user can toggle.
+  const [lang, setLang] = useState<Lang>('fr');
 
-  const { sharpened, domains, grounding, panel, protocol, brief_id, generated_at } = brief;
+  const { sharpened, domains, grounding, panel, protocol, brief_id, generated_at, vulgarization_fr } = brief;
+
+  const headerTitle = lang === 'fr' && vulgarization_fr?.title_fr
+    ? vulgarization_fr.title_fr
+    : sharpened.title;
 
   return (
     <article className="space-y-12">
@@ -36,7 +43,7 @@ export default function BriefDetailClient({ brief, markdown }: Props) {
             })}
           </span>
           <span
-            className={`ml-auto rounded-full px-2.5 py-1 font-medium ${
+            className={`rounded-full px-2.5 py-1 font-medium ${
               panel.meta_review.verdict === 'publish_brief'
                 ? 'border border-emerald-bio/40 bg-emerald-bio/10 text-emerald-glow'
                 : panel.meta_review.verdict === 'reject'
@@ -46,10 +53,20 @@ export default function BriefDetailClient({ brief, markdown }: Props) {
           >
             {panel.meta_review.verdict}
           </span>
+
+          {/* Lang toggle — aligned right */}
+          <div className="ml-auto flex rounded-full border border-ink-500 bg-ink-800/60 p-0.5">
+            <LangButton active={lang === 'fr'} onClick={() => setLang('fr')}>
+              🇫🇷 FR
+            </LangButton>
+            <LangButton active={lang === 'en'} onClick={() => setLang('en')}>
+              🇬🇧 EN
+            </LangButton>
+          </div>
         </div>
 
         <h1 className="mb-6 font-display text-3xl leading-tight text-mist-100 md:text-5xl">
-          {sharpened.title}
+          {headerTitle}
         </h1>
 
         <DomainBridge
@@ -72,75 +89,33 @@ export default function BriefDetailClient({ brief, markdown }: Props) {
       <AnimatePresence mode="wait">
         {tab === 'comprendre' ? (
           <motion.div
-            key="comprendre"
+            key={`comprendre-${lang}`}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3 }}
             className="space-y-12"
           >
-            {/* Accessible explanation */}
-            <section>
-              <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-emerald-glow">
-                L'hypothèse en quelques mots
-              </h2>
-              <p className="text-xl leading-relaxed text-mist-100 font-display">
-                {sharpened.formal_statement}
-              </p>
-            </section>
-
-            {/* Mechanism — causal chain */}
-            <section>
-              <h2 className="mb-6 text-xs font-medium uppercase tracking-widest text-cyan-glow">
-                Le mécanisme, étape par étape
-              </h2>
-              <ol className="space-y-4">
-                {sharpened.proposed_mechanism.causal_chain.map((step, i) => (
-                  <li
-                    key={i}
-                    className="flex gap-4 rounded-xl border border-ink-500 bg-ink-800/40 p-4"
-                  >
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-bio/15 font-mono text-sm text-cyan-glow">
-                      {i + 1}
-                    </span>
-                    <p className="text-sm text-mist-300 leading-relaxed">
-                      {step.replace(/^Step \d+:\s*/i, '')}
-                    </p>
-                  </li>
-                ))}
-              </ol>
-            </section>
-
-            {/* Why it matters */}
-            <section>
-              <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-amber-glow">
-                Pourquoi c'est important
-              </h2>
-              <div className="rounded-xl border border-amber-bio/20 bg-amber-bio/5 p-6">
-                <p className="text-sm text-mist-200 leading-relaxed">
-                  {panel.meta_review.final_recommendation ||
-                    panel.meta_review.critical_path}
-                </p>
-              </div>
-            </section>
-
-            {/* And next? Protocol */}
-            <section>
-              <h2 className="mb-6 text-xs font-medium uppercase tracking-widest text-emerald-glow">
-                Et ensuite ? Comment le tester
-              </h2>
-              <ProtocolTimeline protocol={protocol} />
-            </section>
+            <ComprendreTab
+              brief={brief}
+              lang={lang}
+            />
           </motion.div>
         ) : (
           <motion.div
-            key="recherche"
+            key={`recherche-${lang}`}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3 }}
             className="space-y-12"
           >
+            {lang === 'fr' && (
+              <div className="rounded-xl border border-amber-bio/30 bg-amber-bio/5 p-4 text-sm text-amber-glow">
+                Traduction non disponible — contenu original en anglais.
+              </div>
+            )}
+
             {/* Panel */}
             <section>
               <h2 className="mb-6 font-display text-2xl text-mist-100">
@@ -339,6 +314,138 @@ export default function BriefDetailClient({ brief, markdown }: Props) {
   );
 }
 
+// ── Comprendre tab: FR (vulgarization_fr) or EN (original) ──
+function ComprendreTab({ brief, lang }: { brief: Brief; lang: Lang }) {
+  const { sharpened, panel, protocol, vulgarization_fr } = brief;
+
+  // FR path — only when we have vulgarization_fr. Otherwise fall back to EN.
+  if (lang === 'fr' && vulgarization_fr) {
+    const v = vulgarization_fr;
+    return (
+      <>
+        <section>
+          <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-emerald-glow">
+            L'hypothèse en quelques mots
+          </h2>
+          <p className="text-xl leading-relaxed text-mist-100 font-display">
+            {v.hypothesis_in_brief}
+          </p>
+        </section>
+
+        <section>
+          <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-amber-glow">
+            Pourquoi c'est important
+          </h2>
+          <div className="rounded-xl border border-amber-bio/20 bg-amber-bio/5 p-6">
+            <p className="text-sm text-mist-200 leading-relaxed whitespace-pre-line">
+              {v.why_it_matters}
+            </p>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-cyan-glow">
+            Imaginez que...
+          </h2>
+          <div className="rounded-xl border border-cyan-bio/20 bg-cyan-bio/5 p-6">
+            <p className="text-base italic text-mist-100 leading-relaxed whitespace-pre-line">
+              {v.imagine_that}
+            </p>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="mb-4 text-xs font-medium uppercase tracking-widest text-emerald-glow">
+            Et concrètement ?
+          </h2>
+          {v.concretely?.intro && (
+            <p className="mb-4 text-sm text-mist-300">{v.concretely.intro}</p>
+          )}
+          <ol className="space-y-3">
+            {[v.concretely?.phase1, v.concretely?.phase2, v.concretely?.phase3]
+              .filter(Boolean)
+              .map((step, i) => (
+                <li
+                  key={i}
+                  className="flex gap-4 rounded-xl border border-ink-500 bg-ink-800/40 p-4"
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-bio/15 font-mono text-sm text-emerald-glow">
+                    {i + 1}
+                  </span>
+                  <p className="text-sm text-mist-300 leading-relaxed">{step}</p>
+                </li>
+              ))}
+          </ol>
+        </section>
+
+        <section>
+          <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-mist-400">
+            Ce que disent les reviewers
+          </h2>
+          <div className="rounded-xl border border-ink-500 bg-ink-800/40 p-6">
+            <p className="text-sm text-mist-200 leading-relaxed whitespace-pre-line">
+              {v.reviewers_say}
+            </p>
+          </div>
+        </section>
+      </>
+    );
+  }
+
+  // EN path — original formal content
+  return (
+    <>
+      <section>
+        <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-emerald-glow">
+          The hypothesis in brief
+        </h2>
+        <p className="text-xl leading-relaxed text-mist-100 font-display">
+          {sharpened.formal_statement}
+        </p>
+      </section>
+
+      <section>
+        <h2 className="mb-6 text-xs font-medium uppercase tracking-widest text-cyan-glow">
+          Mechanism, step by step
+        </h2>
+        <ol className="space-y-4">
+          {sharpened.proposed_mechanism.causal_chain.map((step, i) => (
+            <li
+              key={i}
+              className="flex gap-4 rounded-xl border border-ink-500 bg-ink-800/40 p-4"
+            >
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-bio/15 font-mono text-sm text-cyan-glow">
+                {i + 1}
+              </span>
+              <p className="text-sm text-mist-300 leading-relaxed">
+                {step.replace(/^Step \d+:\s*/i, '')}
+              </p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section>
+        <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-amber-glow">
+          Why it matters
+        </h2>
+        <div className="rounded-xl border border-amber-bio/20 bg-amber-bio/5 p-6">
+          <p className="text-sm text-mist-200 leading-relaxed">
+            {panel.meta_review.final_recommendation || panel.meta_review.critical_path}
+          </p>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="mb-6 text-xs font-medium uppercase tracking-widest text-emerald-glow">
+          How to test it
+        </h2>
+        <ProtocolTimeline protocol={protocol} />
+      </section>
+    </>
+  );
+}
+
 function TabButton({
   active,
   onClick,
@@ -355,6 +462,29 @@ function TabButton({
         active
           ? 'bg-emerald-bio/20 text-emerald-glow shadow-[0_0_20px_rgba(16,185,129,0.15)]'
           : 'text-mist-400 hover:text-mist-100'
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function LangButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`rounded-full px-3 py-1 text-xs font-medium transition-all ${
+        active
+          ? 'bg-mist-100/10 text-mist-100'
+          : 'text-mist-500 hover:text-mist-300'
       }`}
     >
       {children}
