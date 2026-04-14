@@ -2,11 +2,27 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import PipelineAnimation from '@/components/PipelineAnimation';
 import { getStats } from '@/lib/briefs';
+import { SITE_URL } from '@/lib/seo';
+
+const _desc =
+  'De la collision de domaines au brief de recherche : le pipeline SPORE étape par étape, avec 5 reviewers IA, grounding sur Semantic Scholar et zéro hallucination bibliographique.';
 
 export const metadata: Metadata = {
   title: 'Comment ça marche',
-  description:
-    'Le pipeline SPORE étape par étape : de la collision de domaines scientifiques au brief de recherche publication-ready.',
+  description: _desc,
+  alternates: { canonical: '/how-it-works' },
+  openGraph: {
+    title: 'Comment ça marche | SPORE',
+    description: _desc,
+    url: `${SITE_URL}/how-it-works`,
+    type: 'article',
+    locale: 'fr_FR',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Comment ça marche | SPORE',
+    description: _desc,
+  },
 };
 
 export default function HowItWorksPage() {

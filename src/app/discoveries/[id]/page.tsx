@@ -8,7 +8,15 @@ import {
   getBriefNeighbors,
 } from '@/lib/briefs';
 import { verdictLabel } from '@/lib/verdicts';
+import {
+  SITE_URL,
+  SITE_NAME,
+  briefMetaTitle,
+  briefMetaDescription,
+  briefOgDescription,
+} from '@/lib/seo';
 import BriefDetailClient from './BriefDetailClient';
+import BriefJsonLd from '@/components/BriefJsonLd';
 import type { Brief } from '@/lib/types';
 
 interface Params {
@@ -21,10 +29,39 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const brief = getBriefById(params.id);
-  if (!brief) return { title: 'Brief introuvable' };
+  if (!brief) {
+    return {
+      title: 'Brief introuvable',
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const title = briefMetaTitle(brief);
+  const description = briefMetaDescription(brief);
+  const ogDescription = briefOgDescription(brief);
+  const url = `${SITE_URL}/discoveries/${brief.brief_id}`;
+
   return {
-    title: brief.sharpened.title,
-    description: brief.sharpened.formal_statement.slice(0, 160),
+    title, // uses the `%s | SPORE` template from layout
+    description,
+    openGraph: {
+      type: 'article',
+      locale: 'fr_FR',
+      siteName: SITE_NAME,
+      title,
+      description: ogDescription,
+      url,
+      publishedTime: brief.generated_at,
+      tags: brief.domains,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description: ogDescription,
+    },
+    alternates: {
+      canonical: `/discoveries/${brief.brief_id}`,
+    },
   };
 }
 
@@ -37,6 +74,8 @@ export default function BriefDetailPage({ params }: Params) {
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
+      <BriefJsonLd brief={brief} />
+
       <Link
         href="/discoveries"
         className="group mb-8 inline-flex items-center gap-2 text-sm text-mist-400 hover:text-emerald-glow transition-colors"

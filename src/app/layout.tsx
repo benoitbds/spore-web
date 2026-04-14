@@ -26,30 +26,52 @@ const mono = JetBrains_Mono({
   display: 'swap',
 });
 
+import { SITE_URL, SITE_NAME, SITE_TAGLINE, SITE_DESCRIPTION } from '@/lib/seo';
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: 'SPORE — L\'IA qui imagine les découvertes de demain',
-    template: '%s · SPORE',
+    default: SITE_TAGLINE,
+    template: `%s | ${SITE_NAME}`,
   },
-  description:
-    'SPORE génère des hypothèses scientifiques disruptives en croisant aléatoirement des domaines éloignés, puis les valide avec 5 reviewers IA spécialisés.',
-  keywords: ['science', 'AI', 'research', 'hypothesis', 'interdisciplinary', 'SPORE'],
+  description: SITE_DESCRIPTION,
+  keywords: [
+    'science',
+    'IA',
+    'hypothèses scientifiques',
+    'recherche interdisciplinaire',
+    'collision de domaines',
+    'vulgarisation scientifique',
+    'SPORE',
+  ],
   authors: [{ name: 'Bac' }],
   openGraph: {
     type: 'website',
-    title: 'SPORE — Système de Production d\'Opportunités de Recherche',
+    locale: 'fr_FR',
+    siteName: SITE_NAME,
+    title: SITE_TAGLINE,
     description:
-      'L\'IA qui croise les sciences pour imaginer les découvertes de demain.',
-    siteName: 'SPORE',
+      "Des hypothèses scientifiques disruptives, vulgarisées et vérifiées. Zéro hallucination bibliographique.",
+    url: SITE_URL,
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SPORE',
-    description: 'L\'IA qui croise les sciences pour imaginer les découvertes de demain.',
+    title: SITE_TAGLINE,
+    description: "Des hypothèses scientifiques disruptives, vulgarisées et vérifiées.",
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
+    },
+  },
+  alternates: {
+    canonical: '/',
   },
 };
 

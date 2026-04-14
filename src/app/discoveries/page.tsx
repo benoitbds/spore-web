@@ -1,11 +1,31 @@
 import type { Metadata } from 'next';
 import { getAllBriefs } from '@/lib/briefs';
+import { SITE_URL } from '@/lib/seo';
 import DiscoveriesClient from './DiscoveriesClient';
 
+const _briefs = getAllBriefs();
+const _domainCount = new Set(_briefs.flatMap((b) => b.domains)).size;
+const _description =
+  _briefs.length > 0
+    ? `Explorez les hypothèses de recherche générées par SPORE : ${_briefs.length} brief${_briefs.length > 1 ? 's' : ''} publié${_briefs.length > 1 ? 's' : ''}, couvrant ${_domainCount} domaines scientifiques, validés par 5 reviewers IA.`
+    : 'Hypothèses scientifiques interdisciplinaires générées et validées par SPORE.';
+
 export const metadata: Metadata = {
-  title: 'Découvertes',
-  description:
-    'Hypothèses scientifiques interdisciplinaires générées et validées par SPORE.',
+  title: 'Découvertes scientifiques',
+  description: _description,
+  alternates: { canonical: '/discoveries' },
+  openGraph: {
+    title: 'Découvertes scientifiques | SPORE',
+    description: _description,
+    url: `${SITE_URL}/discoveries`,
+    type: 'website',
+    locale: 'fr_FR',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Découvertes scientifiques | SPORE',
+    description: _description,
+  },
 };
 
 export default function DiscoveriesPage() {
