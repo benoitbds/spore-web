@@ -48,14 +48,27 @@ export function getBriefById(id: string): Brief | null {
   return getAllBriefs().find((b) => b.brief_id === id) ?? null;
 }
 
-/** Get the most recent brief (highest panel_consensus_score among recent ones). */
+/** Get the brief to feature at the top of the homepage.
+ *
+ * Priority order:
+ *   1. Most recent brief that has a vulgarization_fr block AND panel
+ *      verdict == 'publish_brief'.
+ *   2. Most recent brief with a vulgarization_fr block (any verdict).
+ *   3. Most recent brief overall (falls back to EN in the UI).
+ */
 export function getFeaturedBrief(): Brief | null {
-  const all = getAllBriefs();
+  const all = getAllBriefs(); // already sorted by generated_at desc
   if (all.length === 0) return null;
-  // Pick the one with the highest panel consensus among the 5 most recent
-  const recent = all.slice(0, 5);
-  recent.sort((a, b) => b.panel.meta_review.consensus_score - a.panel.meta_review.consensus_score);
-  return recent[0];
+
+  const published = all.find(
+    (b) => b.vulgarization_fr && b.panel?.meta_review?.verdict === 'publish_brief'
+  );
+  if (published) return published;
+
+  const anyVulg = all.find((b) => b.vulgarization_fr);
+  if (anyVulg) return anyVulg;
+
+  return all[0];
 }
 
 /** Load the accompanying markdown file for a brief, if it exists. */
