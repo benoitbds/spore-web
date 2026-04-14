@@ -7,7 +7,9 @@ import remarkGfm from 'remark-gfm';
 import DomainBridge from '@/components/DomainBridge';
 import ReviewerPanel from '@/components/ReviewerPanel';
 import ProtocolTimeline from '@/components/ProtocolTimeline';
+import ShareButtons from '@/components/ShareButtons';
 import type { Brief } from '@/lib/types';
+import { verdictLabel, verdictChipClasses } from '@/lib/verdicts';
 
 interface Props {
   brief: Brief;
@@ -43,15 +45,9 @@ export default function BriefDetailClient({ brief, markdown }: Props) {
             })}
           </span>
           <span
-            className={`rounded-full px-2.5 py-1 font-medium ${
-              panel.meta_review.verdict === 'publish_brief'
-                ? 'border border-emerald-bio/40 bg-emerald-bio/10 text-emerald-glow'
-                : panel.meta_review.verdict === 'reject'
-                  ? 'border border-red-500/40 bg-red-500/10 text-red-400'
-                  : 'border border-amber-bio/40 bg-amber-bio/10 text-amber-glow'
-            }`}
+            className={`rounded-full px-2.5 py-1 font-medium ${verdictChipClasses(panel.meta_review.verdict)}`}
           >
-            {panel.meta_review.verdict}
+            {verdictLabel(panel.meta_review.verdict)}
           </span>
 
           {/* Lang toggle — aligned right */}
@@ -74,6 +70,8 @@ export default function BriefDetailClient({ brief, markdown }: Props) {
           domainB={domains[1] || '—'}
           compact
         />
+
+        <ShareButtons title={headerTitle} className="mt-6" />
       </header>
 
       {/* TABS */}

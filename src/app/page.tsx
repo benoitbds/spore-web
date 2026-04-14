@@ -4,6 +4,7 @@ import EditorialBriefCard from '@/components/EditorialBriefCard';
 import MyceliumBackground from '@/components/MyceliumBackground';
 import { getAllBriefs, getFeaturedBrief, getStats } from '@/lib/briefs';
 import type { Brief } from '@/lib/types';
+import { verdictLabel } from '@/lib/verdicts';
 
 export default function HomePage() {
   const stats = getStats();
@@ -158,7 +159,14 @@ function FeaturedHero({ brief }: { brief: Brief }) {
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-bio/50 to-transparent" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-b from-transparent to-ink-900" />
 
-      <div className="relative mx-auto flex max-w-6xl flex-col px-6 py-20 md:py-28 lg:py-32">
+      <div className="relative mx-auto flex max-w-6xl flex-col px-6 py-16 md:py-24 lg:py-28">
+        {/* tagline — what SPORE is, visible above the fold */}
+        <p className="mb-6 max-w-3xl text-sm leading-relaxed text-mist-200/70 md:text-base">
+          <span className="font-display text-base italic text-mist-100 md:text-lg">SPORE</span>
+          <span className="mx-2 text-mist-600">—</span>
+          L'IA qui croise des domaines scientifiques éloignés pour imaginer des découvertes inédites.
+        </p>
+
         {/* kicker */}
         <div className="mb-8 flex flex-wrap items-center gap-3 text-[11px]">
           <span className="inline-flex items-center gap-2 rounded-full border border-emerald-bio/30 bg-emerald-bio/5 px-3 py-1 uppercase tracking-[0.22em] text-emerald-glow">
@@ -216,7 +224,7 @@ function FeaturedHero({ brief }: { brief: Brief }) {
             <HeroBadge
               label="Panel consensus"
               value={`${panelScore.toFixed(1)}/10`}
-              sub={verdict === 'publish_brief' ? 'publié' : verdict}
+              sub={verdictLabel(verdict).toLowerCase()}
               accent="cyan"
             />
           </div>

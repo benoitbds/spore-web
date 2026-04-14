@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import BriefCard from '@/components/BriefCard';
+import EditorialBriefCard from '@/components/EditorialBriefCard';
 import type { Brief } from '@/lib/types';
 
 type SortMode = 'panel' | 'novelty' | 'date';
@@ -119,7 +119,7 @@ export default function DiscoveriesClient({ briefs, allDomains }: Props) {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((brief, i) => (
-            <BriefCard key={brief.brief_id} brief={brief} index={i} />
+            <EditorialBriefCard key={brief.brief_id} brief={brief} index={i} />
           ))}
         </div>
       )}

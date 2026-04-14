@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import type { Brief } from '@/lib/types';
+import { verdictLabel } from '@/lib/verdicts';
 
 interface Props {
   brief: Brief;
@@ -83,7 +84,7 @@ export default function EditorialBriefCard({ brief, index = 0 }: Props) {
               </span>
               {isPublished && (
                 <span className="rounded-full bg-emerald-bio/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-emerald-glow">
-                  publié
+                  {verdictLabel('publish_brief')}
                 </span>
               )}
             </div>

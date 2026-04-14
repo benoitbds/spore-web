@@ -97,3 +97,21 @@ export function getStats(): Stats | null {
 export function briefToSlug(brief: Brief): string {
   return brief.brief_id;
 }
+
+/** Neighbors of a brief in the generated_at-desc ordering used across the UI.
+ *
+ * `prev` = older brief (lower generated_at).
+ * `next` = newer brief (higher generated_at).
+ * Both are null at the ends of the list.
+ */
+export function getBriefNeighbors(
+  id: string,
+): { prev: Brief | null; next: Brief | null } {
+  const all = getAllBriefs(); // generated_at desc
+  const idx = all.findIndex((b) => b.brief_id === id);
+  if (idx < 0) return { prev: null, next: null };
+  return {
+    prev: idx + 1 < all.length ? all[idx + 1] : null,
+    next: idx - 1 >= 0 ? all[idx - 1] : null,
+  };
+}
