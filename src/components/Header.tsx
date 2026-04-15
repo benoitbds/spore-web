@@ -4,11 +4,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import AuthWidget from '@/components/AuthWidget';
 
 const NAV = [
   { href: '/', label: 'Accueil' },
   { href: '/discoveries', label: 'Découvertes' },
   { href: '/how-it-works', label: 'Comment ça marche' },
+  { href: '/pricing', label: 'Tarifs' },
   { href: '/stats', label: 'Stats' },
 ];
 
@@ -97,6 +99,10 @@ export default function Header() {
             </li>
           ))}
         </ul>
+
+        <div className="mt-auto px-4 pb-6">
+          <AuthWidget orientation="vertical" />
+        </div>
       </div>
     </div>
   );
@@ -135,6 +141,11 @@ export default function Header() {
               </li>
             ))}
           </ul>
+
+          {/* Desktop auth slot */}
+          <div className="hidden md:block">
+            <AuthWidget />
+          </div>
 
           {/* Mobile trigger */}
           <button
