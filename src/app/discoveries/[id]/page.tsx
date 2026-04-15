@@ -4,10 +4,10 @@ import Link from 'next/link';
 import {
   getAllBriefs,
   getBriefById,
-  getBriefMarkdown,
   getBriefNeighbors,
 } from '@/lib/briefs';
 import { verdictLabel } from '@/lib/verdicts';
+import { briefToTeaser } from '@/lib/types';
 import {
   SITE_URL,
   SITE_NAME,
@@ -69,7 +69,12 @@ export default function BriefDetailPage({ params }: Params) {
   const brief = getBriefById(params.id);
   if (!brief) notFound();
 
-  const markdown = getBriefMarkdown(params.id);
+  // Paywall boundary: the full Brief never crosses into a client component.
+  // BriefJsonLd is a pure server component (no "use client"), so its props
+  // stay on the server. BriefDetailClient receives only the teaser subset;
+  // the gated content is fetched from /api/briefs/{id}/full at interaction
+  // time, which enforces free-brief / credit / 402 server-side.
+  const teaser = briefToTeaser(brief);
   const { prev, next } = getBriefNeighbors(params.id);
 
   return (
@@ -84,7 +89,7 @@ export default function BriefDetailPage({ params }: Params) {
         Toutes les découvertes
       </Link>
 
-      <BriefDetailClient brief={brief} markdown={markdown} />
+      <BriefDetailClient teaser={teaser} />
 
       <BriefNeighbors prev={prev} next={next} />
     </div>

@@ -185,6 +185,36 @@ export interface Brief {
   vulgarization_fr?: VulgarizationFr;
 }
 
+/**
+ * Public subset of a Brief rendered without auth.
+ *
+ * Everything gated behind the paywall (panel reviews, evidence base,
+ * counter evidence, predictions, protocol, mechanism, markdown, JSON
+ * download) MUST NOT appear on this type — it becomes part of the
+ * `__NEXT_DATA__` JSON shipped to the client.
+ */
+export interface BriefTeaser {
+  brief_id: string;
+  generated_at: string;
+  domains: string[];
+  title: string;            // sharpened.title (English)
+  formal_statement: string; // sharpened.formal_statement — the one-liner
+  verdict: string;          // panel.meta_review.verdict (for the chip only)
+  vulgarization_fr?: VulgarizationFr;
+}
+
+export function briefToTeaser(b: Brief): BriefTeaser {
+  return {
+    brief_id: b.brief_id,
+    generated_at: b.generated_at,
+    domains: b.domains,
+    title: b.sharpened.title,
+    formal_statement: b.sharpened.formal_statement,
+    verdict: b.panel.meta_review.verdict,
+    vulgarization_fr: b.vulgarization_fr,
+  };
+}
+
 // Summary stats (from export_stats.py)
 export interface Stats {
   generated_at: string;
