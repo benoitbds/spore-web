@@ -92,7 +92,11 @@ export default function AuthWidget({
 
   const email = user?.email ?? '';
   const credits = user?.credits ?? 0;
+  const freeAvailable = user ? !user.free_brief_used : false;
   const emailShort = email.length > 22 ? `${email.slice(0, 20)}…` : email;
+  const creditLabel = freeAvailable
+    ? '🎁 1 brief offert'
+    : `${credits} crédit${credits !== 1 ? 's' : ''}`;
 
   if (orientation === 'vertical') {
     return (
@@ -100,7 +104,7 @@ export default function AuthWidget({
         <div className="px-4 text-xs text-mist-500">Connecté</div>
         <div className="px-4 text-sm text-mist-200">{emailShort}</div>
         <div className="px-4 text-xs text-emerald-glow">
-          {credits} crédit{credits !== 1 ? 's' : ''}
+          {creditLabel}
         </div>
         <button
           onClick={logout}
@@ -122,7 +126,7 @@ export default function AuthWidget({
       >
         <span className="hidden md:inline">{emailShort}</span>
         <span className="rounded-full bg-emerald-bio/15 px-2 py-0.5 font-mono text-emerald-glow">
-          {credits} cr
+          {freeAvailable ? '🎁' : `${credits} cr`}
         </span>
         <span className="text-mist-500">▾</span>
       </button>
@@ -135,7 +139,7 @@ export default function AuthWidget({
             <div className="text-xs text-mist-500">Connecté</div>
             <div className="text-sm text-mist-100">{emailShort}</div>
             <div className="mt-1 text-xs text-emerald-glow">
-              {credits} crédit{credits !== 1 ? 's' : ''}
+              {creditLabel}
             </div>
           </div>
           <Link
