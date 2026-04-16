@@ -6,6 +6,18 @@ import EmailGate from '@/components/EmailGate';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 
+const EXCLUDED_KEYWORDS = [
+  'weapons', 'weapon', 'armament', 'munition', 'ballistic',
+  'surveillance', 'mass monitoring', 'facial recognition', 'spyware',
+];
+
+function isDomainExcluded(domain: string): boolean {
+  const lower = domain.toLowerCase();
+  return EXCLUDED_KEYWORDS.some((kw) =>
+    new RegExp(`\\b${kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(lower),
+  );
+}
+
 /**
  * A hand-picked whitelist of domains users can pick from. Free-text
  * input is still allowed (so researchers can request exotic domains),
@@ -59,6 +71,9 @@ export default function CustomClient() {
   const identical =
     domainA.trim().toLowerCase() === domainB.trim().toLowerCase() &&
     domainA.trim() !== '';
+  const excludedA = ready && isDomainExcluded(domainA);
+  const excludedB = ready && isDomainExcluded(domainB);
+  const hasExclusion = excludedA || excludedB;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -138,6 +153,21 @@ export default function CustomClient() {
           </p>
         )}
 
+        {hasExclusion && !identical && (
+          <div className="space-y-1">
+            {excludedA && (
+              <p className="text-sm text-red-400">
+                ⛔ Le domaine A est exclu par notre charte éthique. Merci d&apos;en choisir un autre.
+              </p>
+            )}
+            {excludedB && (
+              <p className="text-sm text-red-400">
+                ⛔ Le domaine B est exclu par notre charte éthique. Merci d&apos;en choisir un autre.
+              </p>
+            )}
+          </div>
+        )}
+
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-ink-500 pt-6">
           <div>
             <div className="font-display text-2xl text-mist-100">25 €</div>
@@ -148,7 +178,7 @@ export default function CustomClient() {
           </div>
           <button
             type="submit"
-            disabled={!ready || identical || busy || isLoading}
+            disabled={!ready || identical || hasExclusion || busy || isLoading}
             className="rounded-xl bg-emerald-bio px-6 py-3 text-sm font-semibold text-ink-900 hover:bg-emerald-glow disabled:opacity-50"
           >
             {busy ? 'Redirection…' : 'Commander — 25 €'}
