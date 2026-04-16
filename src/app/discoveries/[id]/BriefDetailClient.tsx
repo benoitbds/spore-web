@@ -23,6 +23,7 @@ import type {
   VulgarizationFr,
 } from '@/lib/types';
 import { verdictLabel, verdictChipClasses } from '@/lib/verdicts';
+import { SITE_URL } from '@/lib/seo';
 import { useAuth } from '@/contexts/AuthContext';
 import { api, ApiError, type FullBriefResponse } from '@/lib/api';
 
@@ -188,7 +189,11 @@ export default function BriefDetailClient({ teaser }: Props) {
           compact
         />
 
-        <ShareButtons title={headerTitle} className="mt-6" />
+        <ShareButtons
+          title={`${headerTitle} — SPORE`}
+          url={`${SITE_URL}/discoveries/${teaser.brief_id}`}
+          className="mt-6"
+        />
       </header>
 
       {/* TABS */}
