@@ -3,16 +3,28 @@
 import { motion } from 'framer-motion';
 import type { Stats } from '@/lib/types';
 
+function fmtNum(n: number): string {
+  return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f');
+}
+
+function fmtDate(iso: string): string {
+  const d = new Date(iso);
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  const hh = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+}
+
 interface Props {
   stats: Stats;
   briefCount: number;
+  last30: string[];
 }
 
-export default function StatsClient({ stats, briefCount }: Props) {
+export default function StatsClient({ stats, briefCount, last30 }: Props) {
   const { totals, quality, cost, activity_30d, reviewer_distribution, top_domains } = stats;
-
-  // Prepare 30-day activity: merge dates
-  const last30 = build30DayRange();
   const collisionsMap = new Map(activity_30d.collisions_by_day.map((d) => [d.day, d.count]));
   const briefsMap = new Map(activity_30d.briefs_by_day.map((d) => [d.day, d.count]));
   const activityData = last30.map((day) => ({
@@ -36,8 +48,7 @@ export default function StatsClient({ stats, briefCount }: Props) {
           Mesures publiques de l'activité de SPORE. Mise à jour à chaque run.
         </p>
         <p className="mt-2 text-xs text-mist-500 font-mono">
-          Dernière mise à jour :{' '}
-          {new Date(stats.generated_at).toLocaleString('fr-FR')}
+          Dernière mise à jour : {fmtDate(stats.generated_at)}
         </p>
       </header>
 
@@ -45,17 +56,17 @@ export default function StatsClient({ stats, briefCount }: Props) {
       <section className="mb-16 grid gap-4 md:grid-cols-4">
         <Metric
           label="Collisions explorées"
-          value={totals.collisions.toLocaleString('fr-FR')}
+          value={fmtNum(totals.collisions)}
         />
         <Metric
           label="Hypothèses générées"
-          value={totals.hypotheses.toLocaleString('fr-FR')}
+          value={fmtNum(totals.hypotheses)}
         />
         <Metric
           label="🔥 a_tester"
-          value={totals.fire_hypotheses.toLocaleString('fr-FR')}
+          value={fmtNum(totals.fire_hypotheses)}
         />
-        <Metric label="Briefs publiés" value={totals.briefs.toLocaleString('fr-FR')} />
+        <Metric label="Briefs publiés" value={fmtNum(totals.briefs)} />
       </section>
 
       {/* Activity chart */}
@@ -234,13 +245,3 @@ function QualityCard({
   );
 }
 
-function build30DayRange(): string[] {
-  const out: string[] = [];
-  const today = new Date();
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(today.getDate() - i);
-    out.push(d.toISOString().slice(0, 10));
-  }
-  return out;
-}

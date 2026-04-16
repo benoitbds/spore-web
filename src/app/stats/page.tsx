@@ -24,6 +24,17 @@ export const metadata: Metadata = {
   },
 };
 
+function build30DayRange(): string[] {
+  const out: string[] = [];
+  const today = new Date();
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    out.push(d.toISOString().slice(0, 10));
+  }
+  return out;
+}
+
 export default function StatsPage() {
   const stats = getStats();
   const briefs = getAllBriefs();
@@ -39,5 +50,11 @@ export default function StatsPage() {
     );
   }
 
-  return <StatsClient stats={stats} briefCount={briefs.length} />;
+  return (
+    <StatsClient
+      stats={stats}
+      briefCount={briefs.length}
+      last30={build30DayRange()}
+    />
+  );
 }
