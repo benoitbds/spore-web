@@ -9,7 +9,8 @@ import { api } from '@/lib/api';
 type CheckoutType = 'single' | 'pack_5';
 
 export default function PricingClient() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const freeUsed = isAuthenticated && user?.free_brief_used === true;
   const [pendingGate, setPendingGate] = useState<CheckoutType | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<CheckoutType | null>(null);
@@ -49,13 +50,26 @@ export default function PricingClient() {
         <Card
           title="Découverte"
           price="Gratuit"
-          bullets={[
-            'Votre premier brief complet offert',
-            'Hypothèse + protocole + panel + preuves',
-            'Aucune carte demandée',
-          ]}
+          dimmed={freeUsed}
+          bullets={
+            freeUsed
+              ? [
+                  'Vous avez déjà activé votre brief gratuit',
+                  'Hypothèse + protocole + panel + preuves',
+                  'Aucune carte demandée',
+                ]
+              : [
+                  'Votre premier brief complet offert',
+                  'Hypothèse + protocole + panel + preuves',
+                  'Aucune carte demandée',
+                ]
+          }
           cta={
-            isAuthenticated ? (
+            freeUsed ? (
+              <span className="block rounded-xl border border-ink-500 bg-ink-900/60 px-5 py-3 text-center text-sm text-mist-500">
+                ✓ Offre utilisée
+              </span>
+            ) : isAuthenticated ? (
               <Link
                 href="/discoveries"
                 className="block rounded-xl border border-ink-500 bg-ink-900 px-5 py-3 text-center text-sm text-mist-200 hover:text-mist-100"
@@ -168,6 +182,7 @@ function Card({
   cta,
   highlight,
   badge,
+  dimmed,
 }: {
   title: string;
   price: string;
@@ -176,13 +191,16 @@ function Card({
   cta: React.ReactNode;
   highlight?: boolean;
   badge?: string;
+  dimmed?: boolean;
 }) {
   return (
     <article
       className={`relative flex flex-col rounded-2xl border p-6 ${
-        highlight
-          ? 'border-emerald-bio/60 bg-emerald-bio/5 shadow-[0_0_40px_rgba(16,185,129,0.08)]'
-          : 'border-ink-500 bg-ink-800/40'
+        dimmed
+          ? 'border-ink-500 bg-ink-800/40 opacity-60'
+          : highlight
+            ? 'border-emerald-bio/60 bg-emerald-bio/5 shadow-[0_0_40px_rgba(16,185,129,0.08)]'
+            : 'border-ink-500 bg-ink-800/40'
       }`}
     >
       {badge && (
