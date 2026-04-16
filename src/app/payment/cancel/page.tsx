@@ -3,6 +3,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Paiement annulé',
+  description: 'Votre paiement a été annulé. Aucun montant n\'a été débité.',
   robots: { index: false, follow: false },
 };
 
