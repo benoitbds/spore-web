@@ -43,8 +43,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-ink-500/50 pt-6 text-xs text-mist-500 md:flex-row md:items-center">
-          <p>© {new Date().getFullYear()} SPORE. Zero bibliographic hallucinations.</p>
-          <p className="font-mono">v2 · post-fire pipeline active</p>
+          <p>© {new Date().getFullYear()} SPORE. Zéro hallucination bibliographique.</p>
         </div>
       </div>
     </footer>
