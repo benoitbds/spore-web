@@ -96,7 +96,9 @@ export default function AuthWidget({
   const emailShort = email.length > 22 ? `${email.slice(0, 20)}…` : email;
   const creditLabel = freeAvailable
     ? '🎁 1 brief offert'
-    : `${credits} crédit${credits !== 1 ? 's' : ''}`;
+    : credits > 0
+      ? `${credits} crédit${credits !== 1 ? 's' : ''}`
+      : '0 crédit — recharger';
 
   if (orientation === 'vertical') {
     return (
@@ -131,8 +133,16 @@ export default function AuthWidget({
         aria-haspopup="menu"
       >
         <span className="hidden md:inline">{emailShort}</span>
-        <span className="rounded-full bg-emerald-bio/15 px-2 py-0.5 font-mono text-emerald-glow">
-          {freeAvailable ? '🎁' : `${credits} cr`}
+        <span
+          className={`rounded-full px-2 py-0.5 font-mono ${
+            freeAvailable
+              ? 'bg-emerald-bio/15 text-emerald-glow'
+              : credits > 0
+                ? 'bg-emerald-bio/15 text-emerald-glow'
+                : 'bg-ink-500/40 text-mist-400'
+          }`}
+        >
+          {freeAvailable ? '🎁' : credits > 0 ? `${credits} cr` : '🛒 0'}
         </span>
         <span className="text-mist-500">▾</span>
       </button>
