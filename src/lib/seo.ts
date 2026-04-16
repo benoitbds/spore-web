@@ -6,7 +6,7 @@
 
 import type { Brief } from './types';
 
-export const SITE_URL = 'https://spore-web.baq.ovh';
+export const SITE_URL = 'https://spore-research.com';
 
 export const SITE_NAME = 'SPORE';
 
