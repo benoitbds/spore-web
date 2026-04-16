@@ -106,9 +106,15 @@ export default function AuthWidget({
         <div className="px-4 text-xs text-emerald-glow">
           {creditLabel}
         </div>
+        <Link
+          href="/account"
+          className="mt-2 block rounded-xl px-4 py-2 text-sm text-mist-200 hover:bg-ink-800/60"
+        >
+          Mon compte
+        </Link>
         <button
           onClick={logout}
-          className="mt-2 w-full rounded-xl px-4 py-2 text-left text-sm text-mist-400 hover:bg-ink-800/60 hover:text-red-400"
+          className="w-full rounded-xl px-4 py-2 text-left text-sm text-mist-400 hover:bg-ink-800/60 hover:text-red-400"
         >
           Déconnexion
         </button>
@@ -142,6 +148,13 @@ export default function AuthWidget({
               {creditLabel}
             </div>
           </div>
+          <Link
+            href="/account"
+            onClick={() => setOpen(false)}
+            className="block px-4 py-2 text-sm text-mist-200 hover:bg-ink-700/60"
+          >
+            Mon compte
+          </Link>
           <Link
             href="/pricing"
             onClick={() => setOpen(false)}

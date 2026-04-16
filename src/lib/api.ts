@@ -131,6 +131,39 @@ export interface CustomStatusResponse {
   completed_at: string | null;
 }
 
+export interface AccountBrief {
+  brief_id: string;
+  purchase_type: string;
+  amount_cents: number;
+  paid_at: string | null;
+  panel_consensus_score: number | null;
+  panel_verdict: string | null;
+  novelty_verdict: string | null;
+  brief_created_at: string | null;
+  brief_status: string | null;
+}
+
+export interface AccountCustomRequest {
+  id: string;
+  domain_a: string;
+  domain_b: string;
+  status: string;
+  hypothesis_id: string | null;
+  brief_id: string | null;
+  error_message: string | null;
+  created_at: string | null;
+  completed_at: string | null;
+}
+
+export interface AccountPurchase {
+  id: string;
+  type: string;
+  amount_cents: number;
+  brief_id: string | null;
+  stripe_session_id: string | null;
+  paid_at: string | null;
+}
+
 export const api = {
   requestMagicLink: (email: string) =>
     apiFetch<{ ok: boolean; message: string }>('/api/auth/magic-link', {
@@ -162,4 +195,10 @@ export const api = {
     apiFetch<CustomStatusResponse>(
       `/api/custom/${encodeURIComponent(id)}/status`,
     ),
+  accountBriefs: () =>
+    apiFetch<AccountBrief[]>('/api/account/briefs'),
+  accountCustomRequests: () =>
+    apiFetch<AccountCustomRequest[]>('/api/account/custom-requests'),
+  accountPurchases: () =>
+    apiFetch<AccountPurchase[]>('/api/account/purchases'),
 };
