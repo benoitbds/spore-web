@@ -1,20 +1,20 @@
 {
-  "generated_at": "2026-04-12T09:55:29.754521",
+  "generated_at": "2026-04-16T07:40:44.274789",
   "totals": {
-    "collisions": 685,
-    "hypotheses": 59,
-    "curated": 59,
-    "fire_hypotheses": 7,
-    "briefs": 9
+    "collisions": 1185,
+    "hypotheses": 76,
+    "curated": 76,
+    "fire_hypotheses": 13,
+    "briefs": 11
   },
   "quality": {
-    "avg_novelty_score": 0.783,
-    "avg_panel_consensus": 6.62,
-    "fire_rate": 0.119
+    "avg_novelty_score": 0.773,
+    "avg_panel_consensus": 6.7,
+    "fire_rate": 0.171
   },
   "cost": {
-    "total_usd": 18.236,
-    "per_brief_usd": 2.0262
+    "total_usd": 18.6813,
+    "per_brief_usd": 1.6983
   },
   "activity_30d": {
     "collisions_by_day": [
@@ -49,6 +49,22 @@
       {
         "day": "2026-04-12",
         "count": 100
+      },
+      {
+        "day": "2026-04-13",
+        "count": 100
+      },
+      {
+        "day": "2026-04-14",
+        "count": 200
+      },
+      {
+        "day": "2026-04-15",
+        "count": 100
+      },
+      {
+        "day": "2026-04-16",
+        "count": 100
       }
     ],
     "briefs_by_day": [
@@ -59,14 +75,35 @@
       {
         "day": "2026-04-12",
         "count": 8
+      },
+      {
+        "day": "2026-04-13",
+        "count": 1
+      },
+      {
+        "day": "2026-04-14",
+        "count": 2
+      },
+      {
+        "day": "2026-04-16",
+        "count": 1
       }
     ]
   },
   "reviewer_distribution": {
-    "intéressant": 38,
-    "a_tester": 7
+    "poubelle": 18,
+    "intéressant": 45,
+    "a_tester": 13
   },
   "top_domains": [
+    {
+      "domain": "Synthetic Biology",
+      "count": 2
+    },
+    {
+      "domain": "Tissue Regeneration",
+      "count": 2
+    },
     {
       "domain": "Chemical Engineering",
       "count": 2
@@ -80,11 +117,11 @@
       "count": 1
     },
     {
-      "domain": "Optics",
+      "domain": "Civil Engineering",
       "count": 1
     },
     {
-      "domain": "Condensed Matter Physics",
+      "domain": "Biomedical Engineering",
       "count": 1
     },
     {
@@ -117,14 +154,6 @@
     },
     {
       "domain": "Photochemistry",
-      "count": 1
-    },
-    {
-      "domain": "Molecular Biology",
-      "count": 1
-    },
-    {
-      "domain": "Nanotechnology",
       "count": 1
     }
   ]

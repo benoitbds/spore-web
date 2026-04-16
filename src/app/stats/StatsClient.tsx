@@ -66,7 +66,7 @@ export default function StatsClient({ stats, briefCount, last30 }: Props) {
           label="🔥 a_tester"
           value={fmtNum(totals.fire_hypotheses)}
         />
-        <Metric label="Briefs publiés" value={fmtNum(totals.briefs)} />
+        <Metric label="Briefs publiés" value={fmtNum(briefCount)} />
       </section>
 
       {/* Activity chart */}
