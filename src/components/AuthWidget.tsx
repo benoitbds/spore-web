@@ -3,11 +3,12 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import EmailGate from '@/components/EmailGate';
 
 /**
  * Header auth slot. Renders:
  *   - skeleton dot while rehydrating
- *   - "Se connecter" link if anonymous
+ *   - "Se connecter" button (opens inline EmailGate dropdown) if anonymous
  *   - email + credits badge + logout menu if signed in
  *
  * Desktop-first; mobile surface is handled by the drawer separately.
@@ -19,19 +20,21 @@ export default function AuthWidget({
 }) {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [open, setOpen] = useState(false);
+  const [showGate, setShowGate] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
 
-  // Click-outside to close
+  // Click-outside to close (both dropdown and gate)
   useEffect(() => {
-    if (!open) return;
+    if (!open && !showGate) return;
     function onDown(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false);
+        setShowGate(false);
       }
     }
     document.addEventListener('mousedown', onDown);
     return () => document.removeEventListener('mousedown', onDown);
-  }, [open]);
+  }, [open, showGate]);
 
   if (isLoading) {
     return (
@@ -43,17 +46,47 @@ export default function AuthWidget({
   }
 
   if (!isAuthenticated) {
+    if (orientation === 'vertical') {
+      return (
+        <div className="border-t border-ink-500/50 px-4 pt-4">
+          {showGate ? (
+            <EmailGate
+              headline="Connexion"
+              subtext="Un lien magique vous sera envoyé par email."
+              cta="Recevoir le lien"
+              onSent={() => setShowGate(false)}
+            />
+          ) : (
+            <button
+              onClick={() => setShowGate(true)}
+              className="w-full rounded-xl border border-emerald-bio bg-emerald-bio/10 px-4 py-3 text-sm font-semibold text-emerald-glow hover:bg-emerald-bio/20"
+            >
+              Se connecter
+            </button>
+          )}
+        </div>
+      );
+    }
+
     return (
-      <Link
-        href="/pricing"
-        className={
-          orientation === 'horizontal'
-            ? 'text-sm text-mist-400 hover:text-emerald-glow'
-            : 'block rounded-xl px-4 py-3 text-base text-mist-200 hover:bg-ink-800/60'
-        }
-      >
-        Se connecter
-      </Link>
+      <div ref={ref} className="relative">
+        <button
+          onClick={() => setShowGate((s) => !s)}
+          className="text-sm text-mist-400 hover:text-emerald-glow"
+        >
+          Se connecter
+        </button>
+        {showGate && (
+          <div className="absolute right-0 top-full z-50 mt-3 w-80">
+            <EmailGate
+              headline="Connexion"
+              subtext="Un lien magique vous sera envoyé par email."
+              cta="Recevoir le lien"
+              onSent={() => setShowGate(false)}
+            />
+          </div>
+        )}
+      </div>
     );
   }
 
