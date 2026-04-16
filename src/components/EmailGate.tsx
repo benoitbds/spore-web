@@ -35,10 +35,22 @@ export default function EmailGate({
     'idle',
   );
   const [error, setError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  function validateEmail(v: string): boolean {
+    setValidationError(null);
+    if (!v) return false;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) {
+      setValidationError('Email invalide. Merci de vérifier le format.');
+      return false;
+    }
+    return true;
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!email || status === 'pending') return;
+    if (!validateEmail(email)) return;
     setStatus('pending');
     setError(null);
     try {
@@ -77,9 +89,17 @@ export default function EmailGate({
           type="email"
           required
           placeholder="vous@labo.fr"
+          title="Veuillez entrer une adresse email valide"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="flex-1 rounded-xl border border-ink-500 bg-ink-900 px-4 py-3 text-sm text-mist-100 placeholder:text-mist-500 focus:border-emerald-bio focus:outline-none"
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (validationError) setValidationError(null);
+          }}
+          className={`flex-1 rounded-xl border bg-ink-900 px-4 py-3 text-sm text-mist-100 placeholder:text-mist-500 focus:outline-none ${
+            validationError
+              ? 'border-red-500 focus:border-red-400'
+              : 'border-ink-500 focus:border-emerald-bio'
+          }`}
           disabled={status === 'pending'}
         />
         <button
@@ -90,6 +110,11 @@ export default function EmailGate({
           {status === 'pending' ? 'Envoi…' : cta}
         </button>
       </div>
+      {validationError && (
+        <p className="mt-2 text-sm text-red-400" role="alert">
+          {validationError}
+        </p>
+      )}
       {error && (
         <p className="mt-3 text-sm text-red-400" role="alert">
           {error}
