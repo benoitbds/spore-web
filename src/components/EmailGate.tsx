@@ -56,7 +56,9 @@ export default function EmailGate({
     try {
       await login(email);
       setStatus('sent');
-      onSent?.(email);
+      // Delay onSent so the parent (e.g. header dropdown) doesn't
+      // close before the user reads the confirmation message.
+      setTimeout(() => onSent?.(email), 8000);
     } catch (err) {
       setStatus('error');
       setError((err as Error).message || 'Envoi impossible — réessayez.');
@@ -68,11 +70,18 @@ export default function EmailGate({
       <div
         className={`rounded-xl border border-emerald-bio/40 bg-emerald-bio/5 p-5 ${className}`}
       >
-        <p className="text-sm text-emerald-glow">
-          ✉️ Lien envoyé à <span className="font-mono">{email}</span>.
-          <br />
-          Ouvrez-le dans les 24 h pour débloquer votre brief.
-        </p>
+        <div className="flex items-start gap-3">
+          <span className="text-xl">✅</span>
+          <div>
+            <p className="text-sm font-medium text-emerald-glow">
+              Lien envoyé à <span className="font-mono">{email}</span>
+            </p>
+            <p className="mt-1 text-xs text-mist-300">
+              Vérifiez votre boîte de réception (et vos spams).
+              Le lien est valable 24 h.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
