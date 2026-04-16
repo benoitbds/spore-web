@@ -17,7 +17,7 @@ const STEPS: Step[] = [
   { id: 'synthesis', label: 'Synthesis', icon: '🧩', description: 'Un LLM génère un pont causal entre les deux domaines.', metric: '~70% de bridges' },
   { id: 'critics', label: 'Critics', icon: '⚔️', description: 'Un devil\'s advocate et un angel\'s advocate débattent.', metric: '5 scores produits' },
   { id: 'curator', label: 'Curator', icon: '🎯', description: 'Top 15% retenu sur score composite.', metric: 'Top 15%' },
-  { id: 'reviewer', label: 'Reviewer', icon: '⚖️', description: 'Verdict calibré : poubelle / intéressant / a_tester 🔥.', metric: '~15-20% 🔥' },
+  { id: 'reviewer', label: 'Reviewer', icon: '⚖️', description: 'Verdict calibré : rejeté / intéressant / à tester 🔥.', metric: '~15-20% 🔥' },
   { id: 'grounding', label: 'Literature Grounding', icon: '📚', description: '8-12 requêtes Semantic Scholar. Zéro hallucination — chaque DOI est vérifié.', metric: '5+ références', postFire: true },
   { id: 'sharpening', label: 'Hypothesis Sharpening', icon: '🔬', description: 'Formulation rigoureuse avec variables, prédictions quantitatives, H0, tests statistiques.', postFire: true },
   { id: 'protocol', label: 'Protocol', icon: '🧪', description: '3 phases : in silico (€0-2k) → minimal (€2-15k) → full (€15-200k).', postFire: true },

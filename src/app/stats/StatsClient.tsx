@@ -34,6 +34,11 @@ export default function StatsClient({ stats, briefCount, last30 }: Props) {
   }));
 
   const maxCollisions = Math.max(...activityData.map((d) => d.collisions), 1);
+  const VERDICT_LABEL: Record<string, string> = {
+    a_tester: '🔥 À tester',
+    'intéressant': '🤔 Intéressant',
+    poubelle: '🗑️ Rejeté',
+  };
   const verdicts = Object.entries(reviewer_distribution);
   const totalVerdicts = verdicts.reduce((s, [, n]) => s + n, 0);
 
@@ -63,7 +68,7 @@ export default function StatsClient({ stats, briefCount, last30 }: Props) {
           value={fmtNum(totals.hypotheses)}
         />
         <Metric
-          label="🔥 a_tester"
+          label="🔥 À tester"
           value={fmtNum(totals.fire_hypotheses)}
         />
         <Metric label="Briefs publiés" value={fmtNum(briefCount)} />
@@ -146,17 +151,11 @@ export default function StatsClient({ stats, briefCount, last30 }: Props) {
                   : verdict === 'poubelle'
                     ? 'bg-red-500'
                     : 'bg-amber-bio';
-              const icon =
-                verdict === 'a_tester'
-                  ? '🔥'
-                  : verdict === 'poubelle'
-                    ? '🗑️'
-                    : '🤔';
               return (
                 <div key={verdict}>
                   <div className="mb-1 flex items-baseline justify-between text-sm">
                     <span className="text-mist-200">
-                      {icon} {verdict}
+                      {VERDICT_LABEL[verdict] ?? verdict}
                     </span>
                     <span className="font-mono text-mist-500">
                       {n} · {pct.toFixed(0)}%
