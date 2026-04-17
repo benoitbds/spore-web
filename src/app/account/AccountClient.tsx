@@ -54,34 +54,18 @@ export default function AccountClient() {
 
   return (
     <Shell>
-      {/* Credits */}
-      <Section title="Mes crédits">
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="rounded-2xl border border-ink-500 bg-ink-800/40 px-6 py-5">
-            <div className="text-xs uppercase tracking-widest text-mist-500">
-              Solde
+      {/* Launch mode — replaces the credits section while monetisation is paused */}
+      <Section title="Mon accès">
+        <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-emerald-bio/40 bg-emerald-bio/5 px-6 py-5">
+          <span className="text-2xl">🚀</span>
+          <div>
+            <div className="font-display text-xl text-mist-100">
+              Offre de lancement
             </div>
-            <div className="mt-1 font-display text-4xl text-mist-100">
-              {user?.credits ?? 0}{' '}
-              <span className="text-xl text-mist-400">
-                crédit{(user?.credits ?? 0) !== 1 ? 's' : ''}
-              </span>
+            <div className="text-sm text-emerald-glow">
+              Accès illimité aux briefs — sans carte, sans crédit.
             </div>
           </div>
-          {user && !user.free_brief_used && (
-            <div className="rounded-2xl border border-emerald-bio/40 bg-emerald-bio/5 px-6 py-5">
-              <span className="text-2xl">🎁</span>
-              <span className="ml-2 text-sm text-emerald-glow">
-                1 brief offert disponible
-              </span>
-            </div>
-          )}
-          <Link
-            href="/pricing"
-            className="rounded-xl border border-ink-500 bg-ink-900 px-5 py-3 text-sm text-mist-200 hover:text-mist-100"
-          >
-            Acheter des crédits →
-          </Link>
         </div>
       </Section>
 
@@ -112,7 +96,9 @@ export default function AccountClient() {
                 <div className="text-xs text-mist-500">
                   {b.paid_at ? new Date(b.paid_at).toLocaleDateString('fr-FR') : ''}
                   <span className="ml-2">
-                    {b.purchase_type === 'free' ? '🎁' : `${(b.amount_cents / 100).toFixed(0)} €`}
+                    {b.amount_cents === 0
+                      ? '🎁'
+                      : `${(b.amount_cents / 100).toFixed(0)} €`}
                   </span>
                 </div>
               </Link>
@@ -287,6 +273,8 @@ function purchaseLabel(type: string): string {
       pack_5: 'Pack 5 briefs',
       custom: 'Collision custom',
       free: 'Brief gratuit',
+      launch_free: 'Brief — offre de lancement',
+      launch_custom_free: 'Collision — offre de lancement',
     }[type] ?? type
   );
 }
