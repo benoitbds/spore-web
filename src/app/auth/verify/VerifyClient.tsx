@@ -1,18 +1,24 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import { getToken } from '@/lib/auth-storage';
 
 type VerifyStatus = 'pending' | 'success' | 'error';
 
 function VerifyClient() {
   const params = useSearchParams();
   const router = useRouter();
-  const { verify } = useAuth();
+  const { verify, refresh } = useAuth();
   const [status, setStatus] = useState<VerifyStatus>('pending');
   const [error, setError] = useState<string | null>(null);
+  // Guards against React StrictMode's double-invocation in dev, and any
+  // accidental re-run of this effect — magic-link tokens are single-shot,
+  // so a second call would always fail (400 "already used") and wipe the
+  // JWT the first call just issued.
+  const hasVerified = useRef(false);
 
   useEffect(() => {
     const token = params.get('token');
@@ -21,6 +27,9 @@ function VerifyClient() {
       setError('Lien invalide : aucun token fourni.');
       return;
     }
+    if (hasVerified.current) return;
+    hasVerified.current = true;
+
     (async () => {
       try {
         await verify(token);
@@ -29,6 +38,21 @@ function VerifyClient() {
         // Small delay so the user sees the confirmation before redirect.
         setTimeout(() => router.replace(redirect), 900);
       } catch (err) {
+        // Fallback: if the call failed but the session is actually live
+        // (e.g. a prior call under StrictMode already succeeded before
+        //  the backend fix landed), treat this as success instead of
+        // dumping the user on an "invalid link" screen.
+        try {
+          await refresh();
+        } catch {
+          // swallow — we'll fall back to the error path below
+        }
+        if (getToken()) {
+          setStatus('success');
+          const redirect = params.get('next') || '/discoveries';
+          setTimeout(() => router.replace(redirect), 900);
+          return;
+        }
         setStatus('error');
         setError(
           (err as Error).message ||
