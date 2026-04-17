@@ -4,6 +4,37 @@ import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { LAUNCH_MODE } from '@/lib/launch';
+
+function LaunchSuccess() {
+  return (
+    <div className="mx-auto max-w-xl px-6 py-20 text-center">
+      <div className="mb-6 text-5xl">🚀</div>
+      <h1 className="font-display text-3xl text-mist-100 md:text-4xl">
+        Votre accès est déjà actif
+      </h1>
+      <p className="mx-auto mt-4 max-w-md text-mist-400">
+        SPORE est en offre de lancement — tous les briefs sont gratuits
+        après inscription. Aucun paiement n&apos;est nécessaire pour
+        l&apos;instant.
+      </p>
+      <div className="mt-10 flex flex-wrap justify-center gap-3">
+        <Link
+          href="/discoveries"
+          className="rounded-xl bg-emerald-bio px-5 py-3 text-sm font-semibold text-ink-900 hover:bg-emerald-glow"
+        >
+          Explorer les découvertes →
+        </Link>
+        <Link
+          href="/account"
+          className="rounded-xl border border-ink-500 bg-ink-800/60 px-5 py-3 text-sm text-mist-200 hover:text-mist-100"
+        >
+          Mon compte
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 function SuccessInner() {
   const params = useSearchParams();
@@ -104,6 +135,9 @@ function SuccessInner() {
 }
 
 export default function SuccessClient() {
+  if (LAUNCH_MODE) {
+    return <LaunchSuccess />;
+  }
   return (
     <Suspense
       fallback={

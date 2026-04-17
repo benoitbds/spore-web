@@ -106,7 +106,6 @@ export default function PricingClient() {
             title="Pack 5 briefs"
             price="29 €"
             sub="soit 5,80 €/brief"
-            badge="Populaire"
             bullets={[
               '5 crédits (un par brief)',
               'Valables sans expiration',
