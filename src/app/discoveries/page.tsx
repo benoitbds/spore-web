@@ -7,7 +7,7 @@ const _briefs = getAllBriefs();
 const _domainCount = new Set(_briefs.flatMap((b) => b.domains)).size;
 const _description =
   _briefs.length > 0
-    ? `Explorez les hypothèses de recherche générées par SPORE : ${_briefs.length} brief${_briefs.length > 1 ? 's' : ''} publié${_briefs.length > 1 ? 's' : ''}, couvrant ${_domainCount} domaines scientifiques, validés par 5 reviewers IA.`
+    ? `Explorez les hypothèses de recherche générées par SPORE : ${_briefs.length} brief${_briefs.length > 1 ? 's' : ''} publié${_briefs.length > 1 ? 's' : ''}, couvrant ${_domainCount} domaines scientifiques, validés par 5 relecteurs IA.`
     : 'Hypothèses scientifiques interdisciplinaires générées et validées par SPORE.';
 
 export const metadata: Metadata = {
@@ -53,7 +53,7 @@ export default function DiscoveriesPage() {
         </h1>
         <p className="max-w-2xl text-lg text-mist-400">
           Hypothèses scientifiques générées par SPORE, validées par{' '}
-          <span className="text-emerald-glow">5 reviewers IA</span>, sourcées sur
+          <span className="text-emerald-glow">5 relecteurs IA</span>, sourcées sur
           Semantic Scholar.
         </p>
       </header>

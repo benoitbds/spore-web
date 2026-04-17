@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { api, ApiError, type CustomStatusResponse } from '@/lib/api';
+import { label } from '@/lib/labels';
 
 const POLL_MS = 30_000;
 
@@ -133,8 +134,8 @@ function StatusView({ data }: { data: CustomStatusResponse }) {
             emoji="🧬"
             title={`SPORE explore la connexion entre ${data.domain_a} et ${data.domain_b}…`}
           >
-            Synthèse de l&apos;hypothèse, débat adversarial, curation, impact,
-            literature grounding, panel de review. Temps typique : 10–30 min.
+            Synthèse de l&apos;hypothèse, débat adversarial, sélection, impact,
+            ancrage littérature, panel de relecture. Temps typique : 10–30 min.
           </StatusCard>
         </>
       );
@@ -174,7 +175,7 @@ function StatusView({ data }: { data: CustomStatusResponse }) {
       return (
         <>
           {meta}
-          <StatusCard tone="mist" emoji="ℹ️" title={`Statut : ${data.status}`}>
+          <StatusCard tone="mist" emoji="ℹ️" title={`Statut : ${label(data.status)}`}>
             Nous suivons l&apos;avancement en arrière-plan.
           </StatusCard>
         </>

@@ -67,7 +67,7 @@ export default function BriefCard({ brief, index = 0 }: BriefCardProps) {
                 ))}
               </div>
               <span className="font-mono text-xs text-mist-500">
-                novelty {novelty.toFixed(2)}
+                nouveauté {novelty.toFixed(2)}
               </span>
             </div>
 

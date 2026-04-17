@@ -11,7 +11,7 @@ const NAV = [
   { href: '/discoveries', label: 'Découvertes' },
   { href: '/how-it-works', label: 'Comment ça marche' },
   { href: '/pricing', label: 'Tarifs' },
-  { href: '/stats', label: 'Stats' },
+  { href: '/stats', label: 'Statistiques' },
 ];
 
 export default function Header() {

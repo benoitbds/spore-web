@@ -4,7 +4,7 @@ import { SITE_URL } from '@/lib/seo';
 import StatsClient from './StatsClient';
 
 const _desc =
-  'Métriques publiques de SPORE : collisions explorées, briefs publiés, novelty scores, coûts par brief. Transparence totale sur ce que produit le pipeline.';
+  'Métriques publiques de SPORE : collisions explorées, briefs publiés, scores de nouveauté, coûts par brief. Transparence totale sur ce que produit le pipeline.';
 
 export const metadata: Metadata = {
   title: 'Statistiques',

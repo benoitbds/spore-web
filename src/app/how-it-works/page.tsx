@@ -5,7 +5,7 @@ import { getStats } from '@/lib/briefs';
 import { SITE_URL } from '@/lib/seo';
 
 const _desc =
-  'De la collision de domaines au brief de recherche : le pipeline SPORE étape par étape, avec 5 reviewers IA, grounding sur Semantic Scholar et zéro hallucination bibliographique.';
+  'De la collision de domaines au brief de recherche : le pipeline SPORE étape par étape, avec 5 relecteurs IA, ancrage sur Semantic Scholar et zéro hallucination bibliographique.';
 
 export const metadata: Metadata = {
   title: 'Comment ça marche',
@@ -58,9 +58,9 @@ export default function HowItWorksPage() {
         </h2>
         <div className="grid gap-6 md:grid-cols-5">
           <FunnelStep number="100" label="Collisions" accent="emerald" />
-          <FunnelStep number="30-60" label="Passent le Gate" accent="emerald" />
+          <FunnelStep number="30-60" label="Passent le filtre" accent="emerald" />
           <FunnelStep number="~20" label="Hypothèses" accent="cyan" />
-          <FunnelStep number="~3" label="Curated" accent="cyan" />
+          <FunnelStep number="~3" label="Sélectionnées" accent="cyan" />
           <FunnelStep number="~0.5" label="🔥 briefs" accent="amber" />
         </div>
         <p className="mt-8 text-center text-sm text-mist-400">
@@ -95,8 +95,8 @@ export default function HowItWorksPage() {
           />
           <Principle
             icon="🎭"
-            title="5 reviewers, 5 perspectives"
-            description="Méthodologue, domain expert, contrarian, industriel, funding strategist. Aucun angle mort. Tous les doutes sont exprimés."
+            title="5 relecteurs, 5 perspectives"
+            description="Méthodologue, expert du domaine, avocat du diable, industriel, stratège financement. Aucun angle mort. Tous les doutes sont exprimés."
           />
         </div>
       </section>

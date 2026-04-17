@@ -23,6 +23,7 @@ import type {
   VulgarizationFr,
 } from '@/lib/types';
 import { verdictLabel, verdictChipClasses } from '@/lib/verdicts';
+import { label } from '@/lib/labels';
 import { SITE_URL } from '@/lib/seo';
 import { useAuth } from '@/contexts/AuthContext';
 import { api, ApiError, type FullBriefResponse } from '@/lib/api';
@@ -290,7 +291,7 @@ function PaywallPanel({
       <div className="space-y-4">
         <EmailGate
           headline="Accédez au brief scientifique complet — gratuit"
-          subtext="Panel de review (5 personas), base de preuves, contre-preuves, protocole expérimental, prédictions falsifiables. Tous les briefs sont gratuits pendant le lancement."
+          subtext="Panel de relecture (5 personas), base de preuves, contre-preuves, protocole expérimental, prédictions falsifiables. Tous les briefs sont gratuits pendant le lancement."
           cta="Recevoir mon accès"
         />
         <p className="text-center text-sm text-mist-500">
@@ -397,7 +398,7 @@ function RechercheSections({
       {/* Panel */}
       <section>
         <h2 className="mb-6 font-display text-2xl text-mist-100">
-          Panel de review
+          Panel de relecture
         </h2>
         <ReviewerPanel reviews={panel.reviews} meta={panel.meta_review} />
       </section>
@@ -464,7 +465,7 @@ function RechercheSections({
                           : 'bg-ink-500 text-mist-300'
                     }`}
                   >
-                    {p.support_type}
+                    {label(p.support_type)}
                   </span>
                   <span className="text-mist-500">{p.year}</span>
                   {p.citation_count !== undefined && (
@@ -513,7 +514,7 @@ function RechercheSections({
               >
                 <div className="mb-1 flex items-baseline gap-2 text-xs">
                   <span className="rounded-full bg-red-500/20 px-2 py-0.5 text-red-400">
-                    {p.severity}
+                    {label(p.severity)}
                   </span>
                   <span className="text-mist-500">{p.year}</span>
                 </div>
@@ -538,16 +539,16 @@ function RechercheSections({
       {/* Gap manifest */}
       <section>
         <h2 className="mb-4 font-display text-2xl text-mist-100">
-          Gap Manifest résiduel
+          Lacunes résiduelles
         </h2>
         <div className="grid gap-3 md:grid-cols-2">
           <GapBlock
-            title="Gaps ouverts"
+            title="Lacunes ouvertes"
             items={grounding.gap_manifest_update?.new_gaps ?? []}
             accent="amber"
           />
           <GapBlock
-            title="Data disponible"
+            title="Données disponibles"
             items={grounding.gap_manifest_update?.data_available ?? []}
             accent="emerald"
           />
@@ -653,7 +654,7 @@ function ComprendreTab({ teaser, lang }: { teaser: BriefTeaser; lang: Lang }) {
 
         <section>
           <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-mist-400">
-            Ce que disent les reviewers
+            Ce que disent les relecteurs
           </h2>
           <div className="rounded-xl border border-ink-500 bg-ink-800/40 p-6">
             <p className="text-sm text-mist-200 leading-relaxed whitespace-pre-line">
@@ -684,7 +685,7 @@ function ComprendreTab({ teaser, lang }: { teaser: BriefTeaser; lang: Lang }) {
         <p className="text-sm text-mist-300">
           The step-by-step mechanism, the experimental protocol, the 5-persona
           panel review and the evidence base are inside the{' '}
-          <span className="font-medium text-emerald-glow">Recherche</span> tab.
+          <span className="font-medium text-emerald-glow">Research</span> tab.
           The first brief is free.
         </p>
       </section>

@@ -91,14 +91,14 @@ export default function HomePage() {
               step="02"
               icon="🧪"
               title="Validation"
-              description="Cinq reviewers IA — méthodologue, domain expert, contrarian, industriel, funding strategist — challengent l'hypothèse."
+              description="Cinq relecteurs IA — méthodologue, expert du domaine, avocat du diable, industriel, stratège financement — challengent l'hypothèse."
               accent="cyan"
             />
             <StepCard
               step="03"
               icon="📄"
               title="Publication"
-              description="Un brief sourcé sur Semantic Scholar, avec un protocole en trois phases et un quick start actionnable."
+              description="Un brief sourcé sur Semantic Scholar, avec un protocole en trois phases et un démarrage rapide actionnable."
               accent="amber"
             />
           </div>
@@ -119,7 +119,7 @@ export default function HomePage() {
                     ? stats.quality.avg_novelty_score.toFixed(2)
                     : '—'
                 }
-                label="Novelty moyen"
+                label="Nouveauté moyenne"
               />
               <MiniStat value="100%" label="Références vérifiées" />
             </div>
@@ -216,13 +216,13 @@ function FeaturedHero({ brief }: { brief: Brief }) {
         <div className="mt-12 flex flex-col items-start gap-8 md:flex-row md:items-end md:justify-between">
           <div className="flex flex-wrap gap-6">
             <HeroBadge
-              label="Novelty"
+              label="Nouveauté"
               value={novelty.toFixed(2)}
               sub={verdictLabel(grounding.novelty_assessment.verdict).toLowerCase()}
               accent="emerald"
             />
             <HeroBadge
-              label="Panel consensus"
+              label="Consensus du panel"
               value={`${panelScore.toFixed(1)}/10`}
               sub={verdictLabel(verdict).toLowerCase()}
               accent="cyan"

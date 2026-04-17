@@ -45,7 +45,7 @@ export default function PricingClient() {
           <ul className="mb-8 space-y-2.5 text-sm text-mist-200">
             <Bullet>Tous les briefs débloqués, sans limite</Bullet>
             <Bullet>Hypothèse formalisée + protocole expérimental</Bullet>
-            <Bullet>Panel de review par 5 personas + méta-review</Bullet>
+            <Bullet>Panel de relecture par 5 personas + méta-relecture</Bullet>
             <Bullet>Base de preuves et contre-preuves (DOIs vérifiés)</Bullet>
             <Bullet>1 collision sur mesure offerte</Bullet>
             <Bullet>Aucune carte demandée</Bullet>

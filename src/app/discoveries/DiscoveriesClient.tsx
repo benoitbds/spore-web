@@ -127,7 +127,7 @@ export default function DiscoveriesClient({ briefs, allDomains }: Props) {
                     : 'text-mist-400 hover:text-mist-100'
                 }`}
               >
-                {mode === 'panel' ? 'Panel' : mode === 'novelty' ? 'Novelty' : 'Date'}
+                {mode === 'panel' ? 'Panel' : mode === 'novelty' ? 'Nouveauté' : 'Date'}
               </button>
             ))}
           </div>

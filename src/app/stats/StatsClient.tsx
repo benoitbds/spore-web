@@ -118,12 +118,12 @@ export default function StatsClient({ stats, briefCount, last30 }: Props) {
       {/* Quality + cost */}
       <section className="mb-16 grid gap-6 md:grid-cols-3">
         <QualityCard
-          label="Novelty moyen"
+          label="Nouveauté moyenne"
           value={quality.avg_novelty_score?.toFixed(2) ?? 'N/A'}
           sub="sur /1.0"
         />
         <QualityCard
-          label="Panel consensus"
+          label="Consensus du panel"
           value={quality.avg_panel_consensus?.toFixed(1) ?? 'N/A'}
           sub="moyen sur /10"
         />
@@ -137,7 +137,7 @@ export default function StatsClient({ stats, briefCount, last30 }: Props) {
       {/* Verdict distribution */}
       <section className="mb-16 rounded-2xl border border-ink-500 bg-ink-800/40 p-6 md:p-8">
         <h2 className="mb-6 font-display text-2xl text-mist-100">
-          Distribution des verdicts reviewer
+          Distribution des verdicts des relecteurs
         </h2>
         {totalVerdicts === 0 ? (
           <p className="text-sm text-mist-400">Aucune donnée.</p>

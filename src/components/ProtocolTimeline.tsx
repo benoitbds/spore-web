@@ -18,7 +18,7 @@ const PHASE_META: Record<number, { icon: string; label: string; gradient: string
   },
   3: {
     icon: '🏗️',
-    label: 'Full protocol',
+    label: 'Protocole complet',
     gradient: 'from-cyan-bio/20 to-transparent',
     border: 'border-cyan-bio/40',
   },
@@ -35,7 +35,7 @@ export default function ProtocolTimeline({ protocol, compact = false }: Protocol
       {!compact && (
         <div className="flex flex-wrap items-center gap-4 text-sm text-mist-400">
           <span>
-            <span className="text-mist-500">Timeline: </span>
+            <span className="text-mist-500">Calendrier : </span>
             <span className="font-medium text-mist-100">{protocol.overall_timeline}</span>
           </span>
           <span className="text-mist-600">·</span>
@@ -121,7 +121,7 @@ export default function ProtocolTimeline({ protocol, compact = false }: Protocol
           className="rounded-xl border border-emerald-bio/30 bg-emerald-bio/5 p-4"
         >
           <div className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-glow">
-            🚀 Quick start
+            🚀 Démarrage rapide
           </div>
           <p className="text-sm text-mist-200">
             {protocol.phase_1_quick_start.first_action}

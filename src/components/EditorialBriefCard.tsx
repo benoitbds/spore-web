@@ -69,7 +69,7 @@ export default function EditorialBriefCard({ brief, index = 0 }: Props) {
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1.5 text-mist-400">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-glow" />
-                <span className="font-mono">novelty {novelty.toFixed(2)}</span>
+                <span className="font-mono">nouveauté {novelty.toFixed(2)}</span>
               </span>
               <span
                 className={`font-mono ${

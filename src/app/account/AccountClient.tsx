@@ -11,6 +11,7 @@ import {
   type AccountPurchase,
 } from '@/lib/api';
 import { verdictLabel } from '@/lib/verdicts';
+import { label } from '@/lib/labels';
 
 export default function AccountClient() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -263,7 +264,7 @@ function StatusBadge({ status }: { status: string }) {
         styles[status] ?? styles.pending
       }`}
     >
-      {status}
+      {label(status)}
     </span>
   );
 }

@@ -15,7 +15,7 @@ export const SITE_TAGLINE =
 
 export const SITE_DESCRIPTION =
   "SPORE croise des domaines scientifiques éloignés pour générer des hypothèses " +
-  "de recherche inédites, validées par 5 reviewers IA et sourcées sur la " +
+  "de recherche inédites, validées par 5 relecteurs IA et sourcées sur la " +
   "littérature réelle. Zéro hallucination bibliographique.";
 
 /** Trim a string to `max` chars, breaking at word boundaries when possible. */

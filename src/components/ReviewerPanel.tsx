@@ -3,16 +3,14 @@
 import { motion } from 'framer-motion';
 import type { Review, MetaReview } from '@/lib/types';
 import { verdictLabel } from '@/lib/verdicts';
+import { label } from '@/lib/labels';
 
-const PERSONA_META: Record<
-  string,
-  { icon: string; label: string; color: string }
-> = {
-  methodologist: { icon: '🔬', label: 'Méthodologue', color: '#10B981' },
-  domain_expert: { icon: '🧪', label: 'Domain Expert', color: '#06B6D4' },
-  contrarian: { icon: '😈', label: 'Contrarian', color: '#EF4444' },
-  industrialist: { icon: '🏭', label: 'Industriel', color: '#F59E0B' },
-  funding_strategist: { icon: '💰', label: 'Funding', color: '#8B5CF6' },
+const PERSONA_META: Record<string, { icon: string; color: string }> = {
+  methodologist: { icon: '🔬', color: '#10B981' },
+  domain_expert: { icon: '🧪', color: '#06B6D4' },
+  contrarian: { icon: '😈', color: '#EF4444' },
+  industrialist: { icon: '🏭', color: '#F59E0B' },
+  funding_strategist: { icon: '💰', color: '#8B5CF6' },
 };
 
 function scoreTone(score: number) {
@@ -33,9 +31,9 @@ export default function ReviewerPanel({ reviews, meta }: ReviewerPanelProps) {
         {reviews.slice(0, 5).map((r, i) => {
           const meta = PERSONA_META[r.reviewer_persona] ?? {
             icon: '👤',
-            label: r.reviewer_persona,
             color: '#71717a',
           };
+          const personaLabel = label(r.reviewer_persona);
           const keyPoint =
             r.strengths[0] || r.recommendation || '';
 
@@ -60,7 +58,7 @@ export default function ReviewerPanel({ reviews, meta }: ReviewerPanelProps) {
                 </span>
               </div>
               <div className="mb-1 text-xs font-medium uppercase tracking-wider text-mist-400">
-                {meta.label}
+                {personaLabel}
               </div>
               <div className="mb-2 text-xs text-mist-500">
                 {verdictLabel(r.verdict)} · conf {Math.round(r.confidence * 100)}%
@@ -119,7 +117,7 @@ export default function ReviewerPanel({ reviews, meta }: ReviewerPanelProps) {
             {meta.critical_path && (
               <div className="border-l-2 border-amber-bio pl-3">
                 <div className="mb-1 text-xs font-medium uppercase tracking-wider text-amber-glow">
-                  Critical path
+                  Chemin critique
                 </div>
                 <p className="text-sm text-mist-300 leading-relaxed">
                   {meta.critical_path}

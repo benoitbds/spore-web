@@ -1,10 +1,11 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { label } from '@/lib/labels';
 
 interface Step {
   id: string;
-  label: string;
+  labelKey: string;
   icon: string;
   description: string;
   metric?: string;
@@ -12,17 +13,17 @@ interface Step {
 }
 
 const STEPS: Step[] = [
-  { id: 'collision', label: 'Collision', icon: '🎲', description: '200 domaines scientifiques. Un tirage aléatoire croise deux d\'entre eux.', metric: '~100 collisions/jour' },
-  { id: 'gate', label: 'Gate', icon: '🚪', description: 'Un filtre rejette les paires triviales ou déjà explorées.', metric: '30-60% passent' },
-  { id: 'synthesis', label: 'Synthesis', icon: '🧩', description: 'Un LLM génère un pont causal entre les deux domaines.', metric: '~70% de bridges' },
-  { id: 'critics', label: 'Critics', icon: '⚔️', description: 'Un devil\'s advocate et un angel\'s advocate débattent.', metric: '5 scores produits' },
-  { id: 'curator', label: 'Curator', icon: '🎯', description: 'Top 15% retenu sur score composite.', metric: 'Top 15%' },
-  { id: 'reviewer', label: 'Reviewer', icon: '⚖️', description: 'Verdict calibré : rejeté / intéressant / à tester 🔥.', metric: '~15-20% 🔥' },
-  { id: 'grounding', label: 'Literature Grounding', icon: '📚', description: '8-12 requêtes Semantic Scholar. Zéro hallucination — chaque DOI est vérifié.', metric: '5+ références', postFire: true },
-  { id: 'sharpening', label: 'Hypothesis Sharpening', icon: '🔬', description: 'Formulation rigoureuse avec variables, prédictions quantitatives, H0, tests statistiques.', postFire: true },
-  { id: 'protocol', label: 'Protocol', icon: '🧪', description: '3 phases : in silico (€0-2k) → minimal (€2-15k) → full (€15-200k).', postFire: true },
-  { id: 'panel', label: 'Panel (5 reviewers)', icon: '🎭', description: 'Méthodologue, domain expert, contrarian, industriel, funding strategist.', postFire: true },
-  { id: 'brief', label: 'Research Brief', icon: '📄', description: 'Document publication-ready de 4-6 pages. Markdown + JSON.', postFire: true },
+  { id: 'collision', labelKey: 'collision', icon: '🎲', description: '200 domaines scientifiques. Un tirage aléatoire croise deux d\'entre eux.', metric: '~100 collisions/jour' },
+  { id: 'gate', labelKey: 'gate', icon: '🚪', description: 'Un filtre rejette les paires triviales ou déjà explorées.', metric: '30-60% passent' },
+  { id: 'synthesis', labelKey: 'synthesis', icon: '🧩', description: 'Un LLM génère un pont causal entre les deux domaines.', metric: '~70% de ponts' },
+  { id: 'critics', labelKey: 'critics', icon: '⚔️', description: 'Un avocat du diable et un avocat de l\'ange débattent.', metric: '5 scores produits' },
+  { id: 'curator', labelKey: 'curator', icon: '🎯', description: 'Top 15% retenu sur score composite.', metric: 'Top 15%' },
+  { id: 'reviewer', labelKey: 'reviewer', icon: '⚖️', description: 'Verdict calibré : rejeté / intéressant / à tester 🔥.', metric: '~15-20% 🔥' },
+  { id: 'grounding', labelKey: 'literature_grounding', icon: '📚', description: '8-12 requêtes Semantic Scholar. Zéro hallucination — chaque DOI est vérifié.', metric: '5+ références', postFire: true },
+  { id: 'sharpening', labelKey: 'hypothesis_sharpening', icon: '🔬', description: 'Formulation rigoureuse avec variables, prédictions quantitatives, H0, tests statistiques.', postFire: true },
+  { id: 'protocol', labelKey: 'protocol', icon: '🧪', description: '3 phases : in silico (€0-2k) → minimal (€2-15k) → full (€15-200k).', postFire: true },
+  { id: 'panel', labelKey: 'panel', icon: '🎭', description: 'Méthodologue, expert du domaine, avocat du diable, industriel, stratège financement.', postFire: true },
+  { id: 'brief', labelKey: 'research_brief', icon: '📄', description: 'Document publication-ready de 4-6 pages. Markdown + JSON.', postFire: true },
 ];
 
 export default function PipelineAnimation() {
@@ -63,7 +64,7 @@ export default function PipelineAnimation() {
           {/* Content */}
           <div className="flex-1 pb-4">
             <div className="mb-1 flex items-center gap-3">
-              <h3 className="font-display text-xl text-mist-100">{step.label}</h3>
+              <h3 className="font-display text-xl text-mist-100">{label(step.labelKey)}</h3>
               {step.postFire && (
                 <span className="rounded-full border border-amber-bio/40 bg-amber-bio/10 px-2 py-0.5 text-[10px] uppercase tracking-widest text-amber-glow">
                   Post 🔥

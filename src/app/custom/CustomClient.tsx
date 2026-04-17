@@ -6,6 +6,7 @@ import Link from 'next/link';
 import EmailGate from '@/components/EmailGate';
 import { useAuth } from '@/contexts/AuthContext';
 import { api, ApiError, type AccountCustomRequest } from '@/lib/api';
+import { label } from '@/lib/labels';
 
 const EXCLUDED_KEYWORDS = [
   'weapons', 'weapon', 'armament', 'munition', 'ballistic',
@@ -142,7 +143,7 @@ export default function CustomClient() {
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-mist-400">
           Donnez-nous 2 domaines scientifiques. SPORE force la collision,
-          produit une hypothèse, la valide par un panel de 5 reviewers et
+          produit une hypothèse, la valide par un panel de 5 relecteurs et
           vous livre le brief complet.{' '}
           <span className="font-medium text-emerald-glow">
             Une collision sur mesure offerte par utilisateur pendant le lancement.
@@ -158,7 +159,7 @@ export default function CustomClient() {
           <p className="mb-4 text-sm text-mist-300">
             Collision : <span className="font-mono text-mist-200">{existing.domain_a} × {existing.domain_b}</span>
             {' — '}
-            <span className="text-amber-glow">{existing.status}</span>
+            <span className="text-amber-glow">{label(existing.status)}</span>
           </p>
           <p className="mb-4 text-sm text-mist-400">
             Le service payant (25 €/collision) ouvrira prochainement — inscrivez-vous
