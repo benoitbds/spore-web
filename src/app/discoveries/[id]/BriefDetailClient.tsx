@@ -235,7 +235,6 @@ export default function BriefDetailClient({ teaser }: Props) {
                 grounding={full.grounding}
                 protocol={full.protocol}
                 markdown={full.markdown}
-                deliveryReason={full.delivery_reason}
                 briefId={teaser.brief_id}
                 lang={lang}
               />
@@ -257,18 +256,15 @@ export default function BriefDetailClient({ teaser }: Props) {
   );
 }
 
-// ── Paywall state machine ─────────────────────────────────────────
+// ── Launch mode: email gate only, all briefs free ─────────────────
 //
-// Four paths depending on auth + credits state:
-//   1. not authenticated            → EmailGate + "free first brief" pitch
-//   2. authenticated, free unused   → "Download free" CTA
-//   3. authenticated, credits > 0   → "Download (1 credit)" CTA
-//   4. authenticated, credits == 0  → "Buy brief" CTA → Stripe checkout
+// Two paths:
+//   1. not authenticated → EmailGate
+//   2. authenticated     → free download CTA
 function PaywallPanel({
   briefId,
   isAuthenticated,
   isAuthLoading,
-  user,
   onUnlock,
   loadState,
   loadError,
@@ -281,24 +277,6 @@ function PaywallPanel({
   loadState: 'idle' | 'loading' | 'error' | 'payment_required';
   loadError: string | null;
 }) {
-  const [buyError, setBuyError] = useState<string | null>(null);
-  const [buying, setBuying] = useState(false);
-
-  async function buyThisBrief() {
-    setBuying(true);
-    setBuyError(null);
-    try {
-      const { checkout_url } = await api.createCheckout({
-        type: 'single',
-        brief_id: briefId,
-      });
-      window.location.href = checkout_url;
-    } catch (err) {
-      setBuying(false);
-      setBuyError((err as Error).message || 'Erreur de paiement');
-    }
-  }
-
   if (isAuthLoading) {
     return (
       <div className="rounded-2xl border border-ink-500 bg-ink-800/40 p-6 text-sm text-mist-400">
@@ -311,8 +289,8 @@ function PaywallPanel({
     return (
       <div className="space-y-4">
         <EmailGate
-          headline="Accédez au brief scientifique complet"
-          subtext="Panel de review (5 personas), base de preuves, contre-preuves, protocole expérimental, prédictions falsifiables. Le 1er brief est offert."
+          headline="Accédez au brief scientifique complet — gratuit"
+          subtext="Panel de review (5 personas), base de preuves, contre-preuves, protocole expérimental, prédictions falsifiables. Tous les briefs sont gratuits pendant le lancement."
           cta="Recevoir mon accès"
         />
         <p className="text-center text-sm text-mist-500">
@@ -329,67 +307,16 @@ function PaywallPanel({
     );
   }
 
-  // Authenticated paths
-  if (user && !user.free_brief_used) {
-    return (
-      <UnlockCta
-        headline="🎁 Votre 1er brief est offert"
-        subtext="Une seule fois, sans carte. Les briefs suivants utilisent vos crédits ou un achat ponctuel (9 €)."
-        cta="Télécharger gratuitement"
-        onClick={onUnlock}
-        loadState={loadState}
-        loadError={loadError}
-      />
-    );
-  }
-
-  if (user && user.credits > 0) {
-    return (
-      <UnlockCta
-        headline="Télécharger le brief complet"
-        subtext={`Utilise 1 de vos ${user.credits} crédit${user.credits > 1 ? 's' : ''}. Re-téléchargements gratuits ensuite.`}
-        cta="Télécharger (1 crédit)"
-        onClick={onUnlock}
-        loadState={loadState}
-        loadError={loadError}
-      />
-    );
-  }
-
-  // Out of credits → buy path
+  // Authenticated → always free during launch
   return (
-    <div className="space-y-4 rounded-2xl border border-ink-500 bg-ink-800/40 p-6">
-      <h3 className="font-display text-xl text-mist-100">
-        Achat du brief complet
-      </h3>
-      <p className="text-sm text-mist-400">
-        Brief unitaire : 9 € · ou pack 5 briefs à 29 € (5,80 €/brief) sur la{' '}
-        <Link href="/pricing" className="text-emerald-glow hover:text-emerald-bio">
-          page pricing
-        </Link>
-        .
-      </p>
-      <div className="flex flex-wrap gap-3">
-        <button
-          onClick={buyThisBrief}
-          disabled={buying}
-          className="rounded-xl bg-emerald-bio px-5 py-3 text-sm font-semibold text-ink-900 hover:bg-emerald-glow disabled:opacity-50"
-        >
-          {buying ? 'Redirection…' : 'Acheter ce brief — 9 €'}
-        </button>
-        <Link
-          href="/pricing"
-          className="rounded-xl border border-ink-500 bg-ink-900 px-5 py-3 text-sm text-mist-200 hover:text-mist-100"
-        >
-          Voir les packs
-        </Link>
-      </div>
-      {buyError && (
-        <p className="text-sm text-red-400" role="alert">
-          {buyError}
-        </p>
-      )}
-    </div>
+    <UnlockCta
+      headline="Accédez au brief complet — gratuit"
+      subtext="Hypothèse formalisée, protocole expérimental, panel de review, base de preuves. Tous les briefs sont gratuits pendant le lancement."
+      cta="Télécharger gratuitement"
+      onClick={onUnlock}
+      loadState={loadState}
+      loadError={loadError}
+    />
   );
 }
 
@@ -444,7 +371,6 @@ function RechercheSections({
   grounding,
   protocol,
   markdown,
-  deliveryReason,
   briefId,
   lang,
 }: {
@@ -453,7 +379,6 @@ function RechercheSections({
   grounding: UnlockedBrief['grounding'];
   protocol: Protocol;
   markdown: string | null;
-  deliveryReason: 'owned' | 'free' | 'credit';
   briefId: string;
   lang: Lang;
 }) {
@@ -466,8 +391,7 @@ function RechercheSections({
       )}
 
       <div className="rounded-xl border border-emerald-bio/30 bg-emerald-bio/5 p-4 text-sm text-emerald-glow">
-        ✅ Brief débloqué ({deliveryReasonLabel(deliveryReason)}). Vous pouvez
-        re-télécharger sans frais à tout moment.
+        ✅ Brief débloqué. Tous les briefs sont gratuits pendant le lancement de SPORE.
       </div>
 
       {/* Panel */}
@@ -660,17 +584,6 @@ function RechercheSections({
       </section>
     </>
   );
-}
-
-function deliveryReasonLabel(r: 'owned' | 'free' | 'credit'): string {
-  switch (r) {
-    case 'owned':
-      return 'déjà débloqué';
-    case 'free':
-      return 'offert — 1er brief';
-    case 'credit':
-      return '1 crédit utilisé';
-  }
 }
 
 // ── Comprendre tab (teaser-only) ──────────────────────────────────
