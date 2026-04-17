@@ -53,11 +53,22 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       url,
       publishedTime: brief.generated_at,
       tags: brief.domains,
+      // Reuses the site-wide OG image. A per-brief dynamic image will
+      // land later (e.g. via @vercel/og or a /api/og/[id] route).
+      images: [
+        {
+          url: '/og-default.png',
+          width: 1200,
+          height: 630,
+          alt: `SPORE — ${title}`,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description: ogDescription,
+      images: ['/og-default.png'],
     },
     alternates: {
       canonical: `/discoveries/${brief.brief_id}`,

@@ -20,11 +20,20 @@ export const metadata: Metadata = {
     url: `${SITE_URL}/discoveries`,
     type: 'website',
     locale: 'fr_FR',
+    images: [
+      {
+        url: '/og-default.png',
+        width: 1200,
+        height: 630,
+        alt: 'SPORE — Découvertes scientifiques',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Découvertes scientifiques | SPORE',
     description: _description,
+    images: ['/og-default.png'],
   },
 };
 

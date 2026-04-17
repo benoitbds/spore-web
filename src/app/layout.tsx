@@ -55,11 +55,24 @@ export const metadata: Metadata = {
     description:
       "Des hypothèses scientifiques disruptives, vulgarisées et vérifiées. Zéro hallucination bibliographique.",
     url: SITE_URL,
+    images: [
+      {
+        url: '/og-default.png',
+        width: 1200,
+        height: 630,
+        alt: 'SPORE — L\'IA qui imagine les découvertes de demain',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: SITE_TAGLINE,
     description: "Des hypothèses scientifiques disruptives, vulgarisées et vérifiées.",
+    images: ['/og-default.png'],
+  },
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
   robots: {
     index: true,
