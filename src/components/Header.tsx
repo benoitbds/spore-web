@@ -10,7 +10,7 @@ const NAV = [
   { href: '/', label: 'Accueil' },
   { href: '/discoveries', label: 'Découvertes' },
   { href: '/how-it-works', label: 'Comment ça marche' },
-  // { href: '/pricing', label: 'Tarifs' },  // hidden during launch
+  { href: '/pricing', label: 'Tarifs' },
   { href: '/stats', label: 'Stats' },
 ];
 
