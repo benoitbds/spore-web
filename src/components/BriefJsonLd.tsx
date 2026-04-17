@@ -1,5 +1,6 @@
 import type { Brief } from '@/lib/types';
 import { SITE_URL, SITE_NAME, briefMetaTitle, briefOgDescription } from '@/lib/seo';
+import { isTechnicalVerdict, verdictLabel } from '@/lib/verdicts';
 
 interface Props {
   brief: Brief;
@@ -20,11 +21,18 @@ export default function BriefJsonLd({ brief }: Props) {
     .filter(Boolean)
     .map((name) => ({ '@type': 'Thing', name }));
 
-  const keywords = [
-    ...brief.domains,
+  // Keywords must never leak raw pipeline tokens (e.g. `publish_brief`)
+  // into SEO metadata. Translate known verdicts to their French labels
+  // and drop anything we don't recognise.
+  const verdictKeywords = [
     brief.grounding?.novelty_assessment?.verdict,
     brief.panel?.meta_review?.verdict,
-  ].filter(Boolean);
+  ]
+    .filter((v): v is string => typeof v === 'string' && v.length > 0)
+    .filter(isTechnicalVerdict)
+    .map(verdictLabel);
+
+  const keywords = [...brief.domains, ...verdictKeywords].filter(Boolean);
 
   const jsonLd = {
     '@context': 'https://schema.org',

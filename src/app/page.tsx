@@ -218,7 +218,7 @@ function FeaturedHero({ brief }: { brief: Brief }) {
             <HeroBadge
               label="Novelty"
               value={novelty.toFixed(2)}
-              sub={grounding.novelty_assessment.verdict}
+              sub={verdictLabel(grounding.novelty_assessment.verdict).toLowerCase()}
               accent="emerald"
             />
             <HeroBadge

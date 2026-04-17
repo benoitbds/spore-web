@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import type { Review, MetaReview } from '@/lib/types';
+import { verdictLabel } from '@/lib/verdicts';
 
 const PERSONA_META: Record<
   string,
@@ -62,7 +63,7 @@ export default function ReviewerPanel({ reviews, meta }: ReviewerPanelProps) {
                 {meta.label}
               </div>
               <div className="mb-2 text-xs text-mist-500">
-                {r.verdict} · conf {Math.round(r.confidence * 100)}%
+                {verdictLabel(r.verdict)} · conf {Math.round(r.confidence * 100)}%
               </div>
               {keyPoint && (
                 <div className="text-xs leading-relaxed text-mist-300 line-clamp-3">
@@ -95,7 +96,7 @@ export default function ReviewerPanel({ reviews, meta }: ReviewerPanelProps) {
               <span className="text-xl text-mist-500">/10</span>
             </div>
             <div className="mt-1 text-sm font-medium text-mist-300">
-              {meta.verdict}
+              {verdictLabel(meta.verdict)}
             </div>
           </div>
 

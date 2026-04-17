@@ -10,6 +10,7 @@ import {
   type AccountCustomRequest,
   type AccountPurchase,
 } from '@/lib/api';
+import { verdictLabel } from '@/lib/verdicts';
 
 export default function AccountClient() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -90,7 +91,7 @@ export default function AccountClient() {
                   </span>
                   {b.panel_verdict && (
                     <span className="ml-2 text-xs text-mist-400">
-                      · {b.panel_verdict}
+                      · {verdictLabel(b.panel_verdict)}
                     </span>
                   )}
                 </div>
