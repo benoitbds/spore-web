@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import EmailGate from '@/components/EmailGate';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   api,
@@ -39,15 +40,15 @@ export default function AccountClient() {
   if (!isAuthenticated) {
     return (
       <Shell>
-        <p className="text-mist-300">
-          Connectez-vous pour accéder à votre espace personnel.
+        <p className="mb-6 text-mist-300">
+          Connectez-vous pour accéder à votre espace personnel — briefs
+          débloqués, collisions sur mesure et historique.
         </p>
-        <Link
-          href="/pricing"
-          className="mt-4 inline-block rounded-xl bg-emerald-bio px-5 py-3 text-sm font-semibold text-ink-900 hover:bg-emerald-glow"
-        >
-          Commencer
-        </Link>
+        <EmailGate
+          headline="Accès à mon compte"
+          subtext="Un lien magique sera envoyé à votre email. Aucun mot de passe, aucune carte."
+          cta="Recevoir le lien"
+        />
       </Shell>
     );
   }
