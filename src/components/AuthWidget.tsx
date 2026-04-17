@@ -94,11 +94,8 @@ export default function AuthWidget({
   const credits = user?.credits ?? 0;
   const freeAvailable = user ? !user.free_brief_used : false;
   const emailShort = email.length > 22 ? `${email.slice(0, 20)}…` : email;
-  const creditLabel = freeAvailable
-    ? '🎁 1 brief offert'
-    : credits > 0
-      ? `${credits} crédit${credits !== 1 ? 's' : ''}`
-      : '0 crédit — recharger';
+  // Launch mode: everything is free
+  const creditLabel = '✨ Accès gratuit';
 
   if (orientation === 'vertical') {
     return (
@@ -133,16 +130,8 @@ export default function AuthWidget({
         aria-haspopup="menu"
       >
         <span className="hidden md:inline">{emailShort}</span>
-        <span
-          className={`rounded-full px-2 py-0.5 font-mono ${
-            freeAvailable
-              ? 'bg-emerald-bio/15 text-emerald-glow'
-              : credits > 0
-                ? 'bg-emerald-bio/15 text-emerald-glow'
-                : 'bg-ink-500/40 text-mist-400'
-          }`}
-        >
-          {freeAvailable ? '🎁' : credits > 0 ? `${credits} cr` : '🛒 0'}
+        <span className="rounded-full bg-emerald-bio/15 px-2 py-0.5 font-mono text-emerald-glow">
+          ✨
         </span>
         <span className="text-mist-500">▾</span>
       </button>
@@ -165,13 +154,7 @@ export default function AuthWidget({
           >
             Mon compte
           </Link>
-          <Link
-            href="/pricing"
-            onClick={() => setOpen(false)}
-            className="block px-4 py-2 text-sm text-mist-200 hover:bg-ink-700/60"
-          >
-            Acheter des crédits
-          </Link>
+          {/* pricing link hidden during launch */}
           <Link
             href="/custom"
             onClick={() => setOpen(false)}
