@@ -666,9 +666,15 @@ function ComprendreTab({ teaser, lang }: { teaser: BriefTeaser; lang: Lang }) {
     );
   }
 
-  // EN path or missing vulgarization_fr: minimal teaser + CTA.
+  // EN path (or FR path when vulgarization_fr is missing): a five-
+  // section structured view mirroring the FR layout, fed by the
+  // non-sensitive summary fields denormalised on the teaser.
+  const pendingCopy =
+    'Data pending — this brief was generated with limited literature access.';
+
   return (
     <>
+      {/* 1. Hypothesis */}
       <section>
         <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-emerald-glow">
           The hypothesis in brief
@@ -678,13 +684,138 @@ function ComprendreTab({ teaser, lang }: { teaser: BriefTeaser; lang: Lang }) {
         </p>
       </section>
 
+      {/* 2. Proposed mechanism */}
+      <section>
+        <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-amber-glow">
+          Proposed mechanism
+        </h2>
+        <div className="rounded-xl border border-amber-bio/20 bg-amber-bio/5 p-6">
+          {teaser.mechanism_summary ? (
+            <p className="text-sm text-mist-200 leading-relaxed">
+              {teaser.mechanism_summary}
+            </p>
+          ) : (
+            <p className="text-sm italic text-mist-400">{pendingCopy}</p>
+          )}
+        </div>
+      </section>
+
+      {/* 3. Novelty assessment */}
+      <section>
+        <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-cyan-glow">
+          Novelty assessment
+        </h2>
+        <div className="rounded-xl border border-cyan-bio/20 bg-cyan-bio/5 p-6">
+          {teaser.novelty_summary ? (
+            <>
+              <div className="mb-3 flex items-baseline gap-3">
+                <span className="font-mono text-xs uppercase tracking-wider text-cyan-glow">
+                  Novelty score
+                </span>
+                <span className="font-display text-2xl text-mist-100">
+                  {teaser.novelty_summary.score.toFixed(2)}
+                </span>
+              </div>
+              {teaser.novelty_summary.key_difference ? (
+                <p className="text-base italic text-mist-100 leading-relaxed">
+                  {teaser.novelty_summary.key_difference}
+                </p>
+              ) : (
+                <p className="text-sm italic text-mist-400">
+                  Novelty assessment pending — limited literature access during
+                  generation.
+                </p>
+              )}
+            </>
+          ) : (
+            <p className="text-sm italic text-mist-400">
+              Novelty assessment pending — limited literature access during
+              generation.
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* 4. Experimental roadmap */}
+      <section>
+        <h2 className="mb-4 text-xs font-medium uppercase tracking-widest text-emerald-glow">
+          Experimental roadmap
+        </h2>
+        {teaser.protocol_summary && teaser.protocol_summary.length > 0 ? (
+          <ol className="space-y-3">
+            {teaser.protocol_summary.map((phase, i) => (
+              <li
+                key={i}
+                className="flex gap-4 rounded-xl border border-ink-500 bg-ink-800/40 p-4"
+              >
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-bio/15 font-mono text-sm text-emerald-glow">
+                  {i + 1}
+                </span>
+                <div className="text-sm text-mist-300 leading-relaxed">
+                  {phase.phase_name && (
+                    <div className="mb-1 font-medium text-mist-100">
+                      {phase.phase_name}
+                    </div>
+                  )}
+                  {phase.objective && <p>{phase.objective}</p>}
+                </div>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <div className="rounded-xl border border-ink-500 bg-ink-800/40 p-6">
+            <p className="text-sm italic text-mist-400">{pendingCopy}</p>
+          </div>
+        )}
+      </section>
+
+      {/* 5. Panel review summary */}
+      <section>
+        <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-mist-400">
+          Panel review summary
+        </h2>
+        <div className="rounded-xl border border-ink-500 bg-ink-800/40 p-6">
+          {teaser.panel_summary ? (
+            <>
+              <div className="mb-3 flex items-baseline gap-3">
+                <span className="font-mono text-xs uppercase tracking-wider text-mist-500">
+                  Consensus
+                </span>
+                <span className="font-display text-2xl text-mist-100">
+                  {teaser.panel_summary.consensus_score.toFixed(1)}
+                  <span className="text-sm text-mist-500">/10</span>
+                </span>
+              </div>
+              {teaser.panel_summary.final_recommendation && (
+                <p className="mb-4 text-sm text-mist-200 leading-relaxed">
+                  {teaser.panel_summary.final_recommendation}
+                </p>
+              )}
+              {teaser.panel_summary.key_consensus.length > 0 && (
+                <ul className="space-y-1.5 text-sm text-mist-300">
+                  {teaser.panel_summary.key_consensus.slice(0, 3).map((p, i) => (
+                    <li key={i} className="flex gap-2">
+                      <span className="text-emerald-glow">✓</span>
+                      <span>{p}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
+          ) : (
+            <p className="text-sm italic text-mist-400">{pendingCopy}</p>
+          )}
+        </div>
+      </section>
+
+      {/* Gated teaser — reformulated */}
       <section className="rounded-2xl border border-emerald-bio/30 bg-emerald-bio/5 p-6">
         <h3 className="mb-2 font-display text-xl text-mist-100">
-          Mechanism, protocol, reviewers — gated
+          Want the full picture?
         </h3>
         <p className="text-sm text-mist-300">
-          The step-by-step mechanism, the experimental protocol, the 5-persona
-          panel review and the evidence base are inside the{' '}
+          The full evidence base, detailed protocol, falsifiable predictions and
+          5-persona panel review are inside the{' '}
           <span className="font-medium text-emerald-glow">Research</span> tab.
           The first brief is free.
         </p>

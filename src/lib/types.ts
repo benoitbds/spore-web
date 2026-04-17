@@ -201,9 +201,52 @@ export interface BriefTeaser {
   formal_statement: string; // sharpened.formal_statement — the one-liner
   verdict: string;          // panel.meta_review.verdict (for the chip only)
   vulgarization_fr?: VulgarizationFr;
+
+  // ── EN "Comprendre" summaries ───────────────────────────────────
+  // Denormalised, non-sensitive extracts from the full brief used to
+  // build a structured EN view of the public tab. None of these
+  // expose gated content (no DOIs, no full reviewer breakdown, no
+  // quantitative predictions) — they're headline summaries.
+  mechanism_summary?: string;
+  novelty_summary?: { score: number; key_difference: string } | null;
+  protocol_summary?: Array<{ phase_name: string; objective: string }>;
+  panel_summary?: {
+    final_recommendation: string;
+    consensus_score: number;
+    key_consensus: string[];
+  };
 }
 
 export function briefToTeaser(b: Brief): BriefTeaser {
+  const causalChain = b.sharpened.proposed_mechanism?.causal_chain ?? [];
+  const mechanism_summary = causalChain.slice(0, 2).join(' ').trim() || undefined;
+
+  const nov = b.grounding?.novelty_assessment;
+  const novelty_summary = nov
+    ? {
+        score: nov.score ?? 0,
+        key_difference:
+          nov.closest_existing_work?.[0]?.key_difference ?? '',
+      }
+    : null;
+
+  const protocol_summary = (b.protocol?.phases ?? [])
+    .slice(0, 3)
+    .map((p) => ({
+      phase_name: p.phase_name,
+      objective: p.objective,
+    }))
+    .filter((p) => p.phase_name || p.objective);
+
+  const meta = b.panel?.meta_review;
+  const panel_summary = meta
+    ? {
+        final_recommendation: meta.final_recommendation ?? '',
+        consensus_score: meta.consensus_score ?? 0,
+        key_consensus: meta.key_consensus ?? [],
+      }
+    : undefined;
+
   return {
     brief_id: b.brief_id,
     generated_at: b.generated_at,
@@ -212,6 +255,10 @@ export function briefToTeaser(b: Brief): BriefTeaser {
     formal_statement: b.sharpened.formal_statement,
     verdict: b.panel.meta_review.verdict,
     vulgarization_fr: b.vulgarization_fr,
+    mechanism_summary,
+    novelty_summary,
+    protocol_summary: protocol_summary.length > 0 ? protocol_summary : undefined,
+    panel_summary,
   };
 }
 
