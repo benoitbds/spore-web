@@ -113,6 +113,12 @@ export interface CheckoutResponse {
   purchase_id: string;
 }
 
+export interface CustomFreeResponse {
+  custom_request_id: string;
+  status: string;
+  message: string;
+}
+
 export interface CustomStatusResponse {
   id: string;
   status:
@@ -195,6 +201,11 @@ export const api = {
     apiFetch<CustomStatusResponse>(
       `/api/custom/${encodeURIComponent(id)}/status`,
     ),
+  customFree: (payload: { domain_a: string; domain_b: string }) =>
+    apiFetch<CustomFreeResponse>('/api/custom/free', {
+      method: 'POST',
+      body: payload,
+    }),
   accountBriefs: () =>
     apiFetch<AccountBrief[]>('/api/account/briefs'),
   accountCustomRequests: () =>
