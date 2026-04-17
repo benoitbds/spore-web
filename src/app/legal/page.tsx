@@ -34,18 +34,7 @@ export default function LegalPage() {
       </Section>
 
       <Section title="Hébergement">
-        <p>OVH SAS</p>
-        <p>2 rue Kellermann, 59100 Roubaix, France</p>
-        <p>
-          <a
-            href="https://www.ovh.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-emerald-glow hover:text-emerald-bio"
-          >
-            www.ovh.com
-          </a>
-        </p>
+        <p>Hébergement autogéré par l&apos;éditeur (serveur personnel).</p>
       </Section>
 
       <Section title="Propriété intellectuelle">
