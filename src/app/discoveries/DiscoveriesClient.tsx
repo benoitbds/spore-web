@@ -11,13 +11,114 @@ interface Props {
   allDomains: string[];
 }
 
-/** Lowercased haystack of the fields we want searchable. Memoised per render. */
+/** Lowercased haystack of the fields we want searchable. Memoised per render.
+ *
+ * Testers reported that "CO2", "material" or "méthane" returned zero hits
+ * because the filter only looked at titles + domain names. The haystack
+ * now spans every user-visible text surface in the brief JSON already
+ * shipped to the client:
+ *
+ *   - titles (FR + EN) and domain names
+ *   - hypothesis formulations (formal_statement, original, brief)
+ *   - FR vulgarisation (imagine_that, why_it_matters, reviewers_say,
+ *     concretely.phase1/2/3)
+ *   - sharpened technical text (theoretical_framework, mechanism
+ *     causal_chain + assumptions + known unknowns, prediction
+ *     statements, variable names)
+ *   - grounding prose (evidence_base titles + key_finding + relevance,
+ *     counter_evidence titles + finding, novelty_assessment
+ *     closest_existing_work titles + key_difference)
+ *   - protocol (phase_name, objective, methodology, expected_outputs,
+ *     required_resources equipment / software / datasets, success
+ *     criteria thresholds, quick_start first_action + tools_needed)
+ *
+ * Domain key_concepts live on the server-side domain map and aren't
+ * exported into brief JSONs — skipped. Adding them would require
+ * embedding key_concepts into the brief export; not worth the
+ * plumbing for 13 briefs, since the adjacent prose almost always
+ * surfaces the same concept.
+ */
 function briefHaystack(b: Brief): string {
+  const v = b.vulgarization_fr;
+  const s = b.sharpened;
+  const mech = s?.proposed_mechanism;
+  const concretely = v?.concretely;
+  const predictions = (s?.falsifiable_predictions ?? [])
+    .map((p) => p.prediction)
+    .filter(Boolean);
+  const variableNames = [
+    ...(s?.independent_variables ?? []),
+    ...(s?.dependent_variables ?? []),
+  ]
+    .map((x) => x?.name)
+    .filter(Boolean) as string[];
+
+  const g = b.grounding;
+  const evidenceParts = (g?.evidence_base ?? []).flatMap((p) => [
+    p.title,
+    p.key_finding,
+    p.relevance,
+  ]);
+  const counterParts = (g?.counter_evidence ?? []).flatMap((p) => [
+    p.title,
+    p.finding,
+  ]);
+  const closestParts = (
+    g?.novelty_assessment?.closest_existing_work ?? []
+  ).flatMap((p) => [p.title, p.key_difference]);
+
+  const proto = b.protocol;
+  const phaseParts = (proto?.phases ?? []).flatMap((ph) => {
+    const rr = ph.required_resources;
+    const thresholds = (ph.success_criteria ?? []).map((sc) => sc.threshold);
+    return [
+      ph.phase_name,
+      ph.objective,
+      ph.methodology,
+      ...(ph.expected_outputs ?? []),
+      ...(rr?.equipment ?? []),
+      ...(rr?.software ?? []),
+      ...(rr?.datasets ?? []),
+      ...thresholds,
+    ];
+  });
+  const quickStart = proto?.phase_1_quick_start;
+  const quickStartParts = [
+    quickStart?.first_action,
+    ...(quickStart?.tools_needed ?? []),
+  ];
+
   return [
-    b.sharpened?.title,
-    b.vulgarization_fr?.title_fr,
-    b.vulgarization_fr?.hypothesis_in_brief,
+    // Titles and domain names
+    s?.title,
+    v?.title_fr,
     ...(b.domains ?? []),
+    // Hypothesis formulations
+    s?.formal_statement,
+    b.original_hypothesis,
+    v?.hypothesis_in_brief,
+    // FR vulgarisation narrative
+    v?.imagine_that,
+    v?.why_it_matters,
+    v?.reviewers_say,
+    concretely?.intro,
+    concretely?.phase1,
+    concretely?.phase2,
+    concretely?.phase3,
+    // Sharpened — mechanism prose + framework + predictions
+    s?.theoretical_framework,
+    ...(mech?.causal_chain ?? []),
+    ...(mech?.key_assumptions ?? []),
+    ...(mech?.known_unknowns ?? []),
+    ...predictions,
+    ...variableNames,
+    // Grounding — papers, counter-evidence, novelty closest work
+    ...evidenceParts,
+    ...counterParts,
+    ...closestParts,
+    // Protocol — phase prose + resources + quick start
+    ...phaseParts,
+    ...quickStartParts,
   ]
     .filter(Boolean)
     .join(' ')
