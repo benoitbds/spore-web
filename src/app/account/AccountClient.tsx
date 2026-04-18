@@ -59,16 +59,33 @@ export default function AccountClient() {
     <Shell>
       {/* Launch mode — replaces the credits section while monetisation is paused */}
       <Section title="Mon accès">
-        <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-emerald-bio/40 bg-emerald-bio/5 px-6 py-5">
-          <span className="text-2xl">🚀</span>
-          <div>
-            <div className="font-display text-xl text-mist-100">
-              Offre de lancement
-            </div>
-            <div className="text-sm text-emerald-glow">
-              Accès illimité aux briefs — sans carte, sans crédit.
+        <div className="flex flex-col gap-5 rounded-2xl border border-emerald-bio/40 bg-emerald-bio/5 p-6 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl leading-none">🚀</span>
+            <div>
+              <div className="font-display text-xl text-mist-100">
+                Offre de lancement
+              </div>
+              <div className="mt-1 text-sm text-emerald-glow">
+                Accès illimité aux briefs + 1 collision sur mesure offerte.
+              </div>
             </div>
           </div>
+          {loaded && customs.length > 0 ? (
+            <Link
+              href={`/custom/${customs[0].id}/status`}
+              className="inline-flex shrink-0 items-center gap-2 self-start rounded-full border border-emerald-bio/60 bg-emerald-bio/15 px-5 py-2.5 text-sm font-semibold text-emerald-glow transition-all hover:bg-emerald-bio/25 md:self-auto"
+            >
+              Voir ma collision →
+            </Link>
+          ) : (
+            <Link
+              href="/custom"
+              className="inline-flex shrink-0 items-center gap-2 self-start rounded-full border border-emerald-bio/60 bg-emerald-bio/15 px-5 py-2.5 text-sm font-semibold text-emerald-glow transition-all hover:bg-emerald-bio/25 hover:shadow-[0_0_30px_rgba(16,185,129,0.2)] md:self-auto"
+            >
+              🎯 Demander ma collision →
+            </Link>
+          )}
         </div>
       </Section>
 

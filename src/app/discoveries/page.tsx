@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getAllBriefs } from '@/lib/briefs';
 import { SITE_URL } from '@/lib/seo';
+import CustomCollisionCta from '@/components/CustomCollisionCta';
 import DiscoveriesClient from './DiscoveriesClient';
 
 const _briefs = getAllBriefs();
@@ -59,6 +60,13 @@ export default function DiscoveriesPage() {
       </header>
 
       <DiscoveriesClient briefs={briefs} allDomains={allDomains} />
+
+      <div className="mt-20">
+        <CustomCollisionCta
+          headline="Vous avez un domaine précis en tête ?"
+          subtext="Demandez une collision sur mesure — gratuite pendant le lancement. Choisissez un ou deux domaines, SPORE livre un brief complet (hypothèse, protocole, panel de 5 relecteurs) en quelques minutes."
+        />
+      </div>
     </div>
   );
 }

@@ -17,6 +17,7 @@ import {
 } from '@/lib/seo';
 import BriefDetailClient from './BriefDetailClient';
 import BriefJsonLd from '@/components/BriefJsonLd';
+import CustomCollisionCta from '@/components/CustomCollisionCta';
 import type { Brief } from '@/lib/types';
 
 interface Params {
@@ -101,6 +102,14 @@ export default function BriefDetailPage({ params }: Params) {
       </Link>
 
       <BriefDetailClient teaser={teaser} />
+
+      <div className="mt-20">
+        <CustomCollisionCta
+          headline="Cette collision vous inspire ?"
+          subtext="Demandez la vôtre sur un domaine de votre choix — gratuite pendant le lancement. SPORE croise vos domaines, génère une hypothèse et livre un brief complet en quelques minutes."
+          cta="Demander ma collision →"
+        />
+      </div>
 
       <BriefNeighbors prev={prev} next={next} />
     </div>
