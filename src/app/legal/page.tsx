@@ -24,10 +24,10 @@ export default function LegalPage() {
         <p>
           Email :{' '}
           <a
-            href="mailto:contact@spore-research.com"
+            href="mailto:benoit@spore-research.com"
             className="text-emerald-glow hover:text-emerald-bio"
           >
-            contact@spore-research.com
+            benoit@spore-research.com
           </a>
         </p>
         <p>Directeur de la publication : l&apos;éditeur</p>

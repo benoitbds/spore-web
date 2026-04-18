@@ -21,10 +21,10 @@ export default function PrivacyPage() {
         <p>
           Email :{' '}
           <a
-            href="mailto:contact@spore-research.com"
+            href="mailto:benoit@spore-research.com"
             className="text-emerald-glow hover:text-emerald-bio"
           >
-            contact@spore-research.com
+            benoit@spore-research.com
           </a>
         </p>
       </Section>
@@ -113,10 +113,10 @@ export default function PrivacyPage() {
         <p>
           Pour exercer vos droits :{' '}
           <a
-            href="mailto:contact@spore-research.com"
+            href="mailto:benoit@spore-research.com"
             className="text-emerald-glow hover:text-emerald-bio"
           >
-            contact@spore-research.com
+            benoit@spore-research.com
           </a>
           . Délai de réponse : 30 jours maximum.
         </p>
