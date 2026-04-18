@@ -201,7 +201,11 @@ export const api = {
     apiFetch<CustomStatusResponse>(
       `/api/custom/${encodeURIComponent(id)}/status`,
     ),
-  customFree: (payload: { domain_a: string; domain_b: string }) =>
+  customFree: (payload: {
+    domain_a: string;
+    domain_b?: string;
+    mode?: 'surprise' | 'targeted';
+  }) =>
     apiFetch<CustomFreeResponse>('/api/custom/free', {
       method: 'POST',
       body: payload,

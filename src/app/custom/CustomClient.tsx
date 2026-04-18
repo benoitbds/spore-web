@@ -55,9 +55,12 @@ const DOMAIN_SUGGESTIONS = [
   'Xenobiology',
 ];
 
+type Mode = 'surprise' | 'targeted';
+
 export default function CustomClient() {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAuth();
+  const [mode, setMode] = useState<Mode>('surprise');
   const [domainA, setDomainA] = useState('');
   const [domainB, setDomainB] = useState('');
   const [showGate, setShowGate] = useState(false);
@@ -91,12 +94,18 @@ export default function CustomClient() {
     };
   }, [isAuthenticated, isLoading]);
 
-  const ready = domainA.trim().length > 2 && domainB.trim().length > 2;
+  const aClean = domainA.trim();
+  const bClean = domainB.trim();
+  const aReady = aClean.length > 2;
+  const bReady = bClean.length > 2;
+  const ready = mode === 'surprise' ? aReady : aReady && bReady;
   const identical =
-    domainA.trim().toLowerCase() === domainB.trim().toLowerCase() &&
-    domainA.trim() !== '';
-  const excludedA = ready && isDomainExcluded(domainA);
-  const excludedB = ready && isDomainExcluded(domainB);
+    mode === 'targeted' &&
+    aClean.length > 0 &&
+    bClean.length > 0 &&
+    aClean.toLowerCase() === bClean.toLowerCase();
+  const excludedA = aReady && isDomainExcluded(domainA);
+  const excludedB = mode === 'targeted' && bReady && isDomainExcluded(domainB);
   const hasExclusion = excludedA || excludedB;
   const quotaExhausted = Boolean(existing);
   const formDisabled = quotaExhausted;
@@ -115,10 +124,11 @@ export default function CustomClient() {
     }
     setBusy(true);
     try {
-      const { custom_request_id } = await api.customFree({
-        domain_a: domainA.trim(),
-        domain_b: domainB.trim(),
-      });
+      const payload =
+        mode === 'surprise'
+          ? { mode: 'surprise' as const, domain_a: aClean }
+          : { mode: 'targeted' as const, domain_a: aClean, domain_b: bClean };
+      const { custom_request_id } = await api.customFree(payload);
       router.push(`/custom/${custom_request_id}/status`);
     } catch (err) {
       setBusy(false);
@@ -142,12 +152,8 @@ export default function CustomClient() {
           Votre collision à la carte
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-mist-400">
-          Donnez-nous 2 domaines scientifiques. SPORE force la collision,
-          produit une hypothèse, la valide par un panel de 5 relecteurs et
-          vous livre le brief complet.{' '}
-          <span className="font-medium text-emerald-glow">
-            Une collision sur mesure offerte par utilisateur pendant le lancement.
-          </span>
+          Une collision sur mesure offerte par utilisateur pendant le lancement.
+          Panel de 5 relecteurs, protocole en 3 phases, brief complet.
         </p>
       </header>
 
@@ -157,7 +163,7 @@ export default function CustomClient() {
             Vous avez déjà utilisé votre collision gratuite
           </h2>
           <p className="mb-4 text-sm text-mist-300">
-            Collision : <span className="font-mono text-mist-200">{existing.domain_a} × {existing.domain_b}</span>
+            Collision : <span className="font-mono text-mist-200">{existing.domain_a} × {existing.domain_b || '???'}</span>
             {' — '}
             <span className="text-amber-glow">{label(existing.status)}</span>
           </p>
@@ -184,6 +190,30 @@ export default function CustomClient() {
         </div>
       )}
 
+      {/* Mode toggle */}
+      <div
+        className={`mb-4 flex rounded-full border border-ink-500 bg-ink-800/60 p-1 ${
+          formDisabled ? 'pointer-events-none opacity-50' : ''
+        }`}
+        role="tablist"
+        aria-label="Mode de collision"
+      >
+        <ModeTab
+          active={mode === 'surprise'}
+          onClick={() => setMode('surprise')}
+          icon="🎲"
+          label="Surprise"
+          hint="SPORE choisit le 2ᵉ domaine"
+        />
+        <ModeTab
+          active={mode === 'targeted'}
+          onClick={() => setMode('targeted')}
+          icon="🎯"
+          label="Ciblée"
+          hint="Vous choisissez les deux domaines"
+        />
+      </div>
+
       <form
         onSubmit={submit}
         className={`space-y-6 rounded-2xl border border-ink-500 bg-ink-800/40 p-6 md:p-8 ${
@@ -191,37 +221,61 @@ export default function CustomClient() {
         }`}
         aria-disabled={formDisabled}
       >
-        <DomainField
-          label="Domaine A"
-          value={domainA}
-          onChange={setDomainA}
-          placeholder="ex. Quantum Thermodynamics"
-          listId="domain-a-list"
-          hint="Choisissez parmi la liste ou tapez le vôtre."
-          disabled={formDisabled}
-        />
-        <DomainField
-          label="Domaine B"
-          value={domainB}
-          onChange={setDomainB}
-          placeholder="ex. Reinforcement Learning"
-          listId="domain-b-list"
-          hint="Le plus éloigné de A, le mieux — c'est là que naît la nouveauté."
-          disabled={formDisabled}
-        />
+        {mode === 'surprise' ? (
+          <>
+            <DomainField
+              label="Votre domaine de recherche"
+              value={domainA}
+              onChange={setDomainA}
+              placeholder="ex. Quantum Thermodynamics"
+              listId="domain-a-list"
+              hint="Celui qui vous intéresse, peu importe lequel."
+              disabled={formDisabled}
+            />
+            <p className="text-sm text-mist-400">
+              SPORE va croiser votre domaine avec un domaine scientifique
+              éloigné, choisi aléatoirement. C&apos;est là que naissent les
+              meilleures surprises.
+            </p>
+          </>
+        ) : (
+          <>
+            <DomainField
+              label="Domaine A"
+              value={domainA}
+              onChange={setDomainA}
+              placeholder="ex. Quantum Thermodynamics"
+              listId="domain-a-list"
+              hint="Choisissez parmi la liste ou tapez le vôtre."
+              disabled={formDisabled}
+            />
+            <DomainField
+              label="Domaine B"
+              value={domainB}
+              onChange={setDomainB}
+              placeholder="ex. Reinforcement Learning"
+              listId="domain-b-list"
+              hint="Le plus éloigné de A, le mieux — c'est là que naît la nouveauté."
+              disabled={formDisabled}
+            />
+          </>
+        )}
+
         <datalist id="domain-a-list">
           {DOMAIN_SUGGESTIONS.map((d) => (
             <option key={`a-${d}`} value={d} />
           ))}
         </datalist>
-        <datalist id="domain-b-list">
-          {DOMAIN_SUGGESTIONS.map((d) => (
-            <option key={`b-${d}`} value={d} />
-          ))}
-        </datalist>
+        {mode === 'targeted' && (
+          <datalist id="domain-b-list">
+            {DOMAIN_SUGGESTIONS.map((d) => (
+              <option key={`b-${d}`} value={d} />
+            ))}
+          </datalist>
+        )}
 
         {ready && !identical && !formDisabled && (
-          <CollisionRecap a={domainA} b={domainB} />
+          <CollisionRecap a={aClean} b={mode === 'surprise' ? null : bClean} />
         )}
 
         {identical && (
@@ -234,7 +288,7 @@ export default function CustomClient() {
           <div className="space-y-1">
             {excludedA && (
               <p className="text-sm text-red-400">
-                ⛔ Le domaine A est exclu par notre charte éthique. Merci d&apos;en choisir un autre.
+                ⛔ Le domaine {mode === 'surprise' ? 'saisi' : 'A'} est exclu par notre charte éthique. Merci d&apos;en choisir un autre.
               </p>
             )}
             {excludedB && (
@@ -261,7 +315,11 @@ export default function CustomClient() {
             }
             className="rounded-xl bg-emerald-bio px-6 py-3 text-sm font-semibold text-ink-900 hover:bg-emerald-glow disabled:opacity-50"
           >
-            {busy ? 'Lancement…' : 'Lancer ma collision gratuite →'}
+            {busy
+              ? 'Lancement…'
+              : mode === 'surprise'
+                ? '🎲 Lancer une collision surprise'
+                : 'Lancer ma collision ciblée →'}
           </button>
         </div>
 
@@ -276,7 +334,11 @@ export default function CustomClient() {
         <div className="mt-8">
           <EmailGate
             headline="Un pas avant le lancement"
-            subtext={`Votre collision : ${domainA} × ${domainB}. Connectez-vous par email pour finaliser.`}
+            subtext={
+              mode === 'surprise'
+                ? `Votre domaine : ${aClean}. Connectez-vous par email pour finaliser.`
+                : `Votre collision : ${aClean} × ${bClean}. Connectez-vous par email pour finaliser.`
+            }
             cta="Continuer"
             onSent={() => setShowGate(false)}
           />
@@ -289,6 +351,38 @@ export default function CustomClient() {
         </p>
       )}
     </div>
+  );
+}
+
+function ModeTab({
+  active,
+  onClick,
+  icon,
+  label,
+  hint,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: string;
+  label: string;
+  hint: string;
+}) {
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={active}
+      onClick={onClick}
+      className={`flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-all ${
+        active
+          ? 'bg-emerald-bio/20 text-emerald-glow shadow-[0_0_20px_rgba(16,185,129,0.15)]'
+          : 'text-mist-400 hover:text-mist-100'
+      }`}
+    >
+      <span aria-hidden className="text-base">{icon}</span>
+      <span>{label}</span>
+      <span className="hidden text-xs font-normal text-mist-500 sm:inline">— {hint}</span>
+    </button>
   );
 }
 
@@ -331,14 +425,20 @@ function DomainField({
   );
 }
 
-function CollisionRecap({ a, b }: { a: string; b: string }) {
+function CollisionRecap({ a, b }: { a: string; b: string | null }) {
   return (
     <div className="rounded-xl border border-emerald-bio/30 bg-emerald-bio/5 p-5">
       <p className="text-sm text-mist-200">
         SPORE va croiser{' '}
         <span className="font-display text-lg text-emerald-glow">{a}</span>{' '}
         ×{' '}
-        <span className="font-display text-lg text-emerald-glow">{b}</span>{' '}
+        {b ? (
+          <span className="font-display text-lg text-emerald-glow">{b}</span>
+        ) : (
+          <span className="font-display text-lg text-mist-500" title="SPORE choisira un domaine éloigné au hasard">
+            ???
+          </span>
+        )}{' '}
         et générer un brief de recherche complet.
       </p>
     </div>
