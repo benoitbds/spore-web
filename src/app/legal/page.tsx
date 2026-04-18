@@ -15,22 +15,22 @@ export default function LegalPage() {
 
       <Section title="Éditeur">
         <p>
-          SPORE est un projet de recherche personnel édité par{' '}
+          SPORE est un projet de recherche édité par{' '}
           <span className="font-medium text-mist-100">
-            Benoit Baqué de Sariac
+            SPORE Research (structure en cours de création)
           </span>
           .
         </p>
         <p>
           Email :{' '}
           <a
-            href="mailto:benoit@spore-research.com"
+            href="mailto:contact@spore-research.com"
             className="text-emerald-glow hover:text-emerald-bio"
           >
-            benoit@spore-research.com
+            contact@spore-research.com
           </a>
         </p>
-        <p>Directeur de la publication : Benoit Baqué de Sariac</p>
+        <p>Directeur de la publication : l&apos;éditeur</p>
       </Section>
 
       <Section title="Hébergement">

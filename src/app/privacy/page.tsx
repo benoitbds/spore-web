@@ -17,14 +17,14 @@ export default function PrivacyPage() {
       </p>
 
       <Section title="Responsable du traitement">
-        <p>Benoit Baqué de Sariac</p>
+        <p>SPORE Research (structure en cours de création)</p>
         <p>
           Email :{' '}
           <a
-            href="mailto:benoit@spore-research.com"
+            href="mailto:contact@spore-research.com"
             className="text-emerald-glow hover:text-emerald-bio"
           >
-            benoit@spore-research.com
+            contact@spore-research.com
           </a>
         </p>
       </Section>
@@ -113,10 +113,10 @@ export default function PrivacyPage() {
         <p>
           Pour exercer vos droits :{' '}
           <a
-            href="mailto:benoit@spore-research.com"
+            href="mailto:contact@spore-research.com"
             className="text-emerald-glow hover:text-emerald-bio"
           >
-            benoit@spore-research.com
+            contact@spore-research.com
           </a>
           . Délai de réponse : 30 jours maximum.
         </p>

@@ -32,7 +32,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm text-mist-400">
               <li>
                 <span className="text-mist-300">Construit par</span>{' '}
-                <span className="font-medium text-mist-100">Bac</span>
+                <span className="font-medium text-mist-100">SPORE Research</span>
               </li>
               <li>
                 <span className="text-mist-300">Propulsé par</span>{' '}

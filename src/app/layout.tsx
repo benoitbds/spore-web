@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     'vulgarisation scientifique',
     'SPORE',
   ],
-  authors: [{ name: 'Bac' }],
+  authors: [{ name: 'SPORE Research' }],
   openGraph: {
     type: 'website',
     locale: 'fr_FR',
