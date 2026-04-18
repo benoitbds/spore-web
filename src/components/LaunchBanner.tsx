@@ -24,17 +24,17 @@ function writeCookie(name: string, value: string, maxAgeSec: number) {
  * Thin sticky banner advertising the launch offer. Sits above <Header>
  * and disappears (persistently) when the user clicks the ✕.
  *
- * The banner is only rendered after mount + after we confirm the cookie
- * hasn't been set yet — avoids a hydration mismatch where SSR would
- * show it but the client would immediately hide it.
+ * The banner's initial state is ``visible=true`` so it renders during
+ * SSR (search crawlers + social previews see the launch copy) and
+ * matches the first client render — no hydration mismatch. A useEffect
+ * then flips it off if the dismissal cookie is present.
  */
 export default function LaunchBanner() {
   const { isAuthenticated } = useAuth();
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    if (readCookie(COOKIE_NAME) === '1') return;
-    setVisible(true);
+    if (readCookie(COOKIE_NAME) === '1') setVisible(false);
   }, []);
 
   if (!visible) return null;
