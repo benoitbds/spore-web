@@ -240,20 +240,221 @@ export default function BriefDetailClient({ teaser }: Props) {
                 lang={lang}
               />
             ) : (
-              <PaywallPanel
-                briefId={teaser.brief_id}
-                isAuthenticated={isAuthenticated}
-                isAuthLoading={isLoading}
-                user={user}
-                onUnlock={fetchFull}
-                loadState={loadState}
-                loadError={loadError}
-              />
+              <>
+                <RecherchePreview teaser={teaser} />
+                <PaywallPanel
+                  briefId={teaser.brief_id}
+                  isAuthenticated={isAuthenticated}
+                  isAuthLoading={isLoading}
+                  user={user}
+                  onUnlock={fetchFull}
+                  loadState={loadState}
+                  loadError={loadError}
+                />
+              </>
             )}
           </motion.div>
         )}
       </AnimatePresence>
     </article>
+  );
+}
+
+// ── Recherche preview — shown before the unlock CTA ───────────────
+//
+// Three stacked blocks (TOC, references, panel scores) fed by the
+// non-sensitive summary fields denormalised on the teaser. Any block
+// whose data isn't available on a given brief (e.g. grounding_degraded
+// with zero references) is silently dropped so the preview never
+// renders an empty shell.
+function RecherchePreview({ teaser }: { teaser: BriefTeaser }) {
+  const hasRefs =
+    Array.isArray(teaser.references_preview) &&
+    teaser.references_preview.length > 0;
+  const hasPanel =
+    Array.isArray(teaser.panel_preview) && teaser.panel_preview.length > 0;
+  return (
+    <div className="space-y-8">
+      <BriefToc />
+      {hasRefs && (
+        <ReferencesPreview
+          refs={teaser.references_preview!}
+          total={teaser.references_total ?? teaser.references_preview!.length}
+        />
+      )}
+      {hasPanel && <PanelPreview reviewers={teaser.panel_preview!} />}
+    </div>
+  );
+}
+
+const TOC_ITEMS: ReadonlyArray<{ icon: string; label: string; sub: string }> = [
+  {
+    icon: '🧩',
+    label: 'Hypothèse et mécanisme',
+    sub: 'Chaîne causale, hypothèses clés, inconnues résiduelles',
+  },
+  {
+    icon: '📚',
+    label: 'État de l\'art',
+    sub: 'Références vérifiées + contre-preuves (DOIs)',
+  },
+  {
+    icon: '🔮',
+    label: 'Prédictions falsifiables',
+    sub: 'Bornes quantitatives, tests statistiques, H0',
+  },
+  {
+    icon: '🧪',
+    label: 'Protocole expérimental',
+    sub: '3 phases — in silico → minimal → complet',
+  },
+  {
+    icon: '💥',
+    label: 'Analyse d\'impact',
+    sub: 'Nouveauté, lacunes résiduelles, données disponibles',
+  },
+  {
+    icon: '🎭',
+    label: 'Panel de relecture',
+    sub: '5 personas + méta-relecture',
+  },
+];
+
+function BriefToc() {
+  return (
+    <section>
+      <h3 className="mb-4 text-xs font-medium uppercase tracking-widest text-emerald-glow">
+        Table des matières du brief complet
+      </h3>
+      <ul className="space-y-2">
+        {TOC_ITEMS.map((item) => (
+          <li
+            key={item.label}
+            className="flex items-start gap-3 rounded-xl border border-ink-500 bg-ink-800/40 px-4 py-3"
+          >
+            <span className="mt-0.5 text-xl leading-none" aria-hidden>
+              {item.icon}
+            </span>
+            <div>
+              <div className="text-sm font-medium text-mist-100">
+                {item.label}
+              </div>
+              <div className="text-xs text-mist-500">{item.sub}</div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function ReferencesPreview({
+  refs,
+  total,
+}: {
+  refs: NonNullable<BriefTeaser['references_preview']>;
+  total: number;
+}) {
+  const shown = refs.length;
+  return (
+    <section>
+      <div className="mb-4 flex items-baseline justify-between gap-4">
+        <h3 className="text-xs font-medium uppercase tracking-widest text-emerald-glow">
+          Références vérifiées
+        </h3>
+        <span className="text-xs text-mist-500">
+          {shown} sur {total}{total > 1 ? ' références' : ' référence'}
+        </span>
+      </div>
+      <ul className="space-y-2">
+        {refs.map((r, i) => (
+          <li
+            key={i}
+            className="flex flex-col gap-1 rounded-xl border border-ink-500 bg-ink-800/40 p-4 md:flex-row md:items-baseline md:justify-between md:gap-4"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="text-sm text-mist-100 line-clamp-2">{r.title}</p>
+              {r.year !== null && (
+                <span className="mt-1 inline-block text-xs text-mist-500">
+                  {r.year}
+                </span>
+              )}
+            </div>
+            {r.doi && (
+              <a
+                href={`https://doi.org/${r.doi}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block shrink-0 self-start font-mono text-xs text-emerald-glow hover:text-emerald-bio md:self-auto"
+              >
+                DOI: {r.doi} ↗
+              </a>
+            )}
+          </li>
+        ))}
+      </ul>
+      {total > shown && (
+        <p className="mt-3 text-xs text-mist-500">
+          + {total - shown} autre{total - shown > 1 ? 's' : ''} référence
+          {total - shown > 1 ? 's' : ''} dans le brief complet
+          (contre-preuves incluses).
+        </p>
+      )}
+    </section>
+  );
+}
+
+function PanelPreview({
+  reviewers,
+}: {
+  reviewers: NonNullable<BriefTeaser['panel_preview']>;
+}) {
+  return (
+    <section>
+      <h3 className="mb-4 text-xs font-medium uppercase tracking-widest text-emerald-glow">
+        Scores détaillés du panel
+      </h3>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        {reviewers.map((r, i) => (
+          <PanelPreviewCard key={i} reviewer={r} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PanelPreviewCard({
+  reviewer,
+}: {
+  reviewer: NonNullable<BriefTeaser['panel_preview']>[number];
+}) {
+  const scoreTone =
+    reviewer.score >= 7
+      ? 'text-emerald-glow'
+      : reviewer.score >= 5
+        ? 'text-amber-glow'
+        : 'text-red-400';
+  return (
+    <div className="flex h-full flex-col rounded-xl border border-ink-500 bg-ink-800/40 p-4">
+      <div className="mb-2 flex items-baseline justify-between gap-2">
+        <span className="text-xs font-medium uppercase tracking-wider text-mist-400">
+          {label(reviewer.persona)}
+        </span>
+        <span className={`font-display text-2xl ${scoreTone}`}>
+          {reviewer.score.toFixed(1)}
+        </span>
+      </div>
+      <span
+        className={`mb-2 inline-block w-fit rounded-full px-2 py-0.5 text-[10px] font-medium ${verdictChipClasses(reviewer.verdict)}`}
+      >
+        {verdictLabel(reviewer.verdict)}
+      </span>
+      {reviewer.key_point && (
+        <p className="mt-auto text-xs leading-relaxed text-mist-300 line-clamp-3">
+          {reviewer.key_point}
+        </p>
+      )}
+    </div>
   );
 }
 

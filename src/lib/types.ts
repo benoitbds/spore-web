@@ -205,8 +205,8 @@ export interface BriefTeaser {
   // ── EN "Comprendre" summaries ───────────────────────────────────
   // Denormalised, non-sensitive extracts from the full brief used to
   // build a structured EN view of the public tab. None of these
-  // expose gated content (no DOIs, no full reviewer breakdown, no
-  // quantitative predictions) — they're headline summaries.
+  // expose gated content (no full reviewer breakdown, no quantitative
+  // predictions, no relevance prose) — they're headline summaries.
   mechanism_summary?: string;
   novelty_summary?: { score: number; key_difference: string } | null;
   protocol_summary?: Array<{ phase_name: string; objective: string }>;
@@ -215,6 +215,26 @@ export interface BriefTeaser {
     consensus_score: number;
     key_consensus: string[];
   };
+
+  // ── "Recherche" tab preview ─────────────────────────────────────
+  // Shown before the unlock CTA so experts can size up the brief
+  // without burning their free download. DOIs + titles + years are
+  // already public; reviewer scores/verdicts are public quality
+  // indicators. The gated payload (relevance prose, strengths /
+  // weaknesses detail, funding programs, quantitative bounds) stays
+  // behind the /api/briefs/{id}/full call.
+  references_preview?: Array<{
+    title: string;
+    year: number | null;
+    doi: string | null;
+  }>;
+  references_total?: number;
+  panel_preview?: Array<{
+    persona: string;
+    score: number;
+    verdict: string;
+    key_point: string;
+  }>;
 }
 
 export function briefToTeaser(b: Brief): BriefTeaser {
@@ -247,6 +267,26 @@ export function briefToTeaser(b: Brief): BriefTeaser {
       }
     : undefined;
 
+  const evidence = b.grounding?.evidence_base ?? [];
+  const counter = b.grounding?.counter_evidence ?? [];
+  const references_total = evidence.length + counter.length;
+  const references_preview = evidence
+    .slice(0, 5)
+    .map((p) => ({
+      title: p.title ?? '',
+      year: p.year ?? null,
+      doi: p.doi ?? null,
+    }))
+    .filter((r) => r.title.length > 0);
+
+  const reviews = b.panel?.reviews ?? [];
+  const panel_preview = reviews.slice(0, 5).map((r) => ({
+    persona: r.reviewer_persona,
+    score: r.overall_score ?? 0,
+    verdict: r.verdict ?? '',
+    key_point: r.strengths?.[0] || r.recommendation || '',
+  }));
+
   return {
     brief_id: b.brief_id,
     generated_at: b.generated_at,
@@ -259,6 +299,10 @@ export function briefToTeaser(b: Brief): BriefTeaser {
     novelty_summary,
     protocol_summary: protocol_summary.length > 0 ? protocol_summary : undefined,
     panel_summary,
+    references_preview:
+      references_preview.length > 0 ? references_preview : undefined,
+    references_total: references_total > 0 ? references_total : undefined,
+    panel_preview: panel_preview.length > 0 ? panel_preview : undefined,
   };
 }
 
