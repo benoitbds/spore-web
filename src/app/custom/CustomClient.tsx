@@ -336,10 +336,21 @@ export default function CustomClient() {
             headline="Un pas avant le lancement"
             subtext={
               mode === 'surprise'
-                ? `Votre domaine : ${aClean}. Connectez-vous par email pour finaliser.`
-                : `Votre collision : ${aClean} × ${bClean}. Connectez-vous par email pour finaliser.`
+                ? `Votre domaine : ${aClean}. Saisissez votre email : votre collision sera lancée dès la validation.`
+                : `Votre collision : ${aClean} × ${bClean}. Saisissez votre email : votre collision sera lancée dès la validation.`
             }
-            cta="Continuer"
+            cta="Lancer ma collision"
+            onSubmitWithContext={async (email) => {
+              // Persist the selection server-side BEFORE the magic link
+              // is sent, so the run can fire as soon as the user clicks
+              // the link — no React state to lose across navigations.
+              await api.customFreeSignup({
+                email,
+                mode,
+                domain_a: aClean,
+                ...(mode === 'targeted' ? { domain_b: bClean } : {}),
+              });
+            }}
             onSent={() => setShowGate(false)}
           />
         </div>

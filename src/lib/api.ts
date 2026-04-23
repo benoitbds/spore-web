@@ -119,6 +119,12 @@ export interface CustomFreeResponse {
   message: string;
 }
 
+export interface CustomFreeSignupResponse {
+  success: boolean;
+  request_id: string;
+  message: string;
+}
+
 export interface CustomStatusResponse {
   id: string;
   status:
@@ -209,6 +215,17 @@ export const api = {
     apiFetch<CustomFreeResponse>('/api/custom/free', {
       method: 'POST',
       body: payload,
+    }),
+  customFreeSignup: (payload: {
+    email: string;
+    mode: 'surprise' | 'targeted';
+    domain_a: string;
+    domain_b?: string;
+  }) =>
+    apiFetch<CustomFreeSignupResponse>('/api/custom/free-signup', {
+      method: 'POST',
+      body: payload,
+      auth: false,
     }),
   accountBriefs: () =>
     apiFetch<AccountBrief[]>('/api/account/briefs'),

@@ -6,7 +6,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { api, ApiError, type CustomStatusResponse } from '@/lib/api';
 import { label } from '@/lib/labels';
 
-const POLL_MS = 30_000;
+// Fast polling while the run is in-flight so the UI flips to "complete"
+// within seconds of the pipeline finishing. Terminal statuses poll rarely
+// (or not at all) to spare the API.
+const POLL_MS_ACTIVE = 5_000;
+const POLL_MS_TERMINAL = 60_000;
+const ACTIVE_STATUSES = new Set(['pending', 'paid', 'running']);
 
 export default function StatusClient({ requestId }: { requestId: string }) {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -17,6 +22,7 @@ export default function StatusClient({ requestId }: { requestId: string }) {
   useEffect(() => {
     if (authLoading || !isAuthenticated) return;
     let stopped = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
 
     async function tick() {
       try {
@@ -25,6 +31,10 @@ export default function StatusClient({ requestId }: { requestId: string }) {
         setData(res);
         setError(null);
         setInitial(false);
+        const delay = ACTIVE_STATUSES.has(res.status)
+          ? POLL_MS_ACTIVE
+          : POLL_MS_TERMINAL;
+        timer = setTimeout(tick, delay);
       } catch (err) {
         if (stopped) return;
         if (err instanceof ApiError && err.status === 404) {
@@ -33,14 +43,16 @@ export default function StatusClient({ requestId }: { requestId: string }) {
           setError((err as Error).message || 'Erreur réseau');
         }
         setInitial(false);
+        // On error, retry at the active cadence — a transient 5xx shouldn't
+        // leave the UI stuck for a minute.
+        timer = setTimeout(tick, POLL_MS_ACTIVE);
       }
     }
 
     tick();
-    const id = setInterval(tick, POLL_MS);
     return () => {
       stopped = true;
-      clearInterval(id);
+      if (timer) clearTimeout(timer);
     };
   }, [requestId, isAuthenticated, authLoading]);
 

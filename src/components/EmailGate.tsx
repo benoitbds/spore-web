@@ -19,6 +19,17 @@ interface Props {
   subtext?: string;
   cta?: string;
   onSent?: (email: string) => void;
+  /**
+   * Optional handler that replaces the default ``login(email)`` call.
+   *
+   * When provided, the submit flow dispatches to this callback with the
+   * entered email instead of sending a plain magic-link request. Callers
+   * use it to attach context (e.g. a pending custom-collision selection)
+   * to the signup/login request before the magic link is sent.
+   *
+   * Must throw (or reject) on failure so the gate can surface an error.
+   */
+  onSubmitWithContext?: (email: string) => Promise<void>;
   className?: string;
 }
 
@@ -27,6 +38,7 @@ export default function EmailGate({
   subtext = 'Un lien d\'accès sera envoyé à votre email. Pas de mot de passe.',
   cta = 'Recevoir le lien',
   onSent,
+  onSubmitWithContext,
   className = '',
 }: Props) {
   const { login } = useAuth();
@@ -54,7 +66,11 @@ export default function EmailGate({
     setStatus('pending');
     setError(null);
     try {
-      await login(email);
+      if (onSubmitWithContext) {
+        await onSubmitWithContext(email);
+      } else {
+        await login(email);
+      }
       setStatus('sent');
       // Delay onSent so the parent (e.g. header dropdown) doesn't
       // close before the user reads the confirmation message.
