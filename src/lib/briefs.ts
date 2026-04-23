@@ -30,7 +30,12 @@ export function getAllBriefs(): Brief[] {
     try {
       const raw = fs.readFileSync(path.join(BRIEFS_DIR, file), 'utf-8');
       const data = JSON.parse(raw) as Brief;
-      if (data.brief_id && data.sharpened) {
+      // Regular briefs carry a full pipeline payload; stub briefs (honest
+      // "no bridge" analyses for custom runs) only carry a body_markdown.
+      // Accept both shapes.
+      const hasPipeline = Boolean(data.sharpened);
+      const isStub = Boolean((data as unknown as { is_stub?: boolean }).is_stub);
+      if (data.brief_id && (hasPipeline || isStub)) {
         briefs.push(data);
       }
     } catch (err) {

@@ -141,6 +141,11 @@ export interface CustomStatusResponse {
   error_message: string | null;
   created_at: string | null;
   completed_at: string | null;
+  // True when the pipeline couldn't produce a real brief (e.g. the two
+  // domains had no mechanistic bridge) but delivered an honest analysis
+  // instead. Frontend renders a distinct info-banner presentation.
+  is_stub?: boolean;
+  stub_reason?: string | null;
 }
 
 export interface AccountBrief {

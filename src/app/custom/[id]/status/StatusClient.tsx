@@ -152,6 +152,33 @@ function StatusView({ data }: { data: CustomStatusResponse }) {
         </>
       );
     case 'complete':
+      if (data.is_stub) {
+        return (
+          <>
+            {meta}
+            <StatusCard
+              tone="neutral"
+              emoji="ℹ️"
+              title="Cette collision n'a pas produit d'hypothèse exploitable"
+            >
+              SPORE a analysé la paire et n&apos;a trouvé aucun pont
+              mécanistique solide — uniquement des similitudes lexicales ou
+              métaphoriques. Voici l&apos;analyse honnête de SPORE sur les
+              raisons de cet échec, avec des pistes de recombinaison.
+              {data.brief_id ? (
+                <span className="mt-4 block">
+                  <Link
+                    href={`/discoveries/${data.brief_id}`}
+                    className="inline-block rounded-xl border border-mist-400/40 bg-ink-800/60 px-5 py-3 font-semibold text-mist-100 hover:bg-ink-700"
+                  >
+                    Lire l&apos;analyse →
+                  </Link>
+                </span>
+              ) : null}
+            </StatusCard>
+          </>
+        );
+      }
       return (
         <>
           {meta}
@@ -201,7 +228,7 @@ function StatusCard({
   title,
   children,
 }: {
-  tone: 'mist' | 'emerald' | 'red';
+  tone: 'mist' | 'emerald' | 'red' | 'neutral';
   emoji: string;
   title: string;
   children: React.ReactNode;
@@ -211,7 +238,9 @@ function StatusCard({
       ? 'border-emerald-bio/40 bg-emerald-bio/5'
       : tone === 'red'
         ? 'border-red-500/40 bg-red-500/5'
-        : 'border-ink-500 bg-ink-800/40';
+        : tone === 'neutral'
+          ? 'border-mist-400/30 bg-mist-500/5'
+          : 'border-ink-500 bg-ink-800/40';
   return (
     <div className={`rounded-2xl border ${toneCls} p-6`}>
       <div className="mb-3 text-3xl">{emoji}</div>

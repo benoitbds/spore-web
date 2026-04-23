@@ -16,9 +16,20 @@ import {
   briefOgDescription,
 } from '@/lib/seo';
 import BriefDetailClient from './BriefDetailClient';
+import StubBriefClient from './StubBriefClient';
 import BriefJsonLd from '@/components/BriefJsonLd';
 import CustomCollisionCta from '@/components/CustomCollisionCta';
 import type { Brief } from '@/lib/types';
+
+interface StubBriefShape {
+  brief_id?: string;
+  is_stub?: boolean;
+  stub_reason?: string | null;
+  title?: string;
+  domains?: string[];
+  body_markdown?: string;
+  generated_at?: string;
+}
 
 interface Params {
   params: { id: string };
@@ -33,6 +44,17 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (!brief) {
     return {
       title: 'Brief introuvable',
+      robots: { index: false, follow: false },
+    };
+  }
+
+  // Stub briefs are user-specific honest-failure analyses; they shouldn't
+  // appear in search, and the regular briefMetaTitle helper reads fields
+  // that only exist on pipeline briefs (sharpened.title etc.).
+  const asStub = brief as unknown as { is_stub?: boolean; title?: string };
+  if (asStub.is_stub) {
+    return {
+      title: asStub.title || 'Analyse SPORE',
       robots: { index: false, follow: false },
     };
   }
@@ -80,6 +102,33 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 export default function BriefDetailPage({ params }: Params) {
   const brief = getBriefById(params.id);
   if (!brief) notFound();
+
+  // Stub briefs (custom runs where Synthesis refused to bridge the pair)
+  // carry only { is_stub, title, domains, body_markdown }. They don't
+  // have pipeline data for BriefDetailClient to render, so we route
+  // them to a dedicated client that shows an info banner + the markdown.
+  const asStub = brief as unknown as StubBriefShape;
+  if (asStub.is_stub && asStub.body_markdown) {
+    return (
+      <div className="mx-auto max-w-6xl px-6 py-12">
+        <Link
+          href="/discoveries"
+          className="group mb-8 inline-flex items-center gap-2 text-sm text-mist-400 hover:text-emerald-glow transition-colors"
+        >
+          <span className="transition-transform group-hover:-translate-x-1">←</span>
+          Toutes les découvertes
+        </Link>
+        <StubBriefClient
+          briefId={asStub.brief_id || params.id}
+          title={asStub.title || 'Analyse SPORE'}
+          domainA={asStub.domains?.[0] ?? '?'}
+          domainB={asStub.domains?.[1] ?? '?'}
+          markdown={asStub.body_markdown}
+          generatedAt={asStub.generated_at ?? null}
+        />
+      </div>
+    );
+  }
 
   // Paywall boundary: the full Brief never crosses into a client component.
   // BriefJsonLd is a pure server component (no "use client"), so its props
