@@ -22,6 +22,16 @@ import 'server-only';
 
 import path from 'node:path';
 import Database, { type Database as BetterSqlite3Database } from 'better-sqlite3';
+import {
+  briefToTeaser,
+  type Brief,
+  type BriefTeaser,
+  type Grounding,
+  type Sharpened,
+  type Protocol,
+  type Panel,
+  type VulgarizationFr,
+} from './types';
 
 // ── Environment configuration ─────────────────────────────────────────
 
@@ -103,6 +113,9 @@ export interface BriefRow {
   low_evidence: number;
   is_stub: number;
   stub_reason: string | null;
+  /** Phase 2 mirror of outputs/briefs/{id}.md. May be NULL on rows
+   *  that pre-date the migration and haven't been backfilled. */
+  body_markdown: string | null;
 }
 
 /**
@@ -376,6 +389,242 @@ export function getBriefStats(): BriefStats {
     };
   } catch (err) {
     console.error('[spore-web/db] getBriefStats failed:', err);
+    throw err;
+  }
+}
+
+// ── Adapters: BriefRow → existing nested Brief / BriefTeaser ─────────
+//
+// Phase 2 of the SSG-to-DB refactor: the rest of the codebase (pages,
+// components) consumes the nested ``Brief`` shape from src/lib/types.ts
+// — that contract was set when briefs were JSON files on disk. Rather
+// than refactor every consumer, this PR ships an adapter that
+// reconstructs the nested shape from the flat ``BriefRow``. PR #2 will
+// flip the page imports from ``@/lib/briefs`` to ``@/lib/db`` without
+// touching any component prop type.
+
+function asObjectOrNull(value: unknown): Record<string, unknown> | null {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    return value as Record<string, unknown>;
+  }
+  return null;
+}
+
+function asStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((v): v is string => typeof v === 'string');
+}
+
+function defaultGrounding(): Grounding {
+  return {
+    novelty_assessment: { score: 0, verdict: 'novel', closest_existing_work: [] },
+    evidence_base: [],
+    counter_evidence: [],
+    gap_manifest_update: { closed_gaps: [], new_gaps: [], data_available: [] },
+    search_queries: [],
+  };
+}
+
+function defaultSharpened(): Sharpened {
+  return {
+    title: '',
+    formal_statement: '',
+    independent_variables: [],
+    dependent_variables: [],
+    proposed_mechanism: { causal_chain: [], key_assumptions: [], known_unknowns: [] },
+    falsifiable_predictions: [],
+    boundary_conditions: [],
+    theoretical_framework: '',
+  };
+}
+
+function defaultProtocol(): Protocol {
+  return {
+    protocol_title: '',
+    overall_timeline: '',
+    overall_budget_estimate: '',
+    phases: [],
+    phase_1_quick_start: {
+      can_start_today: false,
+      first_action: '',
+      tools_needed: [],
+      open_data_sources: [],
+    },
+  };
+}
+
+function defaultPanel(): Panel {
+  return {
+    reviews: [],
+    meta_review: {
+      consensus_score: 0,
+      verdict: 'reject',
+      key_consensus: [],
+      key_disagreements: [],
+      critical_path: '',
+      final_recommendation: '',
+      brief_quality_gate: false,
+    },
+  };
+}
+
+/**
+ * Reconstruct the nested ``Brief`` shape consumed by existing components
+ * from a flat ``BriefRow``. Defensive: missing or corrupted JSON blobs
+ * collapse to safe defaults rather than throwing — a partially-broken
+ * brief should still render the unbroken parts of the page instead of
+ * tripping the whole route to 500.
+ *
+ * Includes ``body_markdown`` as a non-standard top-level extension that
+ * Phase 2 consumers (the Markdown rendering path) can read without a
+ * disk fallback. When body_markdown is NULL on a not-yet-backfilled
+ * row, the field is omitted (consumers should guard for it).
+ */
+export interface BriefWithBody extends Brief {
+  body_markdown?: string;
+  is_stub?: boolean;
+  stub_reason?: string | null;
+}
+
+export function briefRowToBrief(row: BriefRow): BriefWithBody {
+  const grounding = (asObjectOrNull(row.grounding_data) as unknown as Grounding | null) ?? defaultGrounding();
+  const sharpened = (asObjectOrNull(row.sharpened_data) as unknown as Sharpened | null) ?? defaultSharpened();
+  const protocol = (asObjectOrNull(row.protocol_data) as unknown as Protocol | null) ?? defaultProtocol();
+  const panel = (asObjectOrNull(row.panel_data) as unknown as Panel | null) ?? defaultPanel();
+
+  const vulgRaw = asObjectOrNull(row.vulgarization_data);
+  const vulgarization_fr = vulgRaw
+    ? (vulgRaw as unknown as VulgarizationFr)
+    : undefined;
+
+  // Domains live inside the JSON sidecars — most often on the panel /
+  // protocol or in the original_hypothesis blob. We surface a best-effort
+  // list from sharpened_data.domains then grounding_data.domains; fall
+  // back to an empty array for stubs and pre-Phase-2 rows.
+  const domainsFromSharpened = asStringArray(
+    (asObjectOrNull(row.sharpened_data) ?? {}).domains,
+  );
+  const domainsFromGrounding = asStringArray(
+    (asObjectOrNull(row.grounding_data) ?? {}).domains,
+  );
+  const domains = domainsFromSharpened.length
+    ? domainsFromSharpened
+    : domainsFromGrounding;
+
+  // ``original_hypothesis`` lives in the JSON file but not in any DB
+  // column. The Markdown body is now in body_markdown so we don't need
+  // to recover original_hypothesis for the rendering path; expose an
+  // empty string for type completeness.
+  const result: BriefWithBody = {
+    brief_id: row.id,
+    generated_at: row.created_at,
+    domains,
+    original_hypothesis: '',
+    grounding,
+    sharpened,
+    protocol,
+    panel,
+    vulgarization_fr,
+    is_stub: row.is_stub === 1,
+    stub_reason: row.stub_reason,
+  };
+  if (row.body_markdown !== null) {
+    result.body_markdown = row.body_markdown;
+  }
+  return result;
+}
+
+/**
+ * Direct DB → BriefTeaser projection. Reuses the existing
+ * ``briefToTeaser`` so the public-vs-paywall split stays in one place.
+ */
+export function briefRowToTeaser(row: BriefRow): BriefTeaser {
+  return briefToTeaser(briefRowToBrief(row));
+}
+
+/**
+ * Same as ``getDiscoverableBriefs`` but built on top of the adapter so
+ * the card shape stays in lockstep with what ``EditorialBriefCard``
+ * consumes. The Phase 1 helper still exists for read-paths that don't
+ * need the full Brief reshape.
+ */
+export function getDiscoveryBriefsViaAdapter(): BriefWithBody[] {
+  return getAllBriefs().map(briefRowToBrief);
+}
+
+// ── Featured + neighbors ─────────────────────────────────────────────
+
+/**
+ * Replacement for ``briefs.ts::getFeaturedBrief`` — three-tier preference:
+ *   1. brief with vulgarization_data AND panel_verdict='publish_brief'
+ *   2. brief with vulgarization_data (any verdict)
+ *   3. most recent brief overall
+ * Each tier is a single-row LIMIT 1 query, evaluated in order.
+ */
+export function getFeaturedBrief(): BriefWithBody | null {
+  const conn = db();
+  try {
+    const tier1 = conn
+      .prepare(
+        `SELECT * FROM briefs
+         WHERE vulgarization_data IS NOT NULL
+           AND panel_verdict = 'publish_brief'
+         ORDER BY created_at DESC LIMIT 1`,
+      )
+      .get() as Record<string, unknown> | undefined;
+    if (tier1) return briefRowToBrief(hydrateBriefRow(tier1));
+
+    const tier2 = conn
+      .prepare(
+        `SELECT * FROM briefs
+         WHERE vulgarization_data IS NOT NULL
+         ORDER BY created_at DESC LIMIT 1`,
+      )
+      .get() as Record<string, unknown> | undefined;
+    if (tier2) return briefRowToBrief(hydrateBriefRow(tier2));
+
+    const tier3 = conn
+      .prepare(`SELECT * FROM briefs ORDER BY created_at DESC LIMIT 1`)
+      .get() as Record<string, unknown> | undefined;
+    return tier3 ? briefRowToBrief(hydrateBriefRow(tier3)) : null;
+  } catch (err) {
+    console.error('[spore-web/db] getFeaturedBrief failed:', err);
+    throw err;
+  }
+}
+
+/**
+ * Replacement for ``briefs.ts::getBriefNeighbors``. Returns the brief
+ * immediately older (``previous``) and newer (``next``) than ``id``,
+ * by created_at. Either side may be null at the bounds of the list.
+ */
+export function getBriefNeighbors(
+  id: string,
+): { previous: BriefWithBody | null; next: BriefWithBody | null } {
+  const conn = db();
+  try {
+    const previous = conn
+      .prepare(
+        `SELECT * FROM briefs
+         WHERE created_at < (SELECT created_at FROM briefs WHERE id = ?)
+         ORDER BY created_at DESC LIMIT 1`,
+      )
+      .get(id) as Record<string, unknown> | undefined;
+
+    const next = conn
+      .prepare(
+        `SELECT * FROM briefs
+         WHERE created_at > (SELECT created_at FROM briefs WHERE id = ?)
+         ORDER BY created_at ASC LIMIT 1`,
+      )
+      .get(id) as Record<string, unknown> | undefined;
+
+    return {
+      previous: previous ? briefRowToBrief(hydrateBriefRow(previous)) : null,
+      next: next ? briefRowToBrief(hydrateBriefRow(next)) : null,
+    };
+  } catch (err) {
+    console.error(`[spore-web/db] getBriefNeighbors(${id}) failed:`, err);
     throw err;
   }
 }
