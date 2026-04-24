@@ -31,6 +31,7 @@ import {
   type Protocol,
   type Panel,
   type VulgarizationFr,
+  type Stats,
 } from './types';
 
 // ── Environment configuration ─────────────────────────────────────────
@@ -553,6 +554,200 @@ export function getDiscoveryBriefsViaAdapter(): BriefWithBody[] {
 }
 
 // ── Featured + neighbors ─────────────────────────────────────────────
+
+// ── Stats (replacement for briefs.ts::getStats) ─────────────────────
+
+interface RunAggRow {
+  runs: number;
+  collisions: number;
+  cost: number;
+}
+
+interface CountByDayRow {
+  day: string;
+  count: number;
+}
+
+/**
+ * Computes the full ``Stats`` shape that ``StatsClient`` and
+ * ``how-it-works`` consume from a single SQLite read. Replaces
+ * ``briefs.ts::getStats()`` which used to read ``data/stats.json``
+ * produced by the manual ``export_stats.py`` script.
+ *
+ * Every aggregate is a straight SQL query against the live DB —
+ * no disk reads, no caching beyond the shared singleton connection.
+ * Returns null only when the briefs table is empty (fresh install).
+ */
+export function getStats(): Stats | null {
+  const conn = db();
+  try {
+    const totalBriefs = (
+      conn.prepare(
+        `SELECT COUNT(*) AS n FROM briefs
+         WHERE (status='complete' AND hypothesis_id IS NOT NULL)
+            OR COALESCE(is_stub,0)=1`,
+      ).get() as { n: number }
+    ).n;
+
+    if (totalBriefs === 0) return null;
+
+    const totalHypotheses = (
+      conn.prepare('SELECT COUNT(*) AS n FROM hypotheses').get() as { n: number }
+    ).n;
+
+    const curatedCount = (
+      conn
+        .prepare(`SELECT COUNT(*) AS n FROM hypotheses WHERE status='curated'`)
+        .get() as { n: number }
+    ).n;
+
+    // ``fire_hypotheses``: reviewer verdict 'a_tester' lives inside the
+    // auto_feedback_json blob. Mirror what dashboard.py does — LIKE on
+    // the raw JSON for speed. False positives on the literal token
+    // inside a free-text field are astronomically rare in practice.
+    const fireCount = (
+      conn
+        .prepare(
+          `SELECT COUNT(*) AS n FROM hypotheses
+           WHERE auto_feedback_json LIKE '%a_tester%'`,
+        )
+        .get() as { n: number }
+    ).n;
+
+    const totalReviewed = (
+      conn
+        .prepare(
+          `SELECT COUNT(*) AS n FROM hypotheses
+           WHERE auto_feedback_json IS NOT NULL`,
+        )
+        .get() as { n: number }
+    ).n;
+
+    const runsAgg = conn
+      .prepare(
+        `SELECT
+           COUNT(*) AS runs,
+           COALESCE(SUM(collisions_processed), 0) AS collisions,
+           COALESCE(SUM(total_cost_usd), 0.0) AS cost
+         FROM runs WHERE status='completed'`,
+      )
+      .get() as RunAggRow;
+
+    const avgNovelty = (
+      conn
+        .prepare(
+          `SELECT AVG(novelty_score) AS v FROM briefs
+           WHERE novelty_score IS NOT NULL`,
+        )
+        .get() as { v: number | null }
+    ).v;
+
+    const avgPanel = (
+      conn
+        .prepare(
+          `SELECT AVG(panel_consensus_score) AS v FROM briefs
+           WHERE panel_consensus_score IS NOT NULL`,
+        )
+        .get() as { v: number | null }
+    ).v;
+
+    // Activity by day — 30 days back. DATE() truncates to YYYY-MM-DD.
+    const collisionsByDay = conn
+      .prepare(
+        `SELECT DATE(started_at) AS day, COALESCE(SUM(collisions_processed), 0) AS count
+         FROM runs
+         WHERE status='completed'
+           AND started_at >= DATE('now', '-30 days')
+         GROUP BY DATE(started_at)
+         ORDER BY day`,
+      )
+      .all() as CountByDayRow[];
+
+    const briefsByDay = conn
+      .prepare(
+        `SELECT DATE(created_at) AS day, COUNT(*) AS count
+         FROM briefs
+         WHERE ((status='complete' AND hypothesis_id IS NOT NULL)
+             OR COALESCE(is_stub,0)=1)
+           AND created_at >= DATE('now', '-30 days')
+         GROUP BY DATE(created_at)
+         ORDER BY day`,
+      )
+      .all() as CountByDayRow[];
+
+    // Reviewer distribution — same LIKE-on-JSON as fireCount, applied
+    // to each verdict. Cheap since the hypotheses table is small and
+    // the column is a TEXT blob, not indexed.
+    const verdictRow = conn
+      .prepare(
+        `SELECT
+           SUM(CASE WHEN auto_feedback_json LIKE '%a_tester%' THEN 1 ELSE 0 END) AS a_tester,
+           SUM(CASE WHEN auto_feedback_json LIKE '%intéressant%' THEN 1 ELSE 0 END) AS interessant,
+           SUM(CASE WHEN auto_feedback_json LIKE '%poubelle%' THEN 1 ELSE 0 END) AS poubelle
+         FROM hypotheses
+         WHERE auto_feedback_json IS NOT NULL`,
+      )
+      .get() as { a_tester: number; interessant: number; poubelle: number };
+    const reviewer_distribution: Record<string, number> = {};
+    if (verdictRow.a_tester > 0) reviewer_distribution.a_tester = verdictRow.a_tester;
+    if (verdictRow.interessant > 0) reviewer_distribution['intéressant'] = verdictRow.interessant;
+    if (verdictRow.poubelle > 0) reviewer_distribution.poubelle = verdictRow.poubelle;
+
+    // Top domains — iterate briefs in memory. With ≤ a few hundred
+    // briefs this is faster than a SQL JSON extract and portable across
+    // SQLite builds that may or may not have the json1 extension.
+    const domainCounts = new Map<string, number>();
+    for (const row of getAllBriefs()) {
+      const adapted = briefRowToBrief(row);
+      for (const d of adapted.domains) {
+        if (!d) continue;
+        domainCounts.set(d, (domainCounts.get(d) ?? 0) + 1);
+      }
+    }
+    const top_domains = Array.from(domainCounts.entries())
+      .map(([domain, count]) => ({ domain, count }))
+      .sort((a, b) => b.count - a.count);
+
+    const costTotal = Number(runsAgg.cost) || 0;
+    const perBrief = totalBriefs > 0 ? costTotal / totalBriefs : null;
+    const fireRate = totalReviewed > 0 ? fireCount / totalReviewed : 0;
+
+    return {
+      generated_at: new Date().toISOString(),
+      totals: {
+        collisions: Number(runsAgg.collisions) || 0,
+        hypotheses: totalHypotheses,
+        curated: curatedCount,
+        fire_hypotheses: fireCount,
+        briefs: totalBriefs,
+      },
+      quality: {
+        avg_novelty_score: avgNovelty !== null ? Number(avgNovelty) : null,
+        avg_panel_consensus: avgPanel !== null ? Number(avgPanel) : null,
+        fire_rate: fireRate,
+      },
+      cost: {
+        total_usd: costTotal,
+        per_brief_usd: perBrief,
+      },
+      activity_30d: {
+        collisions_by_day: collisionsByDay.map((r) => ({
+          day: r.day,
+          count: Number(r.count) || 0,
+        })),
+        briefs_by_day: briefsByDay.map((r) => ({
+          day: r.day,
+          count: Number(r.count) || 0,
+        })),
+      },
+      reviewer_distribution,
+      top_domains,
+    };
+  } catch (err) {
+    console.error('[spore-web/db] getStats failed:', err);
+    throw err;
+  }
+}
 
 /**
  * Replacement for ``briefs.ts::getFeaturedBrief`` — three-tier preference:

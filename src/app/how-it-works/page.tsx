@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import PipelineAnimation from '@/components/PipelineAnimation';
-import { getStats } from '@/lib/briefs';
+import { getStats } from '@/lib/db';
 import { SITE_URL } from '@/lib/seo';
 
 const _desc =
