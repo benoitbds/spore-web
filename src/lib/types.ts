@@ -183,6 +183,13 @@ export interface Brief {
   protocol: Protocol;
   panel: Panel;
   vulgarization_fr?: VulgarizationFr;
+  /**
+   * Set by the db adapter (``briefRowToBrief``) when the row carries
+   * ``is_stub=1`` — i.e. an honest "no bridge found" analysis rather
+   * than a full pipeline output. Optional for backward compatibility
+   * with any mock/fixture payloads that predate the stub flow.
+   */
+  is_stub?: boolean;
 }
 
 /**

@@ -495,7 +495,11 @@ function extractMarkdownTitle(md: string | null): string {
 
 export function briefRowToBrief(row: BriefRow): BriefWithBody {
   const grounding = (asObjectOrNull(row.grounding_data) as unknown as Grounding | null) ?? defaultGrounding();
-  const sharpened = (asObjectOrNull(row.sharpened_data) as unknown as Sharpened | null) ?? defaultSharpened();
+  // sharpened_data can legitimately be a partial object — stubs only
+  // carry ``{domains: [...]}`` there. Shallow-merge with the full default
+  // so downstream card code never reads ``undefined.formal_statement``.
+  const sharpenedRaw = asObjectOrNull(row.sharpened_data) as unknown as Partial<Sharpened> | null;
+  const sharpened: Sharpened = { ...defaultSharpened(), ...(sharpenedRaw ?? {}) };
   const protocol = (asObjectOrNull(row.protocol_data) as unknown as Protocol | null) ?? defaultProtocol();
   const panel = (asObjectOrNull(row.panel_data) as unknown as Panel | null) ?? defaultPanel();
 

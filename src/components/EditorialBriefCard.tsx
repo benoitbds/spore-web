@@ -18,7 +18,7 @@ interface Props {
  * for the "grand public" reader: hook first, metrics as secondary detail.
  */
 export default function EditorialBriefCard({ brief, index = 0 }: Props) {
-  const { vulgarization_fr: v, sharpened, domains, grounding, panel, brief_id, generated_at } = brief;
+  const { vulgarization_fr: v, sharpened, domains, grounding, panel, brief_id, generated_at, is_stub } = brief;
 
   const title = v?.title_fr || sharpened.title;
   const hook = v?.imagine_that || sharpened.formal_statement;
@@ -36,10 +36,17 @@ export default function EditorialBriefCard({ brief, index = 0 }: Props) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.5, delay: Math.min(index * 0.07, 0.35) }}
-      className="h-full"
+      className={`h-full ${
+        is_stub ? 'opacity-60 transition-opacity duration-300 hover:opacity-100' : ''
+      }`}
     >
       <Link href={`/discoveries/${brief_id}`} className="block h-full">
         <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-ink-500 bg-ink-800/40 p-7 transition-all duration-500 hover:-translate-y-0.5 hover:border-emerald-bio/50 hover:bg-ink-800/70 hover:shadow-[0_0_80px_rgba(16,185,129,0.10)]">
+          {is_stub && (
+            <span className="absolute right-4 top-4 rounded-full border border-mist-500/40 bg-ink-900/60 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-mist-400">
+              Non productive
+            </span>
+          )}
           {/* top accent hairline on hover */}
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-bio/50 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
