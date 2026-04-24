@@ -1,10 +1,16 @@
 import type { Metadata } from 'next';
-import { getAllBriefs } from '@/lib/briefs';
+import { briefRowToBrief, getAllBriefs } from '@/lib/db';
+import type { Brief } from '@/lib/types';
 import { SITE_URL } from '@/lib/seo';
 import CustomCollisionCta from '@/components/CustomCollisionCta';
 import DiscoveriesClient from './DiscoveriesClient';
 
-const _briefs = getAllBriefs();
+// Executed once at module load (server-side) to pre-compute the page
+// description. With the Phase-1 DB singleton this reads SQLite at boot
+// rather than the disk JSON snapshot, so the count stays in sync with
+// new briefs on the next process restart (no static rebuild required
+// thanks to the sitemap's ISR revalidate window).
+const _briefs: Brief[] = getAllBriefs().map(briefRowToBrief);
 const _domainCount = new Set(_briefs.flatMap((b) => b.domains)).size;
 const _description =
   _briefs.length > 0
@@ -39,7 +45,7 @@ export const metadata: Metadata = {
 };
 
 export default function DiscoveriesPage() {
-  const briefs = getAllBriefs();
+  const briefs: Brief[] = getAllBriefs().map(briefRowToBrief);
 
   // Extract all unique domains
   const allDomains = Array.from(
