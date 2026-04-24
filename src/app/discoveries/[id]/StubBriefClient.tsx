@@ -17,6 +17,16 @@ import remarkGfm from 'remark-gfm';
 import Link from 'next/link';
 import CustomCollisionCta from '@/components/CustomCollisionCta';
 
+/**
+ * Drop the first top-level H1 from a markdown body so it doesn't
+ * duplicate the page title already rendered by the parent header.
+ * Preserves any leading blank line trimming but leaves the rest of the
+ * markdown untouched — in particular, `##` / `###` headings are kept.
+ */
+function stripLeadingH1(md: string): string {
+  return md.replace(/^\s*#\s+[^\n]*\n+/, '');
+}
+
 interface Props {
   briefId: string;
   title: string;
@@ -68,8 +78,10 @@ export default function StubBriefClient({
         </div>
       </div>
 
-      <div className="prose prose-invert max-w-none prose-headings:font-display prose-headings:text-mist-100 prose-p:text-mist-300 prose-li:text-mist-300 prose-strong:text-mist-100">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
+      <div className="prose-bio max-w-none">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {stripLeadingH1(markdown)}
+        </ReactMarkdown>
       </div>
 
       <div className="mt-12 border-t border-ink-500 pt-8">
