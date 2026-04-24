@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { getStats, getAllBriefs } from '@/lib/briefs';
+import { getStats, getAllBriefs } from '@/lib/db';
 import { SITE_URL } from '@/lib/seo';
 import StatsClient from './StatsClient';
 
