@@ -10,21 +10,25 @@
   },
   "dependencies": {
     "@types/js-cookie": "^3.0.6",
+    "better-sqlite3": "^12.9.0",
     "framer-motion": "^11.11.0",
     "js-cookie": "^3.0.5",
     "next": "^14.2.18",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-markdown": "^9.0.1",
-    "remark-gfm": "^4.0.0"
+    "remark-gfm": "^4.0.0",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20.14.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.10",
+    "tsx": "^4.21.0",
     "typescript": "^5.5.4"
   }
 }
