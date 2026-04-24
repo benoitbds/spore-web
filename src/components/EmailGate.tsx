@@ -30,6 +30,15 @@ interface Props {
    * Must throw (or reject) on failure so the gate can surface an error.
    */
   onSubmitWithContext?: (email: string) => Promise<void>;
+  /**
+   * Optional post-verify redirect path forwarded to the magic-link
+   * request body. Used when the CTA lives on a content page (e.g. a
+   * brief detail) and we want the user to land back on that page after
+   * clicking the emailed link, rather than the default /discoveries.
+   * Ignored when ``onSubmitWithContext`` is provided — callers using the
+   * context branch already persist their own intent server-side.
+   */
+  next?: string;
   className?: string;
 }
 
@@ -39,6 +48,7 @@ export default function EmailGate({
   cta = 'Recevoir le lien',
   onSent,
   onSubmitWithContext,
+  next,
   className = '',
 }: Props) {
   const { login } = useAuth();
@@ -69,7 +79,7 @@ export default function EmailGate({
       if (onSubmitWithContext) {
         await onSubmitWithContext(email);
       } else {
-        await login(email);
+        await login(email, next);
       }
       setStatus('sent');
       // Delay onSent so the parent (e.g. header dropdown) doesn't

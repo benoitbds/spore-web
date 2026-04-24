@@ -494,6 +494,7 @@ function PaywallPanel({
           headline="Accédez au brief scientifique complet — gratuit"
           subtext="Panel de relecture (5 personas), base de preuves, contre-preuves, protocole expérimental, prédictions falsifiables. Tous les briefs sont gratuits pendant le lancement."
           cta="Recevoir mon accès"
+          next={`/discoveries/${briefId}`}
         />
         <p className="text-center text-sm text-mist-500">
           Déjà un compte ? Utilisez votre dernier lien magique ou{' '}

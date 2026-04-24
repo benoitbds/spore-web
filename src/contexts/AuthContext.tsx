@@ -24,7 +24,7 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   /** Request a magic link. Throws on network / rate-limit errors. */
-  login: (email: string) => Promise<void>;
+  login: (email: string, next?: string) => Promise<void>;
   /** Exchange a magic-link token for a session JWT; returns the user profile. */
   verify: (token: string) => Promise<MeResponse>;
   /** Clear the local session. */
@@ -63,8 +63,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     rehydrate();
   }, [rehydrate]);
 
-  const login = useCallback(async (email: string) => {
-    await api.requestMagicLink(email);
+  const login = useCallback(async (email: string, next?: string) => {
+    await api.requestMagicLink(email, next);
   }, []);
 
   const verify = useCallback(async (token: string) => {

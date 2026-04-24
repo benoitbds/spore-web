@@ -182,10 +182,10 @@ export interface AccountPurchase {
 }
 
 export const api = {
-  requestMagicLink: (email: string) =>
+  requestMagicLink: (email: string, next?: string) =>
     apiFetch<{ ok: boolean; message: string }>('/api/auth/magic-link', {
       method: 'POST',
-      body: { email },
+      body: { email, ...(next ? { next } : {}) },
       auth: false,
     }),
   verifyMagicLink: (token: string) =>
