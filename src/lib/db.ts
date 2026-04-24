@@ -5,9 +5,9 @@ import 'server-only';
  *
  * This module exposes typed read functions backed by ``better-sqlite3``
  * pointing at the same database file the Python backend (spore-poc) writes
- * to. The current frontend pages still read JSON files from disk via
- * ``src/lib/briefs.ts`` — Phase 2 will switch them to call this module
- * directly from React Server Components, killing the static rebuild loop.
+ * to. It is the single source of truth for every read path in the
+ * frontend since Phase 2 (PR #3 removed the legacy JSON loader + the
+ * static rebuild loop).
  *
  * Safety properties enforced at connection time:
  *   - ``readonly: true`` on the better-sqlite3 driver — opens the DB with
@@ -396,13 +396,10 @@ export function getBriefStats(): BriefStats {
 
 // ── Adapters: BriefRow → existing nested Brief / BriefTeaser ─────────
 //
-// Phase 2 of the SSG-to-DB refactor: the rest of the codebase (pages,
-// components) consumes the nested ``Brief`` shape from src/lib/types.ts
-// — that contract was set when briefs were JSON files on disk. Rather
-// than refactor every consumer, this PR ships an adapter that
-// reconstructs the nested shape from the flat ``BriefRow``. PR #2 will
-// flip the page imports from ``@/lib/briefs`` to ``@/lib/db`` without
-// touching any component prop type.
+// The rest of the codebase (pages, components) consumes the nested
+// ``Brief`` shape from src/lib/types.ts — the contract set when briefs
+// were JSON files on disk. Rather than refactor every consumer, this
+// adapter reconstructs the nested shape from the flat ``BriefRow``.
 
 function asObjectOrNull(value: unknown): Record<string, unknown> | null {
   if (value && typeof value === 'object' && !Array.isArray(value)) {
