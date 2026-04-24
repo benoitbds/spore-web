@@ -2,14 +2,23 @@ import Link from 'next/link';
 import Counter from '@/components/Counter';
 import EditorialBriefCard from '@/components/EditorialBriefCard';
 import MyceliumBackground from '@/components/MyceliumBackground';
-import { getAllBriefs, getFeaturedBrief, getStats } from '@/lib/briefs';
+import {
+  briefRowToBrief,
+  getAllBriefs,
+  getFeaturedBrief,
+  getStats,
+} from '@/lib/db';
 import type { Brief } from '@/lib/types';
 import { verdictLabel } from '@/lib/verdicts';
 
 export default function HomePage() {
   const stats = getStats();
   const featured = getFeaturedBrief();
-  const all = getAllBriefs();
+  // db.getAllBriefs returns BriefRow[]; EditorialBriefCard consumes the
+  // nested Brief shape from @/lib/types, so we adapt each row here.
+  // The filter-and-slice below runs on already-adapted objects so the
+  // final array shipped to <EditorialBriefCard /> matches its prop type.
+  const all: Brief[] = getAllBriefs().map(briefRowToBrief);
   const others = all
     .filter((b) => b.brief_id !== featured?.brief_id)
     .slice(0, 6);
