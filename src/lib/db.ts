@@ -487,11 +487,29 @@ export interface BriefWithBody extends Brief {
   stub_reason?: string | null;
 }
 
+function extractMarkdownTitle(md: string | null): string {
+  if (!md) return '';
+  for (const rawLine of md.split('\n')) {
+    const line = rawLine.trim();
+    if (line.startsWith('# ')) return line.slice(2).trim();
+  }
+  return '';
+}
+
 export function briefRowToBrief(row: BriefRow): BriefWithBody {
   const grounding = (asObjectOrNull(row.grounding_data) as unknown as Grounding | null) ?? defaultGrounding();
   const sharpened = (asObjectOrNull(row.sharpened_data) as unknown as Sharpened | null) ?? defaultSharpened();
   const protocol = (asObjectOrNull(row.protocol_data) as unknown as Protocol | null) ?? defaultProtocol();
   const panel = (asObjectOrNull(row.panel_data) as unknown as Panel | null) ?? defaultPanel();
+
+  // Stub briefs don't have sharpened_data but their body_markdown
+  // starts with a ``# ...`` line that the old JSON path surfaced as
+  // ``title``. Hydrate sharpened.title from there so consumers that
+  // read brief.sharpened.title (neighbor links, metadata) don't get
+  // an empty string for stubs.
+  if (row.is_stub === 1 && !sharpened.title) {
+    sharpened.title = extractMarkdownTitle(row.body_markdown);
+  }
 
   const vulgRaw = asObjectOrNull(row.vulgarization_data);
   const vulgarization_fr = vulgRaw

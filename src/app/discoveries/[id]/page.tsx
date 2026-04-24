@@ -2,12 +2,14 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
+  briefRowToBrief,
+  briefRowToTeaser,
   getAllBriefs,
   getBriefById,
   getBriefNeighbors,
-} from '@/lib/briefs';
+  type BriefWithBody,
+} from '@/lib/db';
 import { verdictLabel } from '@/lib/verdicts';
-import { briefToTeaser } from '@/lib/types';
 import {
   SITE_URL,
   SITE_NAME,
@@ -21,40 +23,33 @@ import BriefJsonLd from '@/components/BriefJsonLd';
 import CustomCollisionCta from '@/components/CustomCollisionCta';
 import type { Brief } from '@/lib/types';
 
-interface StubBriefShape {
-  brief_id?: string;
-  is_stub?: boolean;
-  stub_reason?: string | null;
-  title?: string;
-  domains?: string[];
-  body_markdown?: string;
-  generated_at?: string;
-}
-
 interface Params {
   params: { id: string };
 }
 
 export async function generateStaticParams() {
-  return getAllBriefs().map((b) => ({ id: b.brief_id }));
+  // getAllBriefs returns BriefRow[] where the primary key lives on .id
+  // (the SPR-XXXX string). Params expect { id } — direct pass-through.
+  return getAllBriefs().map((b) => ({ id: b.id }));
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const brief = getBriefById(params.id);
-  if (!brief) {
+  const row = getBriefById(params.id);
+  if (!row) {
     return {
       title: 'Brief introuvable',
       robots: { index: false, follow: false },
     };
   }
 
+  const brief: BriefWithBody = briefRowToBrief(row);
+
   // Stub briefs are user-specific honest-failure analyses; they shouldn't
   // appear in search, and the regular briefMetaTitle helper reads fields
   // that only exist on pipeline briefs (sharpened.title etc.).
-  const asStub = brief as unknown as { is_stub?: boolean; title?: string };
-  if (asStub.is_stub) {
+  if (brief.is_stub) {
     return {
-      title: asStub.title || 'Analyse SPORE',
+      title: brief.sharpened.title || 'Analyse SPORE',
       robots: { index: false, follow: false },
     };
   }
@@ -100,15 +95,16 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 }
 
 export default function BriefDetailPage({ params }: Params) {
-  const brief = getBriefById(params.id);
-  if (!brief) notFound();
+  const row = getBriefById(params.id);
+  if (!row) notFound();
+
+  const brief: BriefWithBody = briefRowToBrief(row);
 
   // Stub briefs (custom runs where Synthesis refused to bridge the pair)
   // carry only { is_stub, title, domains, body_markdown }. They don't
   // have pipeline data for BriefDetailClient to render, so we route
   // them to a dedicated client that shows an info banner + the markdown.
-  const asStub = brief as unknown as StubBriefShape;
-  if (asStub.is_stub && asStub.body_markdown) {
+  if (brief.is_stub && brief.body_markdown) {
     return (
       <div className="mx-auto max-w-6xl px-6 py-12">
         <Link
@@ -119,12 +115,12 @@ export default function BriefDetailPage({ params }: Params) {
           Toutes les découvertes
         </Link>
         <StubBriefClient
-          briefId={asStub.brief_id || params.id}
-          title={asStub.title || 'Analyse SPORE'}
-          domainA={asStub.domains?.[0] ?? '?'}
-          domainB={asStub.domains?.[1] ?? '?'}
-          markdown={asStub.body_markdown}
-          generatedAt={asStub.generated_at ?? null}
+          briefId={brief.brief_id || params.id}
+          title={brief.sharpened.title || 'Analyse SPORE'}
+          domainA={brief.domains[0] ?? '?'}
+          domainB={brief.domains[1] ?? '?'}
+          markdown={brief.body_markdown}
+          generatedAt={brief.generated_at ?? null}
         />
       </div>
     );
@@ -135,8 +131,11 @@ export default function BriefDetailPage({ params }: Params) {
   // stay on the server. BriefDetailClient receives only the teaser subset;
   // the gated content is fetched from /api/briefs/{id}/full at interaction
   // time, which enforces free-brief / credit / 402 server-side.
-  const teaser = briefToTeaser(brief);
-  const { prev, next } = getBriefNeighbors(params.id);
+  const teaser = briefRowToTeaser(row);
+  // db.getBriefNeighbors returns {previous, next}; the local neighbors
+  // component was built against the briefs.ts shape {prev, next}.
+  // Alias the destructure so we don't need to rename the component API.
+  const { previous: prev, next } = getBriefNeighbors(params.id);
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
