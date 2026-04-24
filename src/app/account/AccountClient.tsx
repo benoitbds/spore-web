@@ -67,7 +67,9 @@ export default function AccountClient() {
                 Offre de lancement
               </div>
               <div className="mt-1 text-sm text-emerald-glow">
-                Accès illimité aux briefs + 1 collision sur mesure offerte.
+                {loaded && customs.length > 0
+                  ? 'Accès illimité aux briefs · Vous avez utilisé votre collision sur mesure offerte.'
+                  : 'Accès illimité aux briefs + 1 collision sur mesure offerte.'}
               </div>
             </div>
           </div>
@@ -83,7 +85,7 @@ export default function AccountClient() {
               href="/custom"
               className="inline-flex shrink-0 items-center gap-2 self-start rounded-full border border-emerald-bio/60 bg-emerald-bio/15 px-5 py-2.5 text-sm font-semibold text-emerald-glow transition-all hover:bg-emerald-bio/25 hover:shadow-[0_0_30px_rgba(16,185,129,0.2)] md:self-auto"
             >
-              🎯 Demander ma collision →
+              🎯 Lancer ma collision sur mesure →
             </Link>
           )}
         </div>

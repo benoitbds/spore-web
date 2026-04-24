@@ -15,6 +15,7 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Link from 'next/link';
+import CustomCollisionCta from '@/components/CustomCollisionCta';
 
 interface Props {
   briefId: string;
@@ -71,19 +72,23 @@ export default function StubBriefClient({
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
       </div>
 
-      <div className="mt-12 flex flex-wrap gap-3 border-t border-ink-500 pt-8">
-        <Link
-          href="/custom"
-          className="rounded-xl bg-emerald-bio px-5 py-3 text-sm font-semibold text-ink-900 hover:bg-emerald-glow"
-        >
-          Essayer une autre collision →
-        </Link>
-        <Link
-          href="/discoveries"
-          className="rounded-xl border border-ink-500 bg-ink-800/60 px-5 py-3 text-sm text-mist-200 hover:text-mist-100"
-        >
-          Parcourir les briefs existants
-        </Link>
+      <div className="mt-12 border-t border-ink-500 pt-8">
+        {/* Primary CTA — shared brand-panel component, ``card`` variant so
+            it fits the article column without dominating the page after a
+            long honest-failure read. */}
+        <CustomCollisionCta
+          variant="card"
+          headline="Retenter avec votre domaine ?"
+          subtext="Cette paire n'a pas produit de pont. Choisissez un domaine de votre choix (ciblé ou surprise) — gratuite pendant le lancement."
+        />
+        <div className="mt-4 flex">
+          <Link
+            href="/discoveries"
+            className="text-sm text-mist-400 hover:text-mist-200"
+          >
+            ← Parcourir les briefs existants
+          </Link>
+        </div>
       </div>
     </article>
   );
