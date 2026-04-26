@@ -34,7 +34,7 @@ interface Props {
    * Optional post-verify redirect path forwarded to the magic-link
    * request body. Used when the CTA lives on a content page (e.g. a
    * brief detail) and we want the user to land back on that page after
-   * clicking the emailed link, rather than the default /discoveries.
+   * clicking the emailed link, rather than the default /briefs.
    * Ignored when ``onSubmitWithContext`` is provided — callers using the
    * context branch already persist their own intent server-side.
    */

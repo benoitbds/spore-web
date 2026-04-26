@@ -22,7 +22,7 @@ export default function CancelPage() {
         </p>
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           <Link
-            href="/discoveries"
+            href="/briefs"
             className="rounded-xl bg-emerald-bio px-5 py-3 text-sm font-semibold text-ink-900 hover:bg-emerald-glow"
           >
             Explorer les découvertes →
@@ -56,7 +56,7 @@ export default function CancelPage() {
           ← Retour aux tarifs
         </Link>
         <Link
-          href="/discoveries"
+          href="/briefs"
           className="rounded-xl border border-ink-500 bg-ink-800/60 px-5 py-3 text-sm text-mist-200 hover:text-mist-100"
         >
           Explorer les briefs publics

@@ -168,7 +168,7 @@ function StatusView({ data }: { data: CustomStatusResponse }) {
               {data.brief_id ? (
                 <span className="mt-4 block">
                   <Link
-                    href={`/discoveries/${data.brief_id}`}
+                    href={`/briefs/${data.brief_id}`}
                     className="inline-block rounded-xl border border-mist-400/40 bg-ink-800/60 px-5 py-3 font-semibold text-mist-100 hover:bg-ink-700"
                   >
                     Lire l&apos;analyse →
@@ -187,7 +187,7 @@ function StatusView({ data }: { data: CustomStatusResponse }) {
             {data.brief_id ? (
               <span className="mt-4 block">
                 <Link
-                  href={`/discoveries/${data.brief_id}`}
+                  href={`/briefs/${data.brief_id}`}
                   className="inline-block rounded-xl bg-emerald-bio px-5 py-3 font-semibold text-ink-900 hover:bg-emerald-glow"
                 >
                   Ouvrir le brief →

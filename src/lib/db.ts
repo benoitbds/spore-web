@@ -120,7 +120,7 @@ export interface BriefRow {
 }
 
 /**
- * Lightweight card shape for the ``/discoveries`` index. Drops the
+ * Lightweight card shape for the ``/briefs`` index. Drops the
  * heavy JSON blobs and exposes only what the editorial card needs.
  */
 export interface DiscoveryCard {
@@ -296,7 +296,7 @@ export function getBriefById(id: string): BriefRow | null {
 }
 
 /**
- * Lightweight cards for ``/discoveries``. Same visibility rules as
+ * Lightweight cards for ``/briefs``. Same visibility rules as
  * ``getAllBriefs`` but with only the fields the editorial card needs.
  */
 export function getDiscoverableBriefs(): DiscoveryCard[] {

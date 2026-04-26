@@ -46,7 +46,7 @@ export default function HomePage() {
                 </h2>
               </div>
               <Link
-                href="/discoveries"
+                href="/briefs"
                 className="hidden whitespace-nowrap text-sm text-emerald-glow transition-colors hover:text-emerald-bio md:inline-flex"
               >
                 Voir toutes les découvertes →
@@ -61,7 +61,7 @@ export default function HomePage() {
 
             <div className="mt-12 flex justify-center md:hidden">
               <Link
-                href="/discoveries"
+                href="/briefs"
                 className="text-sm text-emerald-glow transition-colors hover:text-emerald-bio"
               >
                 Voir toutes les découvertes →
@@ -239,7 +239,7 @@ function FeaturedHero({ brief }: { brief: Brief }) {
           </div>
 
           <Link
-            href={`/discoveries/${brief_id}`}
+            href={`/briefs/${brief_id}`}
             className="group inline-flex items-center gap-2 rounded-full border border-emerald-bio/50 bg-emerald-bio/10 px-6 py-3 text-sm font-medium text-emerald-glow transition-all hover:border-emerald-bio hover:bg-emerald-bio/20 hover:shadow-[0_0_50px_rgba(16,185,129,0.3)]"
           >
             Lire cette découverte
