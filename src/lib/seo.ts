@@ -11,12 +11,11 @@ export const SITE_URL = 'https://spore-research.com';
 export const SITE_NAME = 'SPORE';
 
 export const SITE_TAGLINE =
-  "SPORE — L'IA qui imagine les découvertes de demain";
+  "SPORE — Le moteur d'hypothèses interdisciplinaires";
 
 export const SITE_DESCRIPTION =
-  "SPORE croise des domaines scientifiques éloignés pour générer des hypothèses " +
-  "de recherche inédites, validées par 5 relecteurs IA et sourcées sur la " +
-  "littérature réelle. Zéro hallucination bibliographique.";
+  "SPORE génère des hypothèses scientifiques interdisciplinaires inédites par " +
+  "croisement de domaines, ancrées sur de la littérature vérifiée.";
 
 /** Trim a string to `max` chars, breaking at word boundaries when possible. */
 export function truncate(text: string | undefined | null, max: number): string {

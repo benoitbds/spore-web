@@ -16,7 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const briefs = getAllBriefs();
 
   const briefUrls: MetadataRoute.Sitemap = briefs.map((b) => ({
-    url: `${SITE_URL}/discoveries/${b.id}`,
+    url: `${SITE_URL}/briefs/${b.id}`,
     lastModified: b.created_at || now,
     changeFrequency: 'monthly',
     priority: 0.8,
@@ -30,7 +30,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: `${SITE_URL}/discoveries`,
+      url: `${SITE_URL}/briefs`,
       lastModified: now,
       changeFrequency: 'daily',
       priority: 0.9,
