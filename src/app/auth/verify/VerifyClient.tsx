@@ -95,7 +95,7 @@ function VerifyClient() {
               href="/briefs"
               className="rounded-xl border border-ink-500 bg-ink-800/60 px-5 py-3 text-sm text-mist-200 hover:text-mist-100"
             >
-              ← Retour aux découvertes
+              ← Retour aux briefs
             </Link>
           </div>
         </>

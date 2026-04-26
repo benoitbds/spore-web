@@ -23,7 +23,7 @@ function LaunchSuccess() {
           href="/briefs"
           className="rounded-xl bg-emerald-bio px-5 py-3 text-sm font-semibold text-ink-900 hover:bg-emerald-glow"
         >
-          Explorer les découvertes →
+          Explorer les briefs →
         </Link>
         <Link
           href="/account"
@@ -108,7 +108,7 @@ function SuccessInner() {
           href="/briefs"
           className="rounded-xl bg-emerald-bio px-5 py-3 text-sm font-semibold text-ink-900 hover:bg-emerald-glow"
         >
-          Explorer les découvertes →
+          Explorer les briefs →
         </Link>
         <Link
           href="/pricing"

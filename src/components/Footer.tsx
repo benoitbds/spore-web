@@ -10,7 +10,7 @@ export default function Footer() {
             </div>
             <p className="text-sm text-mist-400 leading-relaxed">
               Système de Production d'Opportunités de Recherche par Exploration.
-              L'IA qui croise les sciences pour imaginer les découvertes de demain.
+              Le moteur d'hypothèses interdisciplinaires que personne n'a encore proposées.
             </p>
           </div>
 

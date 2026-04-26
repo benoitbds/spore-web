@@ -108,7 +108,7 @@ export default function HowItWorksPage() {
           href="/briefs"
           className="inline-flex items-center gap-2 rounded-full border border-emerald-bio/40 bg-emerald-bio/10 px-6 py-3 text-sm font-medium text-emerald-glow transition-all hover:border-emerald-bio/60 hover:bg-emerald-bio/20 hover:shadow-[0_0_40px_rgba(16,185,129,0.25)]"
         >
-          Voir les découvertes →
+          Voir les briefs →
         </Link>
       </section>
     </div>

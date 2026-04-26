@@ -123,7 +123,7 @@ export interface BriefRow {
  * Lightweight card shape for the ``/briefs`` index. Drops the
  * heavy JSON blobs and exposes only what the editorial card needs.
  */
-export interface DiscoveryCard {
+export interface BriefCard {
   brief_id: string;
   title: string | null;
   imagine_that: string | null;
@@ -299,7 +299,7 @@ export function getBriefById(id: string): BriefRow | null {
  * Lightweight cards for ``/briefs``. Same visibility rules as
  * ``getAllBriefs`` but with only the fields the editorial card needs.
  */
-export function getDiscoverableBriefs(): DiscoveryCard[] {
+export function getVisibleBriefs(): BriefCard[] {
   return getAllBriefs().map((row) => ({
     brief_id: row.id,
     title: extractTitle(row),
@@ -563,12 +563,12 @@ export function briefRowToTeaser(row: BriefRow): BriefTeaser {
 }
 
 /**
- * Same as ``getDiscoverableBriefs`` but built on top of the adapter so
+ * Same as ``getVisibleBriefs`` but built on top of the adapter so
  * the card shape stays in lockstep with what ``EditorialBriefCard``
  * consumes. The Phase 1 helper still exists for read-paths that don't
  * need the full Brief reshape.
  */
-export function getDiscoveryBriefsViaAdapter(): BriefWithBody[] {
+export function getBriefsViaAdapter(): BriefWithBody[] {
   return getAllBriefs().map(briefRowToBrief);
 }
 

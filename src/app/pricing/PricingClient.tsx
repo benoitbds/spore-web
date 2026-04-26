@@ -36,7 +36,7 @@ export default function PricingClient() {
             Accès complet
           </div>
           <h2 className="mb-3 font-display text-3xl text-mist-100">
-            Découverte
+            Brief
           </h2>
           <div className="mb-6 flex items-baseline gap-3">
             <span className="font-display text-5xl text-mist-100">Gratuit</span>

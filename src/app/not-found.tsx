@@ -26,7 +26,7 @@ export default function NotFound() {
           href="/briefs"
           className="rounded-xl border border-ink-500 bg-ink-800/60 px-6 py-3 text-sm text-mist-200 transition-colors hover:border-ink-400 hover:text-mist-100"
         >
-          Explorer les découvertes
+          Explorer les briefs
         </Link>
       </div>
     </div>
