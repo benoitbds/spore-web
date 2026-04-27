@@ -169,14 +169,15 @@ function FeaturedHero({ brief }: { brief: Brief }) {
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-b from-transparent to-ink-900" />
 
       <div className="relative mx-auto flex max-w-6xl flex-col px-6 py-16 md:py-24 lg:py-28">
-        {/* tagline — what SPORE is, visible above the fold */}
+        {/* tagline — manifeste épistémique, identifié comme la meilleure phrase
+            du site par 2 personas indépendants lors des tests utilisateurs */}
         <p className="mb-3 max-w-3xl text-sm leading-relaxed text-mist-200/70 md:text-base">
           <span className="font-display text-base italic text-mist-100 md:text-lg">SPORE</span>
           <span className="mx-2 text-mist-600">—</span>
-          Des hypothèses scientifiques interdisciplinaires que personne n'a encore proposées.
+          Une hypothèse nulle bien documentée vaut mieux qu'une fausse promesse d'unification.
         </p>
         <p className="mb-6 max-w-3xl text-xs italic leading-relaxed text-mist-400 md:text-sm">
-          Une hypothèse nulle bien documentée vaut mieux qu'une fausse promesse d'unification.
+          Des hypothèses scientifiques interdisciplinaires que personne n'a encore proposées.
         </p>
 
         {/* kicker */}

@@ -21,7 +21,7 @@ export default function PricingClient() {
         <p className="mx-auto mt-4 max-w-2xl text-mist-400">
           Pour ses premiers utilisateurs, l&apos;intégralité des research briefs
           est gratuite — hypothèse formalisée, protocole expérimental, panel
-          de review par 5 personas, références vérifiées. Créez votre compte
+          de review par 5 personas, DOIs vérifiés sur Semantic Scholar. Créez votre compte
           pour y accéder.
         </p>
       </header>
