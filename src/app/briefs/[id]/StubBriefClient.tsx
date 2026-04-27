@@ -95,7 +95,7 @@ export default function StubBriefClient({
         />
         <div className="mt-4 flex">
           <Link
-            href="/discoveries"
+            href="/briefs"
             className="text-sm text-mist-400 hover:text-mist-200"
           >
             ← Parcourir les briefs existants

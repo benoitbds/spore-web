@@ -3,7 +3,7 @@ import { briefRowToBrief, getAllBriefs } from '@/lib/db';
 import type { Brief } from '@/lib/types';
 import { SITE_URL } from '@/lib/seo';
 import CustomCollisionCta from '@/components/CustomCollisionCta';
-import DiscoveriesClient from './DiscoveriesClient';
+import BriefsClient from './BriefsClient';
 
 // Executed once at module load (server-side) to pre-compute the page
 // description. With the Phase-1 DB singleton this reads SQLite at boot
@@ -18,13 +18,13 @@ const _description =
     : 'Hypothèses scientifiques interdisciplinaires générées et validées par SPORE.';
 
 export const metadata: Metadata = {
-  title: 'Découvertes scientifiques',
+  title: 'Tous les briefs',
   description: _description,
-  alternates: { canonical: '/discoveries' },
+  alternates: { canonical: '/briefs' },
   openGraph: {
-    title: 'Découvertes scientifiques | SPORE',
+    title: 'Tous les briefs | SPORE',
     description: _description,
-    url: `${SITE_URL}/discoveries`,
+    url: `${SITE_URL}/briefs`,
     type: 'website',
     locale: 'fr_FR',
     images: [
@@ -32,19 +32,19 @@ export const metadata: Metadata = {
         url: '/og-default.png',
         width: 1200,
         height: 630,
-        alt: 'SPORE — Découvertes scientifiques',
+        alt: 'SPORE — Briefs scientifiques',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Découvertes scientifiques | SPORE',
+    title: 'Tous les briefs | SPORE',
     description: _description,
     images: ['/og-default.png'],
   },
 };
 
-export default function DiscoveriesPage() {
+export default function BriefsPage() {
   const briefs: Brief[] = getAllBriefs().map(briefRowToBrief);
 
   // Extract all unique domains
@@ -56,7 +56,7 @@ export default function DiscoveriesPage() {
     <div className="mx-auto max-w-7xl px-6 py-16 md:py-24">
       <header className="mb-12 md:mb-16">
         <h1 className="mb-3 font-display text-4xl text-mist-100 md:text-6xl">
-          Découvertes
+          Briefs
         </h1>
         <p className="max-w-2xl text-lg text-mist-400">
           Hypothèses scientifiques générées par SPORE, validées par{' '}
@@ -65,7 +65,7 @@ export default function DiscoveriesPage() {
         </p>
       </header>
 
-      <DiscoveriesClient briefs={briefs} allDomains={allDomains} />
+      <BriefsClient briefs={briefs} allDomains={allDomains} />
 
       <div className="mt-20">
         <CustomCollisionCta

@@ -11,7 +11,7 @@ interface Props {
 }
 
 /**
- * Compact share row for a discovery page — copy link, X, LinkedIn.
+ * Compact share row for a brief page — copy link, X, LinkedIn.
  *
  * Icons are inline SVG so we ship no extra dep. Each button has a min
  * touch target of 44×44px via p-2.5 on a 24px icon.

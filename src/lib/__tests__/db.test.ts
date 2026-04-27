@@ -17,7 +17,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { getAllBriefs, getBriefById, getDiscoverableBriefs, getBriefStats } from '../db';
+import { getAllBriefs, getBriefById, getVisibleBriefs, getBriefStats } from '../db';
 
 describe('db.ts', () => {
   it('lists at least one brief from the live database', () => {
@@ -36,8 +36,8 @@ describe('db.ts', () => {
     expect(stub?.stub_reason).toBe('no_bridge_found');
   });
 
-  it('produces discovery cards with the editorial fields', () => {
-    const cards = getDiscoverableBriefs();
+  it('produces brief cards with the editorial fields', () => {
+    const cards = getVisibleBriefs();
     expect(cards.length).toBeGreaterThan(0);
     for (const c of cards) {
       expect(typeof c.brief_id).toBe('string');

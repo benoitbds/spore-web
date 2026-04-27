@@ -57,7 +57,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const title = briefMetaTitle(brief);
   const description = briefMetaDescription(brief);
   const ogDescription = briefOgDescription(brief);
-  const url = `${SITE_URL}/discoveries/${brief.brief_id}`;
+  const url = `${SITE_URL}/briefs/${brief.brief_id}`;
 
   return {
     title, // uses the `%s | SPORE` template from layout
@@ -89,7 +89,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       images: ['/og-default.png'],
     },
     alternates: {
-      canonical: `/discoveries/${brief.brief_id}`,
+      canonical: `/briefs/${brief.brief_id}`,
     },
   };
 }
@@ -108,11 +108,11 @@ export default function BriefDetailPage({ params }: Params) {
     return (
       <div className="mx-auto max-w-6xl px-6 py-12">
         <Link
-          href="/discoveries"
+          href="/briefs"
           className="group mb-8 inline-flex items-center gap-2 text-sm text-mist-400 hover:text-emerald-glow transition-colors"
         >
           <span className="transition-transform group-hover:-translate-x-1">←</span>
-          Toutes les découvertes
+          Tous les briefs
         </Link>
         <StubBriefClient
           briefId={brief.brief_id || params.id}
@@ -142,11 +142,11 @@ export default function BriefDetailPage({ params }: Params) {
       <BriefJsonLd brief={brief} />
 
       <Link
-        href="/discoveries"
+        href="/briefs"
         className="group mb-8 inline-flex items-center gap-2 text-sm text-mist-400 hover:text-emerald-glow transition-colors"
       >
         <span className="transition-transform group-hover:-translate-x-1">←</span>
-        Toutes les découvertes
+        Tous les briefs
       </Link>
 
       <BriefDetailClient teaser={teaser} />
@@ -172,17 +172,17 @@ function BriefNeighbors({ prev, next }: { prev: Brief | null; next: Brief | null
   if (!prev && !next) return null;
   return (
     <nav
-      aria-label="Navigation entre découvertes"
+      aria-label="Navigation entre briefs"
       className="mt-20 grid gap-4 border-t border-ink-500/60 pt-10 md:grid-cols-2"
     >
       {prev ? (
         <Link
-          href={`/discoveries/${prev.brief_id}`}
+          href={`/briefs/${prev.brief_id}`}
           className="group rounded-2xl border border-ink-500 bg-ink-800/40 p-5 transition-all hover:border-emerald-bio/40 hover:bg-ink-800/70"
         >
           <div className="mb-2 flex items-center gap-2 text-[11px] uppercase tracking-widest text-mist-500">
             <span className="transition-transform group-hover:-translate-x-1">←</span>
-            Découverte précédente
+            Brief précédent
           </div>
           <div className="font-display text-lg leading-tight text-mist-100 line-clamp-2">
             {neighborTitle(prev)}
@@ -198,11 +198,11 @@ function BriefNeighbors({ prev, next }: { prev: Brief | null; next: Brief | null
 
       {next ? (
         <Link
-          href={`/discoveries/${next.brief_id}`}
+          href={`/briefs/${next.brief_id}`}
           className="group rounded-2xl border border-ink-500 bg-ink-800/40 p-5 text-right transition-all hover:border-emerald-bio/40 hover:bg-ink-800/70"
         >
           <div className="mb-2 flex items-center justify-end gap-2 text-[11px] uppercase tracking-widest text-mist-500">
-            Découverte suivante
+            Brief suivant
             <span className="transition-transform group-hover:translate-x-1">→</span>
           </div>
           <div className="font-display text-lg leading-tight text-mist-100 line-clamp-2">

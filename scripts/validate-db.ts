@@ -37,7 +37,7 @@ async function main(): Promise<void> {
   const {
     getAllBriefs,
     getBriefById,
-    getDiscoverableBriefs,
+    getVisibleBriefs,
     getBriefStats,
     briefRowToBrief,
     briefRowToTeaser,
@@ -68,8 +68,8 @@ async function main(): Promise<void> {
     );
   }
 
-  const cards = getDiscoverableBriefs();
-  check('getDiscoverableBriefs returns >=1 card', cards.length > 0, `count=${cards.length}`);
+  const cards = getVisibleBriefs();
+  check('getVisibleBriefs returns >=1 card', cards.length > 0, `count=${cards.length}`);
   if (cards.length) {
     const c = cards[0];
     check(

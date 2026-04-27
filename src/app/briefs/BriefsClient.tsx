@@ -125,7 +125,7 @@ function briefHaystack(b: Brief): string {
     .toLowerCase();
 }
 
-export default function DiscoveriesClient({ briefs, allDomains }: Props) {
+export default function BriefsClient({ briefs, allDomains }: Props) {
   const [sort, setSort] = useState<SortMode>('panel');
   const [selectedDomains, setSelectedDomains] = useState<Set<string>>(new Set());
   const [query, setQuery] = useState('');
@@ -198,7 +198,7 @@ export default function DiscoveriesClient({ briefs, allDomains }: Props) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Rechercher un domaine, un sujet..."
-          aria-label="Rechercher parmi les découvertes"
+          aria-label="Rechercher parmi les briefs"
           className="w-full rounded-2xl border border-ink-500 bg-ink-800/40 py-3.5 pl-11 pr-12 text-sm text-mist-100 placeholder:text-mist-500 transition-colors focus:border-emerald-bio focus:outline-none focus:ring-2 focus:ring-emerald-bio/20"
         />
         {query && (
@@ -236,7 +236,7 @@ export default function DiscoveriesClient({ briefs, allDomains }: Props) {
 
         <div className="flex items-center gap-3">
           <span className="text-sm text-mist-400">
-            {filtered.length} découverte{filtered.length > 1 ? 's' : ''}
+            {filtered.length} brief{filtered.length > 1 ? 's' : ''} publié{filtered.length > 1 ? 's' : ''}
           </span>
           {hasFilter && (
             <button
@@ -278,7 +278,7 @@ export default function DiscoveriesClient({ briefs, allDomains }: Props) {
       {filtered.length === 0 ? (
         <div className="rounded-2xl border border-ink-500 bg-ink-800/40 py-16 text-center">
           <p className="text-mist-400">
-            Aucune découverte ne correspond à votre recherche.
+            Aucun brief ne correspond à votre recherche.
           </p>
         </div>
       ) : (

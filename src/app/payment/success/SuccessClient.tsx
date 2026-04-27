@@ -20,10 +20,10 @@ function LaunchSuccess() {
       </p>
       <div className="mt-10 flex flex-wrap justify-center gap-3">
         <Link
-          href="/discoveries"
+          href="/briefs"
           className="rounded-xl bg-emerald-bio px-5 py-3 text-sm font-semibold text-ink-900 hover:bg-emerald-glow"
         >
-          Explorer les découvertes →
+          Explorer les briefs →
         </Link>
         <Link
           href="/account"
@@ -105,10 +105,10 @@ function SuccessInner() {
 
       <div className="mt-10 flex flex-wrap justify-center gap-3">
         <Link
-          href="/discoveries"
+          href="/briefs"
           className="rounded-xl bg-emerald-bio px-5 py-3 text-sm font-semibold text-ink-900 hover:bg-emerald-glow"
         >
-          Explorer les découvertes →
+          Explorer les briefs →
         </Link>
         <Link
           href="/pricing"

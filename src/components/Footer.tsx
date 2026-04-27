@@ -10,7 +10,7 @@ export default function Footer() {
             </div>
             <p className="text-sm text-mist-400 leading-relaxed">
               Système de Production d'Opportunités de Recherche par Exploration.
-              L'IA qui croise les sciences pour imaginer les découvertes de demain.
+              Le moteur d'hypothèses interdisciplinaires que personne n'a encore proposées.
             </p>
           </div>
 
@@ -19,7 +19,7 @@ export default function Footer() {
               Explorer
             </h4>
             <ul className="space-y-2 text-sm text-mist-400">
-              <li><a href="/discoveries" className="hover:text-emerald-glow transition-colors">Découvertes</a></li>
+              <li><a href="/briefs" className="hover:text-emerald-glow transition-colors">Briefs</a></li>
               <li><a href="/how-it-works" className="hover:text-emerald-glow transition-colors">Comment ça marche</a></li>
               <li><a href="/stats" className="hover:text-emerald-glow transition-colors">Statistiques</a></li>
             </ul>

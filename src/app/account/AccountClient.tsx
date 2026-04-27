@@ -102,7 +102,7 @@ export default function AccountClient() {
             {briefs.map((b) => (
               <Link
                 key={b.brief_id}
-                href={`/discoveries/${b.brief_id}`}
+                href={`/briefs/${b.brief_id}`}
                 className="flex items-center justify-between rounded-xl border border-ink-500 bg-ink-800/40 px-5 py-3 transition-colors hover:border-emerald-bio/40"
               >
                 <div>
@@ -156,7 +156,7 @@ export default function AccountClient() {
                 </div>
                 {c.status === 'complete' && c.brief_id && (
                   <Link
-                    href={`/discoveries/${c.brief_id}`}
+                    href={`/briefs/${c.brief_id}`}
                     className="mt-2 inline-block text-sm text-emerald-glow hover:text-emerald-bio"
                   >
                     Ouvrir le brief →

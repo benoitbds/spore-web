@@ -192,7 +192,7 @@ export default function BriefDetailClient({ teaser }: Props) {
 
         <ShareButtons
           title={`${headerTitle} — SPORE`}
-          url={`${SITE_URL}/discoveries/${teaser.brief_id}`}
+          url={`${SITE_URL}/briefs/${teaser.brief_id}`}
           className="mt-6"
         />
       </header>
@@ -494,12 +494,12 @@ function PaywallPanel({
           headline="Accédez au brief scientifique complet — gratuit"
           subtext="Panel de relecture (5 personas), base de preuves, contre-preuves, protocole expérimental, prédictions falsifiables. Tous les briefs sont gratuits pendant le lancement."
           cta="Recevoir mon accès"
-          next={`/discoveries/${briefId}`}
+          next={`/briefs/${briefId}`}
         />
         <p className="text-center text-sm text-mist-500">
           Déjà un compte ? Utilisez votre dernier lien magique ou{' '}
           <Link
-            href={`/auth/verify?next=/discoveries/${briefId}`}
+            href={`/auth/verify?next=/briefs/${briefId}`}
             className="text-emerald-glow hover:text-emerald-bio"
           >
             redemandez un accès

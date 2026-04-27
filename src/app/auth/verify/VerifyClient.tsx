@@ -34,7 +34,7 @@ function VerifyClient() {
       try {
         await verify(token);
         setStatus('success');
-        const redirect = params.get('next') || '/discoveries';
+        const redirect = params.get('next') || '/briefs';
         // Small delay so the user sees the confirmation before redirect.
         setTimeout(() => router.replace(redirect), 900);
       } catch (err) {
@@ -49,7 +49,7 @@ function VerifyClient() {
         }
         if (getToken()) {
           setStatus('success');
-          const redirect = params.get('next') || '/discoveries';
+          const redirect = params.get('next') || '/briefs';
           setTimeout(() => router.replace(redirect), 900);
           return;
         }
@@ -92,10 +92,10 @@ function VerifyClient() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
-              href="/discoveries"
+              href="/briefs"
               className="rounded-xl border border-ink-500 bg-ink-800/60 px-5 py-3 text-sm text-mist-200 hover:text-mist-100"
             >
-              ← Retour aux découvertes
+              ← Retour aux briefs
             </Link>
           </div>
         </>

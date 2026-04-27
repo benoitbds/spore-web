@@ -40,7 +40,7 @@ export default function EditorialBriefCard({ brief, index = 0 }: Props) {
         is_stub ? 'opacity-60 transition-opacity duration-300 hover:opacity-100' : ''
       }`}
     >
-      <Link href={`/discoveries/${brief_id}`} className="block h-full">
+      <Link href={`/briefs/${brief_id}`} className="block h-full">
         <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-ink-500 bg-ink-800/40 p-7 transition-all duration-500 hover:-translate-y-0.5 hover:border-emerald-bio/50 hover:bg-ink-800/70 hover:shadow-[0_0_80px_rgba(16,185,129,0.10)]">
           {is_stub && (
             <span className="absolute right-4 top-4 rounded-full border border-mist-500/40 bg-ink-900/60 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-mist-400">

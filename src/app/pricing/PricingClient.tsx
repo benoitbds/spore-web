@@ -36,7 +36,7 @@ export default function PricingClient() {
             Accès complet
           </div>
           <h2 className="mb-3 font-display text-3xl text-mist-100">
-            Découverte
+            Brief
           </h2>
           <div className="mb-6 flex items-baseline gap-3">
             <span className="font-display text-5xl text-mist-100">Gratuit</span>
@@ -52,7 +52,7 @@ export default function PricingClient() {
           </ul>
           {isAuthenticated ? (
             <Link
-              href="/discoveries"
+              href="/briefs"
               className="block rounded-xl bg-emerald-bio px-5 py-4 text-center text-sm font-semibold text-ink-900 transition-colors hover:bg-emerald-glow"
             >
               Parcourir les briefs →

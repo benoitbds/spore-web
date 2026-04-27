@@ -12,7 +12,7 @@ interface Props {
  * (no hooks, no client-only APIs).
  */
 export default function BriefJsonLd({ brief }: Props) {
-  const url = `${SITE_URL}/discoveries/${brief.brief_id}`;
+  const url = `${SITE_URL}/briefs/${brief.brief_id}`;
   const headline = briefMetaTitle(brief);
   const description = briefOgDescription(brief);
   const datePublished = brief.generated_at;

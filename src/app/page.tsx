@@ -25,31 +25,31 @@ export default function HomePage() {
 
   return (
     <>
-      {/* ── BLOC 1 — HERO : LA DERNIÈRE DÉCOUVERTE ────────────── */}
+      {/* ── BLOC 1 — HERO : LE DERNIER BRIEF ──────────────────── */}
       {featured ? (
         <FeaturedHero brief={featured} />
       ) : (
         <EmptyHero />
       )}
 
-      {/* ── BLOC 2 — LES AUTRES TROUVAILLES ───────────────────── */}
+      {/* ── BLOC 2 — LES AUTRES BRIEFS ────────────────────────── */}
       {others.length > 0 && (
         <section className="relative border-t border-ink-500/50 py-24">
           <div className="mx-auto max-w-6xl px-6">
             <div className="mb-12 flex items-end justify-between gap-4">
               <div>
                 <span className="mb-3 inline-block text-xs uppercase tracking-[0.3em] text-emerald-glow">
-                  Les autres trouvailles
+                  Les autres briefs
                 </span>
                 <h2 className="font-display text-3xl text-mist-100 md:text-4xl">
                   D'autres idées à explorer
                 </h2>
               </div>
               <Link
-                href="/discoveries"
+                href="/briefs"
                 className="hidden whitespace-nowrap text-sm text-emerald-glow transition-colors hover:text-emerald-bio md:inline-flex"
               >
-                Voir toutes les découvertes →
+                Voir tous les briefs →
               </Link>
             </div>
 
@@ -61,10 +61,10 @@ export default function HomePage() {
 
             <div className="mt-12 flex justify-center md:hidden">
               <Link
-                href="/discoveries"
+                href="/briefs"
                 className="text-sm text-emerald-glow transition-colors hover:text-emerald-bio"
               >
-                Voir toutes les découvertes →
+                Voir tous les briefs →
               </Link>
             </div>
           </div>
@@ -170,17 +170,20 @@ function FeaturedHero({ brief }: { brief: Brief }) {
 
       <div className="relative mx-auto flex max-w-6xl flex-col px-6 py-16 md:py-24 lg:py-28">
         {/* tagline — what SPORE is, visible above the fold */}
-        <p className="mb-6 max-w-3xl text-sm leading-relaxed text-mist-200/70 md:text-base">
+        <p className="mb-3 max-w-3xl text-sm leading-relaxed text-mist-200/70 md:text-base">
           <span className="font-display text-base italic text-mist-100 md:text-lg">SPORE</span>
           <span className="mx-2 text-mist-600">—</span>
-          L'IA qui croise des domaines scientifiques éloignés pour imaginer des découvertes inédites.
+          Des hypothèses scientifiques interdisciplinaires que personne n'a encore proposées.
+        </p>
+        <p className="mb-6 max-w-3xl text-xs italic leading-relaxed text-mist-400 md:text-sm">
+          Une hypothèse nulle bien documentée vaut mieux qu'une fausse promesse d'unification.
         </p>
 
         {/* kicker */}
         <div className="mb-8 flex flex-wrap items-center gap-3 text-[11px]">
           <span className="inline-flex items-center gap-2 rounded-full border border-emerald-bio/30 bg-emerald-bio/5 px-3 py-1 uppercase tracking-[0.22em] text-emerald-glow">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-glow" />
-            La dernière découverte
+            Le dernier brief
           </span>
           <time
             className="font-mono text-mist-500"
@@ -239,10 +242,10 @@ function FeaturedHero({ brief }: { brief: Brief }) {
           </div>
 
           <Link
-            href={`/discoveries/${brief_id}`}
+            href={`/briefs/${brief_id}`}
             className="group inline-flex items-center gap-2 rounded-full border border-emerald-bio/50 bg-emerald-bio/10 px-6 py-3 text-sm font-medium text-emerald-glow transition-all hover:border-emerald-bio hover:bg-emerald-bio/20 hover:shadow-[0_0_50px_rgba(16,185,129,0.3)]"
           >
-            Lire cette découverte
+            Lire ce brief
             <span className="transition-transform group-hover:translate-x-1">→</span>
           </Link>
         </div>
@@ -259,7 +262,7 @@ function EmptyHero() {
       <MyceliumBackground density={0.4} className="opacity-40" />
       <div className="relative mx-auto max-w-3xl px-6 py-24 text-center">
         <h1 className="font-display text-4xl text-mist-100 md:text-6xl">
-          Aucune découverte publiée pour l'instant
+          Aucun brief publié pour l'instant
         </h1>
         <p className="mt-6 text-mist-400">
           Le pipeline tourne — les prochains briefs apparaîtront ici.

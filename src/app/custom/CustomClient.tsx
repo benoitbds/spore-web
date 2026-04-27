@@ -181,7 +181,7 @@ export default function CustomClient() {
               </Link>
             )}
             <Link
-              href="/discoveries"
+              href="/briefs"
               className="rounded-xl border border-ink-500 bg-ink-900 px-4 py-2 text-sm text-mist-200 hover:text-mist-100"
             >
               Explorer les briefs existants

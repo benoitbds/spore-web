@@ -14,7 +14,7 @@ interface Props {
    * Visual shape of the CTA.
    *
    * - ``'banner'`` (default): horizontal two-column panel, strong visual
-   *   weight. Used below the /discoveries grid and at the bottom of
+   *   weight. Used below the /briefs grid and at the bottom of
    *   regular brief pages where the user has a lot of surrounding room.
    * - ``'card'``: vertical stacked layout, narrower max-width. Fits the
    *   article column at the bottom of a stub brief (where the user just
@@ -27,7 +27,7 @@ interface Props {
 /**
  * Inline panel inviting the reader to request a custom collision.
  *
- * Rendered below the discoveries grid, at the bottom of brief detail
+ * Rendered below the briefs grid, at the bottom of brief detail
  * pages (normal AND stub), and wherever else we need to surface the
  * "/custom" path. Visually anchored by the emerald→cyan gradient
  * (SPORE's brand pair) so it reads as a primary CTA without shouting.
