@@ -1,5 +1,5 @@
 import type { Brief } from '@/lib/types';
-import { SITE_URL, SITE_NAME, briefMetaTitle, briefOgDescription } from '@/lib/seo';
+import { SITE_URL, SITE_NAME, briefMetaTitle, briefOgDescription, toIsoUtc } from '@/lib/seo';
 import { isTechnicalVerdict, verdictLabel } from '@/lib/verdicts';
 
 interface Props {
@@ -41,17 +41,19 @@ export default function BriefJsonLd({ brief }: Props) {
     name: headline,
     alternativeHeadline: brief.sharpened.title,
     description,
-    datePublished,
-    dateModified: datePublished,
+    datePublished: toIsoUtc(datePublished),
+    dateModified: toIsoUtc(datePublished),
     inLanguage: ['fr-FR', 'en'],
     url,
     mainEntityOfPage: url,
     identifier: brief.brief_id,
     isAccessibleForFree: true,
+    image: `${SITE_URL}/og-default.png`,
     author: {
       '@type': 'SoftwareApplication',
       name: SITE_NAME,
       applicationCategory: 'ResearchApplication',
+      operatingSystem: 'Web',
       url: SITE_URL,
     },
     publisher: {
