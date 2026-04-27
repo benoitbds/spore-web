@@ -7,7 +7,7 @@ interface Props {
 }
 
 /**
- * Schema.org ScholarlyArticle payload for a brief. Renders a
+ * Schema.org Article payload for a brief. Renders a
  * `<script type="application/ld+json">` tag. Server-component safe
  * (no hooks, no client-only APIs).
  */
@@ -36,7 +36,7 @@ export default function BriefJsonLd({ brief }: Props) {
 
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'ScholarlyArticle',
+    '@type': 'Article',
     headline,
     name: headline,
     alternativeHeadline: brief.sharpened.title,
@@ -49,8 +49,9 @@ export default function BriefJsonLd({ brief }: Props) {
     identifier: brief.brief_id,
     isAccessibleForFree: true,
     author: {
-      '@type': 'Organization',
+      '@type': 'SoftwareApplication',
       name: SITE_NAME,
+      applicationCategory: 'ResearchApplication',
       url: SITE_URL,
     },
     publisher: {
