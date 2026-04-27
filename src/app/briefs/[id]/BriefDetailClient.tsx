@@ -184,6 +184,11 @@ export default function BriefDetailClient({ teaser }: Props) {
           {headerTitle}
         </h1>
 
+        {/* Badge épistémique — honnêteté sur le statut du contenu (test users N1.4) */}
+        <p className="mb-6 text-xs uppercase tracking-[0.18em] text-mist-500">
+          Hypothèse générée par IA <span className="text-mist-600">·</span> Pré-publication <span className="text-mist-600">·</span> À tester expérimentalement
+        </p>
+
         <DomainBridge
           domainA={teaser.domains[0]}
           domainB={teaser.domains[1] || '—'}
