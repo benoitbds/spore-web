@@ -28,6 +28,25 @@ export function truncate(text: string | undefined | null, max: number): string {
   return base.trimEnd() + '…';
 }
 
+/**
+ * Normalize a timestamp string to ISO 8601 UTC format.
+ * Idempotent: returns input unchanged if already ISO with timezone marker.
+ *
+ * Handles:
+ * - "2026-04-22 07:18:11" (SQLite CURRENT_TIMESTAMP, UTC by contract)
+ *   → "2026-04-22T07:18:11Z"
+ * - "2026-04-22T07:18:11.123Z" (Node.js toISOString())
+ *   → unchanged
+ * - "2026-04-22T07:18:11+02:00" (any ISO with offset)
+ *   → unchanged
+ */
+export function toIsoUtc(timestamp: string): string {
+  if (/T.*[Zz]|T.*[+-]\d{2}:\d{2}/.test(timestamp)) {
+    return timestamp;
+  }
+  return timestamp.replace(' ', 'T') + 'Z';
+}
+
 /** The description text to use in meta tags for a brief — FR vulgarisation first. */
 export function briefMetaDescription(brief: Brief): string {
   const v = brief.vulgarization_fr;
