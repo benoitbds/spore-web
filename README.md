@@ -21,9 +21,9 @@ cd ../spore-poc && .venv/bin/python scripts/export_stats.py
 
 ## Pages
 
-- `/` — Landing with hero, latest discovery, how-it-works preview
-- `/discoveries` — Catalogue of research briefs
-- `/discoveries/[id]` — Full brief with Comprendre/Recherche tabs
+- `/` — Landing with hero, latest brief, how-it-works preview
+- `/briefs` — Catalogue of research briefs
+- `/briefs/[id]` — Full brief with Comprendre/Recherche tabs
 - `/how-it-works` — Pipeline visualization
 - `/stats` — Public dashboard
 
