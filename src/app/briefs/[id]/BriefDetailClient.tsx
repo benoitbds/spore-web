@@ -10,6 +10,7 @@ import ReviewerPanel from '@/components/ReviewerPanel';
 import ProtocolTimeline from '@/components/ProtocolTimeline';
 import ShareButtons from '@/components/ShareButtons';
 import EmailGate from '@/components/EmailGate';
+import NewsletterOptIn from '@/components/NewsletterOptIn';
 import type {
   BriefTeaser,
   CounterEvidence,
@@ -261,6 +262,17 @@ export default function BriefDetailClient({ teaser }: Props) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Newsletter capture (N4.1) — visible at the bottom of every brief
+          page on both tabs. Source carries the brief id so the analytics
+          can attribute future signups to the brief that drove them. */}
+      <div className="mt-16 border-t border-ink-500/50 pt-10">
+        <NewsletterOptIn
+          variant="full"
+          source={`brief:${teaser.brief_id}`}
+          briefId={teaser.brief_id}
+        />
+      </div>
     </article>
   );
 }
