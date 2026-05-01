@@ -248,4 +248,10 @@ export const api = {
       body: payload,
       auth: false,
     }),
+  requestAnthology: (payload: { email: string }) =>
+    apiFetch<{ ok: boolean; message: string }>('/api/anthology/request', {
+      method: 'POST',
+      body: payload,
+      auth: false,
+    }),
 };
