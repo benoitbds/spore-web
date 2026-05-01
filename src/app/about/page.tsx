@@ -207,6 +207,17 @@ export default function AboutPage() {
             bibliographie en 24h. Première collision offerte pendant le
             lancement.
           </Bullet>
+          <Bullet>
+            <Strong>Recevoir l&apos;anthologie SPORE</Strong> — un PDF gratuit
+            des 8 meilleures hypothèses des 6 premiers mois, livré par email{' '}
+            <Link
+              href="/anthology"
+              className="text-emerald-glow underline-offset-2 hover:underline"
+            >
+              ici
+            </Link>
+            .
+          </Bullet>
         </ul>
         <P>
           Pour les équipes de recherche ou R&amp;D corporate intéressées par une
