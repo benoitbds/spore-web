@@ -55,6 +55,14 @@ export default function Footer() {
             </li>
             <li>
               <a
+                href="/methodology"
+                className="hover:text-emerald-glow transition-colors"
+              >
+                Méthodologie
+              </a>
+            </li>
+            <li>
+              <a
                 href="/legal"
                 className="hover:text-emerald-glow transition-colors"
               >
