@@ -47,6 +47,14 @@ export default function Footer() {
           <ul className="flex flex-wrap gap-x-5 gap-y-1">
             <li>
               <a
+                href="/about"
+                className="hover:text-emerald-glow transition-colors"
+              >
+                À propos
+              </a>
+            </li>
+            <li>
+              <a
                 href="/legal"
                 className="hover:text-emerald-glow transition-colors"
               >
