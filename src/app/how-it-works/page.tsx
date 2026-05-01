@@ -101,8 +101,21 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
+      {/* Methodology pointer */}
+      <section className="mt-24 rounded-2xl border border-ink-500 bg-ink-800/40 p-6 text-sm text-mist-300 md:p-8">
+        Pour comprendre en détail comment chaque métrique est calculée — y
+        compris ses limites — consultez la{' '}
+        <Link
+          href="/methodology"
+          className="text-emerald-glow underline-offset-2 hover:underline"
+        >
+          page Méthodologie
+        </Link>
+        .
+      </section>
+
       {/* CTA */}
-      <section className="mt-24 text-center">
+      <section className="mt-12 text-center">
         <p className="mb-6 text-mist-400">Prêt à explorer ?</p>
         <Link
           href="/briefs"

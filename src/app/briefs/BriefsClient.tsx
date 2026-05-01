@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import EditorialBriefCard from '@/components/EditorialBriefCard';
+import NoveltyScoreTooltip from '@/components/NoveltyScoreTooltip';
 import type { Brief } from '@/lib/types';
 
 type SortMode = 'panel' | 'novelty' | 'date';
@@ -232,6 +233,7 @@ export default function BriefsClient({ briefs, allDomains }: Props) {
               </button>
             ))}
           </div>
+          {sort === 'novelty' && <NoveltyScoreTooltip />}
         </div>
 
         <div className="flex items-center gap-3">

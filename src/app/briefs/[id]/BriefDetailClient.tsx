@@ -11,6 +11,7 @@ import ProtocolTimeline from '@/components/ProtocolTimeline';
 import ShareButtons from '@/components/ShareButtons';
 import EmailGate from '@/components/EmailGate';
 import NewsletterOptIn from '@/components/NewsletterOptIn';
+import NoveltyScoreTooltip from '@/components/NoveltyScoreTooltip';
 import type {
   BriefTeaser,
   CounterEvidence,
@@ -928,8 +929,9 @@ function ComprendreTab({ teaser, lang }: { teaser: BriefTeaser; lang: Lang }) {
           {teaser.novelty_summary ? (
             <>
               <div className="mb-3 flex items-baseline gap-3">
-                <span className="font-mono text-xs uppercase tracking-wider text-cyan-glow">
-                  Novelty score
+                <span className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider text-cyan-glow">
+                  <span>Novelty score</span>
+                  <NoveltyScoreTooltip />
                 </span>
                 <span className="font-display text-2xl text-mist-100">
                   {teaser.novelty_summary.score.toFixed(2)}
