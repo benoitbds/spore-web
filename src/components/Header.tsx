@@ -9,6 +9,7 @@ import AuthWidget from '@/components/AuthWidget';
 const NAV = [
   { href: '/', label: 'Accueil' },
   { href: '/briefs', label: 'Briefs' },
+  { href: '/custom', label: 'Collision sur mesure' },
   { href: '/how-it-works', label: 'Comment ça marche' },
   { href: '/pricing', label: 'Tarifs' },
   { href: '/stats', label: 'Statistiques' },
