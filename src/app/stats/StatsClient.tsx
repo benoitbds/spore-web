@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import NoveltyScoreTooltip from '@/components/NoveltyScoreTooltip';
 import type { Stats } from '@/lib/types';
 
 function fmtNum(n: number): string {
@@ -121,6 +122,7 @@ export default function StatsClient({ stats, briefCount, last30 }: Props) {
           label="Nouveauté moyenne"
           value={quality.avg_novelty_score?.toFixed(2) ?? 'N/A'}
           sub="sur /1.0"
+          labelTooltip={<NoveltyScoreTooltip />}
         />
         <QualityCard
           label="Consensus du panel"
@@ -230,14 +232,19 @@ function QualityCard({
   label,
   value,
   sub,
+  labelTooltip,
 }: {
   label: string;
   value: string;
   sub: string;
+  labelTooltip?: React.ReactNode;
 }) {
   return (
     <div className="rounded-2xl border border-ink-500 bg-gradient-to-br from-emerald-bio/5 to-transparent p-6">
-      <div className="text-xs uppercase tracking-widest text-mist-500">{label}</div>
+      <div className="flex items-center gap-1.5 text-xs uppercase tracking-widest text-mist-500">
+        <span>{label}</span>
+        {labelTooltip}
+      </div>
       <div className="mt-2 font-display text-5xl text-gradient-bio">{value}</div>
       <div className="mt-1 text-xs text-mist-500">{sub}</div>
     </div>

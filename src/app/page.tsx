@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Counter from '@/components/Counter';
 import EditorialBriefCard from '@/components/EditorialBriefCard';
 import MyceliumBackground from '@/components/MyceliumBackground';
+import NoveltyScoreTooltip from '@/components/NoveltyScoreTooltip';
 import {
   briefRowToBrief,
   getAllBriefs,
@@ -129,6 +130,7 @@ export default function HomePage() {
                     : '—'
                 }
                 label="Nouveauté moyenne"
+                labelTooltip={<NoveltyScoreTooltip />}
               />
               <MiniStat value="100%" label="Références vérifiées" />
             </div>
@@ -233,6 +235,7 @@ function FeaturedHero({ brief }: { brief: Brief }) {
               value={novelty.toFixed(2)}
               sub={verdictLabel(grounding.novelty_assessment.verdict).toLowerCase()}
               accent="emerald"
+              labelTooltip={<NoveltyScoreTooltip />}
             />
             <HeroBadge
               label="Consensus du panel"
@@ -280,11 +283,13 @@ function HeroBadge({
   value,
   sub,
   accent,
+  labelTooltip,
 }: {
   label: string;
   value: string;
   sub: string;
   accent: 'emerald' | 'cyan';
+  labelTooltip?: React.ReactNode;
 }) {
   const tone =
     accent === 'emerald'
@@ -292,8 +297,9 @@ function HeroBadge({
       : 'border-cyan-bio/30 bg-cyan-bio/5 text-cyan-glow';
   return (
     <div className={`rounded-xl border ${tone} px-5 py-3`}>
-      <div className="text-[10px] uppercase tracking-[0.2em] text-mist-500">
-        {label}
+      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-mist-500">
+        <span>{label}</span>
+        {labelTooltip}
       </div>
       <div className="mt-1 font-display text-2xl text-mist-100">{value}</div>
       <div className="text-xs text-mist-400">{sub}</div>
@@ -331,11 +337,22 @@ function StepCard({
   );
 }
 
-function MiniStat({ value, label }: { value: string; label: string }) {
+function MiniStat({
+  value,
+  label,
+  labelTooltip,
+}: {
+  value: string;
+  label: string;
+  labelTooltip?: React.ReactNode;
+}) {
   return (
     <div className="text-center">
       <div className="font-display text-3xl text-mist-100 md:text-4xl">{value}</div>
-      <div className="mt-1 text-xs uppercase tracking-wider text-mist-500">{label}</div>
+      <div className="mt-1 inline-flex items-center gap-1.5 text-xs uppercase tracking-wider text-mist-500">
+        <span>{label}</span>
+        {labelTooltip}
+      </div>
     </div>
   );
 }
