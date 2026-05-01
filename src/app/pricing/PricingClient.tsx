@@ -26,50 +26,93 @@ export default function PricingClient() {
         </p>
       </header>
 
-      {/* Main launch card */}
-      <section className="mx-auto mb-16 max-w-2xl">
-        <article className="relative overflow-hidden rounded-2xl border border-emerald-bio/60 bg-emerald-bio/5 p-8 shadow-[0_0_60px_rgba(16,185,129,0.08)]">
-          <span className="absolute -right-4 -top-4 text-6xl opacity-10">
-            ✨
-          </span>
-          <div className="mb-2 text-xs font-medium uppercase tracking-widest text-emerald-glow">
-            Accès complet
-          </div>
-          <h2 className="mb-3 font-display text-3xl text-mist-100">
-            Brief
-          </h2>
-          <div className="mb-6 flex items-baseline gap-3">
-            <span className="font-display text-5xl text-mist-100">Gratuit</span>
-            <span className="text-sm text-mist-500">pour le lancement</span>
-          </div>
-          <ul className="mb-8 space-y-2.5 text-sm text-mist-200">
-            <Bullet>Tous les briefs débloqués, sans limite</Bullet>
-            <Bullet>Hypothèse formalisée + protocole expérimental</Bullet>
-            <Bullet>Panel de relecture par 5 personas + méta-relecture</Bullet>
-            <Bullet>Base de preuves et contre-preuves (DOIs vérifiés)</Bullet>
-            <Bullet>1 collision sur mesure offerte</Bullet>
-            <Bullet>Aucune carte demandée</Bullet>
-          </ul>
-          {isAuthenticated ? (
+      {/* Primary launch grid: free brief + custom collision */}
+      <section className="mx-auto mb-16 max-w-5xl">
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Card 1: Brief gratuit */}
+          <article className="relative overflow-hidden rounded-2xl border border-emerald-bio/60 bg-emerald-bio/5 p-8 shadow-[0_0_60px_rgba(16,185,129,0.08)]">
+            <span className="absolute -right-4 -top-4 text-6xl opacity-10">
+              ✨
+            </span>
+            <div className="mb-2 text-xs font-medium uppercase tracking-widest text-emerald-glow">
+              Accès complet
+            </div>
+            <h2 className="mb-3 font-display text-3xl text-mist-100">
+              Brief
+            </h2>
+            <div className="mb-6 flex items-baseline gap-3">
+              <span className="font-display text-5xl text-mist-100">Gratuit</span>
+              <span className="text-sm text-mist-500">pour le lancement</span>
+            </div>
+            <ul className="mb-8 space-y-2.5 text-sm text-mist-200">
+              <Bullet>Tous les briefs débloqués, sans limite</Bullet>
+              <Bullet>Hypothèse formalisée + protocole expérimental</Bullet>
+              <Bullet>Panel de relecture par 5 personas + méta-relecture</Bullet>
+              <Bullet>Base de preuves et contre-preuves (DOIs vérifiés)</Bullet>
+              <Bullet>1 collision sur mesure offerte</Bullet>
+              <Bullet>Aucune carte demandée</Bullet>
+            </ul>
+            {isAuthenticated ? (
+              <Link
+                href="/briefs"
+                className="block rounded-xl bg-emerald-bio px-5 py-4 text-center text-sm font-semibold text-ink-900 transition-colors hover:bg-emerald-glow"
+              >
+                Parcourir les briefs →
+              </Link>
+            ) : (
+              <button
+                onClick={() => setShowGate((s) => !s)}
+                disabled={isLoading}
+                className="block w-full rounded-xl bg-emerald-bio px-5 py-4 text-center text-sm font-semibold text-ink-900 transition-colors hover:bg-emerald-glow disabled:opacity-50"
+              >
+                Commencer gratuitement →
+              </button>
+            )}
+          </article>
+
+          {/* Card 2: Collision sur mesure */}
+          <article className="relative overflow-hidden rounded-2xl border border-emerald-bio/60 bg-emerald-bio/5 p-8 shadow-[0_0_60px_rgba(16,185,129,0.08)]">
+            <span className="absolute -top-3 left-6 rounded-full border border-amber-400/40 bg-amber-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-amber-400">
+              ★ L&apos;offre signature de SPORE
+            </span>
+            <span className="absolute -right-4 -top-4 text-6xl opacity-10">
+              🎯
+            </span>
+            <div className="mb-2 text-xs font-medium uppercase tracking-widest text-emerald-glow">
+              Sur mesure
+            </div>
+            <h2 className="mb-3 font-display text-3xl text-mist-100">
+              Collision sur mesure
+            </h2>
+            <div className="mb-6 flex items-baseline gap-3">
+              <span className="font-display text-5xl text-mist-100">Offerte</span>
+              <span className="text-sm text-mist-500">pour le lancement</span>
+            </div>
+            <p className="mb-6 text-sm text-mist-300">
+              Vous choisissez 2 domaines scientifiques. SPORE génère une
+              hypothèse interdisciplinaire inédite avec protocole expérimental,
+              prédictions falsifiables et bibliographie vérifiée.
+            </p>
+            <ul className="mb-6 space-y-2.5 text-sm text-mist-200">
+              <Bullet>2 domaines scientifiques au choix</Bullet>
+              <Bullet>Brief complet (hypothèse, protocole 3 phases, prédictions, sources)</Bullet>
+              <Bullet>Livraison par email sous 24 h</Bullet>
+              <Bullet>Format identique aux briefs publiés</Bullet>
+            </ul>
+            <p className="mb-4 text-xs text-mist-500">
+              × 1 par utilisateur · valeur 25 €
+            </p>
             <Link
-              href="/briefs"
+              href="/custom"
               className="block rounded-xl bg-emerald-bio px-5 py-4 text-center text-sm font-semibold text-ink-900 transition-colors hover:bg-emerald-glow"
             >
-              Parcourir les briefs →
+              Réserver ma collision →
             </Link>
-          ) : (
-            <button
-              onClick={() => setShowGate((s) => !s)}
-              disabled={isLoading}
-              className="block w-full rounded-xl bg-emerald-bio px-5 py-4 text-center text-sm font-semibold text-ink-900 transition-colors hover:bg-emerald-glow disabled:opacity-50"
-            >
-              Commencer gratuitement →
-            </button>
-          )}
-        </article>
+          </article>
+        </div>
 
         {showGate && !isAuthenticated && (
-          <div className="mt-6">
+          <div className="mx-auto mt-6 max-w-2xl">
             <EmailGate
               headline="Créez votre compte"
               subtext="Un lien magique vous sera envoyé par email. Aucun mot de passe, aucune carte."
