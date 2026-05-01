@@ -2,6 +2,22 @@ export default function Footer() {
   return (
     <footer className="border-t border-ink-500/50 bg-ink-800/30 py-12">
       <div className="mx-auto max-w-7xl px-6">
+        <a
+          href="/anthology"
+          className="group mb-10 flex items-center justify-between gap-4 rounded-2xl border border-emerald-bio/30 bg-emerald-bio/5 px-5 py-4 text-sm transition-colors hover:border-emerald-bio/60 hover:bg-emerald-bio/10"
+        >
+          <span className="flex items-center gap-3">
+            <span aria-hidden className="text-xl">📕</span>
+            <span className="text-mist-200">
+              <span className="font-medium text-mist-100">Anthologie SPORE</span>{' '}
+              — 8 hypothèses sélectionnées dans un PDF gratuit
+            </span>
+          </span>
+          <span className="font-mono text-xs text-emerald-glow transition-transform group-hover:translate-x-1">
+            →
+          </span>
+        </a>
+
         <div className="grid gap-10 md:grid-cols-3">
           <div>
             <div className="mb-3 flex items-center gap-2">
