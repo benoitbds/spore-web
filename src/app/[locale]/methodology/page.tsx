@@ -1,275 +1,224 @@
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { SITE_URL } from '@/lib/seo';
+import { localeAlternates } from '@/lib/i18n-seo';
 
-const _title = 'Méthodologie — SPORE';
-const _desc =
-  'Comment SPORE calcule (ou pas) ses métriques : score de Nouveauté, ' +
-  'consensus du Panel, kill rate, vérification bibliographique. ' +
-  'Transparence sur les méthodes et leurs limites assumées.';
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'methodologyPage' });
+  const title = t('metaTitle');
+  const desc = t('metaDescription');
+  return {
+    title,
+    description: desc,
+    alternates: localeAlternates(locale, '/methodology'),
+    openGraph: {
+      title: `${title} — SPORE`,
+      description: desc,
+      url: `${SITE_URL}/${locale}/methodology`,
+      type: 'article',
+      locale: locale === 'fr' ? 'fr_FR' : 'en_US',
+      images: [
+        {
+          url: '/og-default.png',
+          width: 1200,
+          height: 630,
+          alt: 'SPORE',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} — SPORE`,
+      description: desc,
+      images: ['/og-default.png'],
+    },
+  };
+}
 
-export const metadata: Metadata = {
-  title: 'Méthodologie',
-  description: _desc,
-  alternates: { canonical: '/methodology' },
-  openGraph: {
-    title: _title,
-    description: _desc,
-    url: `${SITE_URL}/methodology`,
-    type: 'article',
-    locale: 'fr_FR',
-    images: [
-      {
-        url: '/og-default.png',
-        width: 1200,
-        height: 630,
-        alt: 'SPORE — Le moteur d\'hypothèses interdisciplinaires',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: _title,
-    description: _desc,
-    images: ['/og-default.png'],
-  },
-};
+export default async function MethodologyPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'methodologyPage' });
 
-export default function MethodologyPage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-16 md:py-24">
       <header className="mb-12">
         <span className="mb-4 inline-block text-xs uppercase tracking-[0.3em] text-emerald-glow">
-          Transparence
+          {t('kicker')}
         </span>
         <h1 className="font-display text-4xl leading-tight text-mist-100 md:text-6xl">
-          Méthodologie SPORE
+          {t('title')}
         </h1>
-        <p className="mt-6 text-mist-300 leading-relaxed">
-          Cette page documente avec transparence le fonctionnement réel des
-          métriques affichées sur SPORE. Le projet revendique la rigueur
-          scientifique — la rigueur commence par dire honnêtement comment
-          chaque chiffre est produit, y compris quand la méthode est
-          imparfaite.
-        </p>
+        <p className="mt-6 text-mist-300 leading-relaxed">{t('intro')}</p>
       </header>
 
-      <Section id="novelty" title="Le score de Nouveauté (0,00 à 1,00)">
-        <Field label="Ce que c'est">
-          une estimation, par le LLM lui-même, de l&apos;originalité de
-          l&apos;hypothèse formulée par rapport à la littérature scientifique
-          récente trouvée via Semantic Scholar.
-        </Field>
-        <Field label="Comment il est produit">
-          après avoir interrogé l&apos;API Semantic Scholar sur les mots-clés
-          de l&apos;hypothèse, SPORE soumet l&apos;ensemble des papiers
-          trouvés au LLM (DeepSeek ou Claude selon l&apos;étape) avec une
-          consigne explicite : <em>« évalue à quel point cette hypothèse est
-          nouvelle par rapport à ce qui existe déjà »</em>. Le LLM retourne un
-          score entre 0 et 1 et un verdict catégoriel{' '}
+      <Section id="novelty" title={t('noveltyTitle')}>
+        <Field label={t('novelty_what_label')}>{t('novelty_what_text')}</Field>
+        <Field label={t('novelty_how_label')}>
+          {t('novelty_how_textBefore')}
+          <em>{t('novelty_how_quote')}</em>
+          {t('novelty_how_textAfter')}
           <span className="font-mono text-xs text-mist-400">
-            (novel · incremental · already_explored · already_proven)
+            {t('novelty_how_verdicts')}
           </span>
-          .
+          {t('novelty_how_period')}
         </Field>
-        <Field label="Ce que ce n'est PAS">
-          une mesure objective basée sur des embeddings, une distance
-          cosinus, ou une analyse statistique du graphe de citations. Il
-          n&apos;y a pas de formule mathématique derrière. C&apos;est une
-          auto-évaluation heuristique.
-        </Field>
+        <Field label={t('novelty_not_label')}>{t('novelty_not_text')}</Field>
         <div className="mt-4 rounded-xl border border-amber-bio/30 bg-amber-bio/5 p-5">
           <p className="mb-2 text-xs font-medium uppercase tracking-widest text-amber-glow">
-            Limites assumées
+            {t('novelty_limits_title')}
           </p>
           <ul className="space-y-2 text-sm text-mist-300">
-            <Bullet>
-              Le score reflète le biais d&apos;auto-évaluation du LLM
-              (tendance à surévaluer ses propres productions, ou à
-              sous-évaluer si entraîné à la prudence).
-            </Bullet>
-            <Bullet>
-              La fenêtre temporelle de comparaison dépend des résultats
-              Semantic Scholar et n&apos;est pas strictement bornée.
-            </Bullet>
-            <Bullet>
-              Un concept « redécouvert » qui existe depuis 30 ans mais
-              n&apos;apparaît pas dans le top 10 Semantic Scholar peut être
-              scoré comme nouveau.
-            </Bullet>
-            <Bullet>
-              Le score moyen observé sur les briefs publiés est de 0,80 —
-              c&apos;est un signal de surévaluation systématique, pas une
-              mesure neutre.
-            </Bullet>
+            <Bullet>{t('novelty_limit1')}</Bullet>
+            <Bullet>{t('novelty_limit2')}</Bullet>
+            <Bullet>{t('novelty_limit3')}</Bullet>
+            <Bullet>{t('novelty_limit4')}</Bullet>
           </ul>
         </div>
-        <Field label="Comment le lire">
-          utilisez le score Nouveauté comme un indicateur <em>relatif</em>{' '}
-          (cette hypothèse semble plus nouvelle que celle-là, selon le
-          modèle), pas comme une mesure absolue. Pour évaluer la vraie
-          nouveauté d&apos;une hypothèse, lisez la section « Évaluation de
-          nouveauté » du brief, qui liste les travaux les plus proches
-          identifiés.
+        <Field label={t('novelty_read_label')}>
+          {t('novelty_read_textBefore')}
+          <em>{t('novelty_read_em')}</em>
+          {t('novelty_read_textAfter')}
         </Field>
-        <Field label="Évolution prévue">
-          un sprint futur (référencé en backlog comme <span className="font-mono text-xs">N2.7-bis</span>) implémentera un score
-          algorithmique basé sur la distance sémantique (embeddings
-          sentence-transformers) et l&apos;absence de cooccurrence dans le
-          corpus. Le score actuel sera conservé en parallèle pour
-          comparaison.
+        <Field label={t('novelty_planned_label')}>
+          {t('novelty_planned_textBefore')}
+          <span className="font-mono text-xs">{t('novelty_planned_code')}</span>
+          {t('novelty_planned_textAfter')}
         </Field>
       </Section>
 
-      <Section id="panel" title="Le score de consensus du Panel (0 à 10)">
-        <Field label="Ce que c'est">
-          la moyenne pondérée des scores individuels donnés par les 5
-          reviewers IA du panel post-publication.
-        </Field>
-        <Field label="Comment il est produit">
-          chaque reviewer (Méthodologue, Expert du domaine, Avocat du diable,
-          Industriel, Stratège financement) attribue un score sur 10 selon
-          ses critères propres, accompagné d&apos;un verdict catégoriel{' '}
+      <Section id="panel" title={t('panelTitle')}>
+        <Field label={t('panel_what_label')}>{t('panel_what_text')}</Field>
+        <Field label={t('panel_how_label')}>
+          {t('panel_how_textBefore')}
           <span className="font-mono text-xs text-mist-400">
-            (strong_accept · accept · weak_accept · weak_reject · reject)
-          </span>{' '}
-          et d&apos;une note de confiance (0 à 1). Le{' '}
-          <span className="font-mono text-xs">consensus_score</span> est une
-          moyenne pondérée par la confidence de chaque reviewer.
+            {t('panel_how_verdicts')}
+          </span>
+          {t('panel_how_textAfter')}
+          <span className="font-mono text-xs">{t('panel_how_code')}</span>
+          {t('panel_how_textEnd')}
         </Field>
         <div className="mt-4 rounded-xl border border-cyan-bio/30 bg-cyan-bio/5 p-5">
           <p className="mb-2 text-xs font-medium uppercase tracking-widest text-cyan-glow">
-            Verdict du Meta-Reviewer
+            {t('panel_meta_title')}
           </p>
           <ul className="space-y-2 text-sm text-mist-300">
             <Bullet>
-              Si <span className="font-mono text-xs">consensus_score ≥ 7,0</span>{' '}
-              et verdict iter1 ≥ majorité accept →{' '}
+              {t('panel_meta_rule1Pre')}
+              <span className="font-mono text-xs">{t('panel_meta_rule1Code1')}</span>
+              {t('panel_meta_rule1Mid')}
               <span className="font-mono text-xs text-emerald-glow">
-                publish_brief
+                {t('panel_meta_rule1Result')}
               </span>
             </Bullet>
             <Bullet>
-              Si <span className="font-mono text-xs">4,5 ≤ consensus_score &lt; 7,0</span>{' '}
-              →{' '}
+              {t('panel_meta_rule2Pre')}
+              <span className="font-mono text-xs">{t('panel_meta_rule2Code')}</span>
+              {t('panel_meta_rule2Mid')}
               <span className="font-mono text-xs text-amber-glow">
-                revise_and_resubmit
-              </span>{' '}
-              (1 itération maximum)
+                {t('panel_meta_rule2Result')}
+              </span>
+              {t('panel_meta_rule2Suffix')}
             </Bullet>
             <Bullet>
-              Si <span className="font-mono text-xs">consensus_score &lt; 4,5</span>{' '}
-              →{' '}
-              <span className="font-mono text-xs text-mist-400">reject</span>
+              {t('panel_meta_rule3Pre')}
+              <span className="font-mono text-xs">{t('panel_meta_rule3Code')}</span>
+              {t('panel_meta_rule3Mid')}
+              <span className="font-mono text-xs text-mist-400">
+                {t('panel_meta_rule3Result')}
+              </span>
             </Bullet>
           </ul>
         </div>
-        <Field label="Ce que ce n'est PAS">
-          une validation indépendante. Les 5 reviewers sont des projections
-          du même espace de représentation linguistique que celui qui a
-          généré l&apos;hypothèse. Ils détectent les incohérences internes,
-          pas la contradiction expérimentale.
-        </Field>
+        <Field label={t('panel_not_label')}>{t('panel_not_text')}</Field>
       </Section>
 
-      <Section id="kill-rate" title="Le taux de rejet (kill rate)">
-        <Field label="Ce que c'est">
-          la proportion de collisions tentées qui n&apos;aboutissent pas à un
-          brief publié.
-        </Field>
-        <Field label="Comment il est produit">
-          compteur public mis à jour à chaque cycle, visible sur la page{' '}
+      <Section id="kill-rate" title={t('killRateTitle')}>
+        <Field label={t('killRate_what_label')}>{t('killRate_what_text')}</Field>
+        <Field label={t('killRate_how_label')}>
+          {t('killRate_how_textBefore')}
           <Link
             href="/stats"
             className="text-emerald-glow underline-offset-2 hover:underline"
           >
-            Statistiques
+            {t('killRate_how_link')}
           </Link>
-          .
+          {t('killRate_how_textAfter')}
         </Field>
-        <Field label="Pourquoi il est élevé">
-          sur 2 095 collisions tentées, 38 briefs publiés (taux de rejet de
-          98,2 %). Ce chiffre n&apos;est PAS un défaut — c&apos;est la
-          sélection rigoureuse en action. La majorité des paires de domaines
-          aléatoires ne produisent pas de pont causal scientifiquement
-          défendable. Publier toutes les collisions reviendrait à publier
-          95 % de bruit.
-        </Field>
+        <Field label={t('killRate_why_label')}>{t('killRate_why_text')}</Field>
       </Section>
 
-      <Section id="references" title="Vérification des références bibliographiques">
-        <Field label="Ce que c'est">
-          chaque DOI cité dans un brief publié a été vérifié techniquement
-          via l&apos;API Semantic Scholar.
-        </Field>
-        <Field label="Ce que ça signifie">
-          le DOI existe, il pointe vers un article identifié sur Semantic
-          Scholar, le titre et les auteurs récupérés correspondent à ce qui
-          est cité dans le brief.
-        </Field>
-        <Field label="Ce que ça ne signifie PAS">
-          la conclusion citée n&apos;a pas été vérifiée. SPORE garantit que
-          les références existent et sont correctement identifiées. SPORE ne
-          garantit pas que le LLM a correctement interprété le contenu de
-          chaque article. Pour les briefs critiques, vérifier toujours la
-          conclusion en consultant l&apos;article original.
-        </Field>
+      <Section id="references" title={t('refsTitle')}>
+        <Field label={t('refs_what_label')}>{t('refs_what_text')}</Field>
+        <Field label={t('refs_means_label')}>{t('refs_means_text')}</Field>
+        <Field label={t('refs_notMeans_label')}>{t('refs_notMeans_text')}</Field>
       </Section>
 
-      <Section id="costs" title="Coûts publics">
+      <Section id="costs" title={t('costsTitle')}>
         <p className="text-mist-300 leading-relaxed">
-          Tous les coûts d&apos;inférence LLM sont publiés en temps réel sur
-          la page{' '}
+          {t('costs_textBefore')}
           <Link
             href="/stats"
             className="text-emerald-glow underline-offset-2 hover:underline"
           >
-            Statistiques
+            {t('costs_link')}
           </Link>
-          . Coût moyen par brief : <span className="font-mono text-mist-100">~0,51 $</span>.
-          Coût total cumulé depuis le lancement : visible publiquement.
+          {t('costs_textAfter')}
+          <span className="font-mono text-mist-100">{t('costs_meanCode')}</span>
+          {t('costs_textEnd')}
         </p>
       </Section>
 
-      <Section id="stack" title="Stack technique">
+      <Section id="stack" title={t('stackTitle')}>
         <ul className="space-y-2 text-mist-300">
           <Bullet>
-            <Strong>LLM</Strong> : DeepSeek V3.2 (primaire) + Claude (étapes
-            critiques)
+            <Strong>{t('stack_llm_label')}</Strong>
+            {t('stack_llm_value')}
           </Bullet>
           <Bullet>
-            <Strong>Embeddings</Strong> : sentence-transformers
-            all-MiniLM-L6-v2
+            <Strong>{t('stack_embeddings_label')}</Strong>
+            {t('stack_embeddings_value')}
           </Bullet>
           <Bullet>
-            <Strong>Bibliographie</Strong> : Semantic Scholar API
+            <Strong>{t('stack_biblio_label')}</Strong>
+            {t('stack_biblio_value')}
           </Bullet>
           <Bullet>
-            <Strong>Domaines scientifiques</Strong> : OpenAlex (500 concepts
-            level 2)
+            <Strong>{t('stack_domains_label')}</Strong>
+            {t('stack_domains_value')}
           </Bullet>
           <Bullet>
-            <Strong>Pipeline</Strong> : Python 3.12, LangGraph, SQLite
+            <Strong>{t('stack_pipeline_label')}</Strong>
+            {t('stack_pipeline_value')}
           </Bullet>
           <Bullet>
-            <Strong>Frontend</Strong> : Next.js 14, App Router
+            <Strong>{t('stack_frontend_label')}</Strong>
+            {t('stack_frontend_value')}
           </Bullet>
         </ul>
       </Section>
 
       <hr className="my-12 border-ink-500/50" />
       <p className="mb-2 text-sm italic text-mist-400">
-        Cette page est un document évolutif. Si vous trouvez une formulation
-        imprécise, contactez{' '}
+        {t('footer1_textBefore')}
         <a
           href="mailto:benoit@spore-research.com"
           className="text-emerald-glow underline-offset-2 hover:underline"
         >
-          benoit@spore-research.com
+          {t('footer1_email')}
         </a>
-        .
+        {t('footer1_textAfter')}
       </p>
-      <p className="text-xs italic text-mist-500">Mise à jour : mai 2026.</p>
+      <p className="text-xs italic text-mist-500">{t('footer2')}</p>
     </div>
   );
 }
