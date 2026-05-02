@@ -1,10 +1,18 @@
+// Root layout (S7.2). After the i18n migration the chrome
+// (Header/Footer/LaunchBanner) lives in app/[locale]/layout.tsx so it
+// can use useTranslations. This root layout only owns the HTML shell,
+// fonts, and the AuthProvider; inherited by every route including the
+// transactional landings still at the root (auth, newsletter, payment,
+// account, anthology/sent, custom/[id]/status).
+//
+// <html lang="fr"> is hardcoded here as a fallback. Localised pages
+// override the locale signal via hreflangs and metadata.
+
 import type { Metadata } from 'next';
 import { Instrument_Serif, Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import LaunchBanner from '@/components/LaunchBanner';
 import { AuthProvider } from '@/contexts/AuthContext';
 import '@/styles/globals.css';
+import { SITE_URL, SITE_NAME, SITE_TAGLINE, SITE_DESCRIPTION } from '@/lib/seo';
 
 const display = Instrument_Serif({
   subsets: ['latin'],
@@ -27,8 +35,6 @@ const mono = JetBrains_Mono({
   variable: '--font-mono',
   display: 'swap',
 });
-
-import { SITE_URL, SITE_NAME, SITE_TAGLINE, SITE_DESCRIPTION } from '@/lib/seo';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -85,21 +91,13 @@ export const metadata: Metadata = {
       'max-video-preview': -1,
     },
   },
-  alternates: {
-    canonical: '/',
-  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
       <body className="bg-ink-900 text-mist-200 antialiased font-sans">
-        <AuthProvider>
-          <LaunchBanner />
-          <Header />
-          <main className="min-h-screen">{children}</main>
-          <Footer />
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
