@@ -1,0 +1,10 @@
+{
+  "common": {
+    "siteTitle": "SPORE",
+    "siteDescription": "Le moteur d'hypothèses interdisciplinaires"
+  },
+  "test": {
+    "hello": "Bonjour, ceci est une page test en français",
+    "linkToOther": "Voir la version anglaise"
+  }
+}
