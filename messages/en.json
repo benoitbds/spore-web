@@ -1,10 +1,10 @@
 {
   "common": {
     "siteTitle": "SPORE",
-    "siteDescription": "The interdisciplinary hypothesis engine",
-    "tagline": "The interdisciplinary hypothesis engine",
-    "siteBlurbShort": "Système de Production d'Opportunités de Recherche par Exploration. The interdisciplinary hypothesis engine surfacing connections nobody has proposed yet.",
-    "manifesto": "A well-documented null hypothesis is worth more than a false promise of unification."
+    "siteDescription": "A research collision engine",
+    "tagline": "SPORE — A research collision engine",
+    "siteBlurbShort": "Système de Production d'Opportunités de Recherche par Exploration. A research collision engine surfacing interdisciplinary hypotheses that no one has proposed yet.",
+    "manifesto": "A well-documented dead end is worth more than a glib unification."
   },
   "test": {
     "hello": "Hello, this is a test page in English",

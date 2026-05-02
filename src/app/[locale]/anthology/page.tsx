@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { getLocale } from 'next-intl/server';
+import { Link } from '@/i18n/routing';
 import { SITE_URL } from '@/lib/seo';
 import AnthologyClient from './AnthologyClient';
 
@@ -100,6 +101,7 @@ export default function AnthologyPage() {
         <h2 className="mb-4 font-display text-2xl text-mist-100 md:text-3xl">
           Au sommaire
         </h2>
+        <BilingualNotice />
         <ol className="space-y-3">
           {PREVIEW_TITLES.map((entry, i) => (
             <li
@@ -171,6 +173,24 @@ export default function AnthologyPage() {
           </li>
         </ul>
       </section>
+    </div>
+  );
+}
+
+// Bilingual notice rendered above the FR titles list, ONLY on /en/.
+// The 8 anthology titles are kept in their original French phrasing
+// (editorial signature decision in S7.2). EN visitors see this notice
+// explaining the choice; FR visitors see nothing extra.
+async function BilingualNotice() {
+  const locale = await getLocale();
+  if (locale !== 'en') return null;
+  return (
+    <div className="mb-6 rounded-xl border border-amber-bio/30 bg-amber-bio/5 p-4 text-xs italic text-mist-300 leading-relaxed">
+      This anthology contains briefs originally vulgarised in French.
+      Their introductory titles below preserve the original French
+      phrasing; the scientific content within each brief (hypothesis,
+      predictions, protocol, references, panel review) is in English.
+      The full PDF is bilingual.
     </div>
   );
 }

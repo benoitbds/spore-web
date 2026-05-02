@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { SITE_URL } from '@/lib/seo';
 
 const _title = 'À propos — SPORE';

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import Counter from '@/components/Counter';
 import EditorialBriefCard from '@/components/EditorialBriefCard';
 import MyceliumBackground from '@/components/MyceliumBackground';

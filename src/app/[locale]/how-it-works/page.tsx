@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import PipelineAnimation from '@/components/PipelineAnimation';
 import { getStats } from '@/lib/db';
 import { SITE_URL } from '@/lib/seo';

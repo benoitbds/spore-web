@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import EmailGate from '@/components/EmailGate';
 import { useAuth } from '@/contexts/AuthContext';
 

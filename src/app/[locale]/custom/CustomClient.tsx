@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import EmailGate from '@/components/EmailGate';
 import { useAuth } from '@/contexts/AuthContext';
 import { api, ApiError, type AccountCustomRequest } from '@/lib/api';
