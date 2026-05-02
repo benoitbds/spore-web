@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import DomainBridge from '@/components/DomainBridge';
 import ReviewerPanel from '@/components/ReviewerPanel';
 import ProtocolTimeline from '@/components/ProtocolTimeline';
