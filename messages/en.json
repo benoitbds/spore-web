@@ -1,0 +1,10 @@
+{
+  "common": {
+    "siteTitle": "SPORE",
+    "siteDescription": "The interdisciplinary hypothesis engine"
+  },
+  "test": {
+    "hello": "Hello, this is a test page in English",
+    "linkToOther": "See the French version"
+  }
+}
