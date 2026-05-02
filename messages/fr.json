@@ -1,10 +1,115 @@
 {
   "common": {
     "siteTitle": "SPORE",
-    "siteDescription": "Le moteur d'hypothèses interdisciplinaires"
+    "siteDescription": "Le moteur d'hypothèses interdisciplinaires",
+    "tagline": "Le moteur d'hypothèses interdisciplinaires",
+    "siteBlurbShort": "Système de Production d'Opportunités de Recherche par Exploration. Le moteur d'hypothèses interdisciplinaires que personne n'a encore proposées.",
+    "manifesto": "Une hypothèse nulle bien documentée vaut mieux qu'une fausse promesse d'unification."
   },
   "test": {
     "hello": "Bonjour, ceci est une page test en français",
     "linkToOther": "Voir la version anglaise"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "briefs": "Briefs",
+    "custom": "Collision sur mesure",
+    "howItWorks": "Comment ça marche",
+    "pricing": "Tarifs",
+    "stats": "Statistiques",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "menu": "Menu"
+  },
+  "footer": {
+    "explore": "Explorer",
+    "explore_briefs": "Briefs",
+    "explore_howItWorks": "Comment ça marche",
+    "explore_stats": "Statistiques",
+    "aboutSection": "À propos",
+    "builtBy": "Construit par",
+    "builtByName": "SPORE Research",
+    "poweredBy": "Propulsé par",
+    "poweredByStack": "DeepSeek · Claude · Semantic Scholar",
+    "anthologyBanner": "Anthologie SPORE — 8 hypothèses sélectionnées dans un PDF gratuit",
+    "copyright": "SPORE. Zéro hallucination bibliographique.",
+    "links_about": "À propos",
+    "links_methodology": "Méthodologie",
+    "links_legal": "Mentions légales",
+    "links_privacy": "Confidentialité"
+  },
+  "launchBanner": {
+    "labelOffer": "Offre de lancement",
+    "authedText": "— Vous bénéficiez de l'accès gratuit.",
+    "anonText": "— Accès complet gratuit.",
+    "createAccountLink": "Créez votre compte →",
+    "close": "Fermer le bandeau"
+  },
+  "actions": {
+    "readMore": "Lire la suite",
+    "download": "Télécharger",
+    "subscribe": "M'inscrire",
+    "subscribing": "Inscription en cours…",
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "send": "Envoyer",
+    "discover": "Découvrir",
+    "backHome": "Retour à l'accueil",
+    "discoverBriefs": "Découvrir les briefs publiés",
+    "viewBriefs": "Voir les briefs",
+    "moreOnPipeline": "En savoir plus sur le pipeline"
+  },
+  "states": {
+    "loading": "Chargement…",
+    "error": "Erreur",
+    "success": "Succès",
+    "verifying": "Vérification…",
+    "confirmed": "Confirmé"
+  },
+  "novelty": {
+    "tooltipBody": "Score auto-attribué par le LLM. C'est une heuristique, pas une mesure objective —",
+    "tooltipLink": "voir Méthodologie",
+    "tooltipAria": "Comment le score Nouveauté est-il calculé ?"
+  },
+  "newsletter": {
+    "headingFull": "Recevez les prochaines hypothèses SPORE",
+    "subtitleFull": "Une à deux fois par mois, dans votre boîte mail. Pas de spam, désinscription en 1 clic.",
+    "emailLabel": "Votre email",
+    "emailPlaceholder": "votre@email.fr",
+    "buttonIdle": "M'inscrire",
+    "buttonLoading": "Inscription en cours…",
+    "successPrefix": "✓",
+    "errorInvalidEmail": "Format d'email invalide.",
+    "errorFallback": "Une erreur est survenue. Réessayez dans un instant.",
+    "privacyNote": "Vos données restent privées. Aucun partage avec des tiers. Conformité RGPD."
+  },
+  "brief": {
+    "tabUnderstand": "💡 Comprendre",
+    "tabResearch": "🔬 Recherche",
+    "epistemicBadge": "Hypothèse générée par IA · Pré-publication · À tester expérimentalement",
+    "labels_panel": "Panel",
+    "labels_novelty": "Nouveauté",
+    "labels_date": "Date",
+    "labels_count": "{n, plural, =0 {aucun brief publié} one {# brief publié} other {# briefs publiés}}",
+    "sort_by": "Trier par"
+  },
+  "stats": {
+    "card_avgNovelty": "Nouveauté moyenne",
+    "card_panelConsensus": "Consensus du panel",
+    "card_costPerBrief": "Coût par brief",
+    "subOnOne": "sur /1.0",
+    "subOnTen": "moyen sur /10",
+    "subTotal": "total"
+  },
+  "home": {
+    "kicker_lastBrief": "Le dernier brief",
+    "metric_collisions": "Collisions explorées",
+    "metric_briefs": "Briefs publiés",
+    "metric_avgNovelty": "Nouveauté moyenne",
+    "metric_referencesVerified": "Références vérifiées",
+    "metric_referencesPercentage": "100%",
+    "tagline_lead": "SPORE",
+    "tagline_dash": "—",
+    "tagline_subtitle": "Des hypothèses scientifiques interdisciplinaires que personne n'a encore proposées."
   }
 }

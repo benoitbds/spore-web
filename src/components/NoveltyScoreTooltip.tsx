@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useId, useRef, useState } from 'react';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 /**
  * Inline tooltip rendered next to any "Nouveauté" score on the site (home,
@@ -16,6 +17,7 @@ export default function NoveltyScoreTooltip({
 }: {
   className?: string;
 }) {
+  const t = useTranslations('novelty');
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLSpanElement>(null);
   const tooltipId = useId();
@@ -45,7 +47,7 @@ export default function NoveltyScoreTooltip({
     >
       <button
         type="button"
-        aria-label="Comment le score Nouveauté est-il calculé ?"
+        aria-label={t('tooltipAria')}
         aria-describedby={tooltipId}
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
@@ -63,13 +65,12 @@ export default function NoveltyScoreTooltip({
             : 'pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100'
         }`}
       >
-        Score auto-attribué par le LLM. C&apos;est une heuristique, pas une
-        mesure objective —{' '}
+        {t('tooltipBody')}{' '}
         <Link
           href="/methodology#novelty"
           className="text-emerald-glow underline-offset-2 hover:underline"
         >
-          voir Méthodologie
+          {t('tooltipLink')}
         </Link>
         .
       </span>

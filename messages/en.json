@@ -1,10 +1,115 @@
 {
   "common": {
     "siteTitle": "SPORE",
-    "siteDescription": "The interdisciplinary hypothesis engine"
+    "siteDescription": "The interdisciplinary hypothesis engine",
+    "tagline": "The interdisciplinary hypothesis engine",
+    "siteBlurbShort": "Système de Production d'Opportunités de Recherche par Exploration. The interdisciplinary hypothesis engine surfacing connections nobody has proposed yet.",
+    "manifesto": "A well-documented null hypothesis is worth more than a false promise of unification."
   },
   "test": {
     "hello": "Hello, this is a test page in English",
     "linkToOther": "See the French version"
+  },
+  "navigation": {
+    "home": "Home",
+    "briefs": "Briefs",
+    "custom": "Custom collision",
+    "howItWorks": "How it works",
+    "pricing": "Pricing",
+    "stats": "Statistics",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "menu": "Menu"
+  },
+  "footer": {
+    "explore": "Explore",
+    "explore_briefs": "Briefs",
+    "explore_howItWorks": "How it works",
+    "explore_stats": "Statistics",
+    "aboutSection": "About",
+    "builtBy": "Built by",
+    "builtByName": "SPORE Research",
+    "poweredBy": "Powered by",
+    "poweredByStack": "DeepSeek · Claude · Semantic Scholar",
+    "anthologyBanner": "SPORE Anthology — 8 selected hypotheses in a free PDF",
+    "copyright": "SPORE. Zero bibliographic hallucination.",
+    "links_about": "About",
+    "links_methodology": "Methodology",
+    "links_legal": "Legal notice",
+    "links_privacy": "Privacy"
+  },
+  "launchBanner": {
+    "labelOffer": "Launch offer",
+    "authedText": "— You have free access.",
+    "anonText": "— Full free access.",
+    "createAccountLink": "Create your account →",
+    "close": "Dismiss banner"
+  },
+  "actions": {
+    "readMore": "Read more",
+    "download": "Download",
+    "subscribe": "Subscribe",
+    "subscribing": "Subscribing…",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "send": "Send",
+    "discover": "Discover",
+    "backHome": "Back to home",
+    "discoverBriefs": "Browse published briefs",
+    "viewBriefs": "View briefs",
+    "moreOnPipeline": "Learn more about the pipeline"
+  },
+  "states": {
+    "loading": "Loading…",
+    "error": "Error",
+    "success": "Success",
+    "verifying": "Verifying…",
+    "confirmed": "Confirmed"
+  },
+  "novelty": {
+    "tooltipBody": "Score self-assigned by the LLM. It's a heuristic, not an objective measurement —",
+    "tooltipLink": "see Methodology",
+    "tooltipAria": "How is the Novelty score computed?"
+  },
+  "newsletter": {
+    "headingFull": "Get the next SPORE hypotheses",
+    "subtitleFull": "Once or twice a month, in your inbox. No spam, one-click unsubscribe.",
+    "emailLabel": "Your email",
+    "emailPlaceholder": "your@email.com",
+    "buttonIdle": "Subscribe",
+    "buttonLoading": "Subscribing…",
+    "successPrefix": "✓",
+    "errorInvalidEmail": "Invalid email format.",
+    "errorFallback": "Something went wrong. Please try again in a moment.",
+    "privacyNote": "Your data stays private. No third-party sharing. GDPR-compliant."
+  },
+  "brief": {
+    "tabUnderstand": "💡 Understand",
+    "tabResearch": "🔬 Research",
+    "epistemicBadge": "AI-generated hypothesis · Pre-publication · To be tested experimentally",
+    "labels_panel": "Panel",
+    "labels_novelty": "Novelty",
+    "labels_date": "Date",
+    "labels_count": "{n, plural, =0 {no brief published} one {# brief published} other {# briefs published}}",
+    "sort_by": "Sort by"
+  },
+  "stats": {
+    "card_avgNovelty": "Average novelty",
+    "card_panelConsensus": "Panel consensus",
+    "card_costPerBrief": "Cost per brief",
+    "subOnOne": "out of 1.0",
+    "subOnTen": "average out of 10",
+    "subTotal": "total"
+  },
+  "home": {
+    "kicker_lastBrief": "Latest brief",
+    "metric_collisions": "Collisions explored",
+    "metric_briefs": "Briefs published",
+    "metric_avgNovelty": "Average novelty",
+    "metric_referencesVerified": "Verified references",
+    "metric_referencesPercentage": "100%",
+    "tagline_lead": "SPORE",
+    "tagline_dash": "—",
+    "tagline_subtitle": "Interdisciplinary scientific hypotheses no one has proposed yet."
   }
 }

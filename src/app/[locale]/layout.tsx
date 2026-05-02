@@ -1,22 +1,25 @@
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import LaunchBanner from '@/components/LaunchBanner';
 
 /**
- * Locale-scoped layout — S7.1.
+ * Locale-scoped layout (S7.2).
  *
- * Intentionally NOT a root layout: ``app/layout.tsx`` keeps ownership
- * of ``<html>`` / ``<body>`` / fonts / providers for the whole site
- * during the parallel migration. This nested layout only mounts the
- * ``NextIntlClientProvider`` so client components under ``/[locale]/...``
- * can call ``useTranslations``.
+ * Owns the chrome — LaunchBanner / Header / Footer — for every page
+ * under ``/fr/...`` and ``/en/...``. Wraps children in
+ * NextIntlClientProvider so client components can call
+ * ``useTranslations`` synchronously.
  *
- * S7.2 follow-up: refactor the root layout so ``lang`` on ``<html>``
- * becomes locale-aware (currently hardcoded ``"fr"``). Either by moving
- * the root layout into this file (replacing the legacy one) or by
- * deriving lang from ``headers()`` at the root.
+ * Pages still living at the root (``/auth``, ``/newsletter/*``,
+ * ``/payment/*``, ``/account``, ``/anthology/sent``,
+ * ``/custom/[id]/status``) bypass this layout and render with the bare
+ * root HTML shell. They will be migrated in S7.2-bis.
  */
+
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
@@ -35,6 +38,14 @@ export default async function LocaleLayout({
   }
 
   setRequestLocale(locale);
+  const messages = await getMessages();
 
-  return <NextIntlClientProvider>{children}</NextIntlClientProvider>;
+  return (
+    <NextIntlClientProvider messages={messages}>
+      <LaunchBanner />
+      <Header />
+      <main className="min-h-screen">{children}</main>
+      <Footer />
+    </NextIntlClientProvider>
+  );
 }

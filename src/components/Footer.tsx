@@ -1,97 +1,98 @@
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
+
 export default function Footer() {
+  const t = useTranslations('footer');
+  const tCommon = useTranslations('common');
   return (
     <footer className="border-t border-ink-500/50 bg-ink-800/30 py-12">
       <div className="mx-auto max-w-7xl px-6">
-        <a
+        <Link
           href="/anthology"
           className="group mb-10 flex items-center justify-between gap-4 rounded-2xl border border-emerald-bio/30 bg-emerald-bio/5 px-5 py-4 text-sm transition-colors hover:border-emerald-bio/60 hover:bg-emerald-bio/10"
         >
           <span className="flex items-center gap-3">
             <span aria-hidden className="text-xl">📕</span>
-            <span className="text-mist-200">
-              <span className="font-medium text-mist-100">Anthologie SPORE</span>{' '}
-              — 8 hypothèses sélectionnées dans un PDF gratuit
-            </span>
+            <span className="text-mist-200">{t('anthologyBanner')}</span>
           </span>
           <span className="font-mono text-xs text-emerald-glow transition-transform group-hover:translate-x-1">
             →
           </span>
-        </a>
+        </Link>
 
         <div className="grid gap-10 md:grid-cols-3">
           <div>
             <div className="mb-3 flex items-center gap-2">
               <span className="text-xl">🧬</span>
-              <span className="font-display text-lg text-mist-100">SPORE</span>
+              <span className="font-display text-lg text-mist-100">{tCommon('siteTitle')}</span>
             </div>
             <p className="text-sm text-mist-400 leading-relaxed">
-              Système de Production d'Opportunités de Recherche par Exploration.
-              Le moteur d'hypothèses interdisciplinaires que personne n'a encore proposées.
+              {tCommon('siteBlurbShort')}
             </p>
           </div>
 
           <div>
             <h4 className="mb-3 text-xs font-medium uppercase tracking-wider text-mist-500">
-              Explorer
+              {t('explore')}
             </h4>
             <ul className="space-y-2 text-sm text-mist-400">
-              <li><a href="/briefs" className="hover:text-emerald-glow transition-colors">Briefs</a></li>
-              <li><a href="/how-it-works" className="hover:text-emerald-glow transition-colors">Comment ça marche</a></li>
-              <li><a href="/stats" className="hover:text-emerald-glow transition-colors">Statistiques</a></li>
+              <li>
+                <Link href="/briefs" className="hover:text-emerald-glow transition-colors">
+                  {t('explore_briefs')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/how-it-works" className="hover:text-emerald-glow transition-colors">
+                  {t('explore_howItWorks')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/stats" className="hover:text-emerald-glow transition-colors">
+                  {t('explore_stats')}
+                </Link>
+              </li>
             </ul>
           </div>
 
           <div>
             <h4 className="mb-3 text-xs font-medium uppercase tracking-wider text-mist-500">
-              À propos
+              {t('aboutSection')}
             </h4>
             <ul className="space-y-2 text-sm text-mist-400">
               <li>
-                <span className="text-mist-300">Construit par</span>{' '}
-                <span className="font-medium text-mist-100">SPORE Research</span>
+                <span className="text-mist-300">{t('builtBy')}</span>{' '}
+                <span className="font-medium text-mist-100">{t('builtByName')}</span>
               </li>
               <li>
-                <span className="text-mist-300">Propulsé par</span>{' '}
-                <span className="font-medium text-emerald-glow">DeepSeek · Claude · Semantic Scholar</span>
+                <span className="text-mist-300">{t('poweredBy')}</span>{' '}
+                <span className="font-medium text-emerald-glow">{t('poweredByStack')}</span>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-ink-500/50 pt-6 text-xs text-mist-500 md:flex-row md:items-center">
-          <p>© {new Date().getFullYear()} SPORE. Zéro hallucination bibliographique.</p>
+          <p>© {new Date().getFullYear()} {t('copyright')}</p>
           <ul className="flex flex-wrap gap-x-5 gap-y-1">
             <li>
-              <a
-                href="/about"
-                className="hover:text-emerald-glow transition-colors"
-              >
-                À propos
-              </a>
+              <Link href="/about" className="hover:text-emerald-glow transition-colors">
+                {t('links_about')}
+              </Link>
             </li>
             <li>
-              <a
-                href="/methodology"
-                className="hover:text-emerald-glow transition-colors"
-              >
-                Méthodologie
-              </a>
+              <Link href="/methodology" className="hover:text-emerald-glow transition-colors">
+                {t('links_methodology')}
+              </Link>
             </li>
             <li>
-              <a
-                href="/legal"
-                className="hover:text-emerald-glow transition-colors"
-              >
-                Mentions légales
-              </a>
+              <Link href="/legal" className="hover:text-emerald-glow transition-colors">
+                {t('links_legal')}
+              </Link>
             </li>
             <li>
-              <a
-                href="/privacy"
-                className="hover:text-emerald-glow transition-colors"
-              >
-                Confidentialité
-              </a>
+              <Link href="/privacy" className="hover:text-emerald-glow transition-colors">
+                {t('links_privacy')}
+              </Link>
             </li>
           </ul>
         </div>

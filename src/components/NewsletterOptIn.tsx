@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { api, ApiError } from '@/lib/api';
 
 type Variant = 'compact' | 'full';
@@ -26,6 +27,7 @@ export default function NewsletterOptIn({
   briefId,
   variant = 'full',
 }: Props) {
+  const t = useTranslations('newsletter');
   const [email, setEmail] = useState('');
   const [state, setState] = useState<State>({ kind: 'idle' });
 
@@ -35,7 +37,7 @@ export default function NewsletterOptIn({
     if (!EMAIL_RE.test(trimmed)) {
       setState({
         kind: 'error',
-        message: "Format d'email invalide.",
+        message: t('errorInvalidEmail'),
       });
       return;
     }
@@ -50,7 +52,7 @@ export default function NewsletterOptIn({
       setState({ kind: 'success', message: res.message });
       setEmail('');
     } catch (err) {
-      const fallback = "Une erreur est survenue. Réessayez dans un instant.";
+      const fallback = t('errorFallback');
       const msg =
         err instanceof ApiError
           ? typeof err.message === 'string' && err.message.length > 0
@@ -79,11 +81,10 @@ export default function NewsletterOptIn({
             id="newsletter-optin-heading"
             className="mb-3 font-display text-2xl text-mist-100 md:text-3xl"
           >
-            Recevez les prochaines hypothèses SPORE
+            {t('headingFull')}
           </h2>
           <p className="mb-5 text-sm text-mist-300 leading-relaxed">
-            Une à deux fois par mois, dans votre boîte mail.
-            Pas de spam, désinscription en 1 clic.
+            {t('subtitleFull')}
           </p>
         </>
       )}
@@ -93,7 +94,7 @@ export default function NewsletterOptIn({
         className="flex flex-col gap-3 sm:flex-row sm:items-stretch"
       >
         <label htmlFor="newsletter-email" className="sr-only">
-          Votre email
+          {t('emailLabel')}
         </label>
         <input
           id="newsletter-email"
@@ -103,7 +104,7 @@ export default function NewsletterOptIn({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={state.kind === 'loading' || state.kind === 'success'}
-          placeholder="votre@email.fr"
+          placeholder={t('emailPlaceholder')}
           className="flex-1 rounded-xl border border-ink-500 bg-ink-900/60 px-4 py-3 text-sm text-mist-100 placeholder:text-mist-500 focus:border-emerald-bio/60 focus:outline-none focus:ring-1 focus:ring-emerald-bio/40 disabled:opacity-60"
         />
         <button
@@ -111,7 +112,7 @@ export default function NewsletterOptIn({
           disabled={state.kind === 'loading' || state.kind === 'success'}
           className="rounded-xl bg-emerald-bio px-5 py-3 text-sm font-semibold text-ink-900 transition-colors hover:bg-emerald-glow disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {state.kind === 'loading' ? 'Inscription en cours…' : "M'inscrire"}
+          {state.kind === 'loading' ? t('buttonLoading') : t('buttonIdle')}
         </button>
       </form>
 
@@ -126,8 +127,7 @@ export default function NewsletterOptIn({
 
       {isFull && (
         <p className="mt-4 text-[11px] leading-relaxed text-mist-500">
-          Vos données restent privées. Aucun partage avec des tiers.
-          Conformité RGPD.
+          {t('privacyNote')}
         </p>
       )}
     </section>
