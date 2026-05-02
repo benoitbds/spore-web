@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import { useAuth } from '@/contexts/AuthContext';
 
 const COOKIE_NAME = 'spore_launch_banner_dismissed';
@@ -31,6 +32,7 @@ function writeCookie(name: string, value: string, maxAgeSec: number) {
  */
 export default function LaunchBanner() {
   const { isAuthenticated } = useAuth();
+  const t = useTranslations('launchBanner');
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
@@ -51,19 +53,19 @@ export default function LaunchBanner() {
           {isAuthenticated ? (
             <>
               <span aria-hidden>🚀</span>{' '}
-              <span className="font-medium">Offre de lancement</span>{' '}
-              — Vous bénéficiez de l&apos;accès gratuit.
+              <span className="font-medium">{t('labelOffer')}</span>{' '}
+              {t('authedText')}
             </>
           ) : (
             <>
               <span aria-hidden>🚀</span>{' '}
-              <span className="font-medium">Offre de lancement</span>{' '}
-              — Accès complet gratuit.{' '}
+              <span className="font-medium">{t('labelOffer')}</span>{' '}
+              {t('anonText')}{' '}
               <Link
                 href="/pricing"
                 className="underline decoration-white/60 underline-offset-2 hover:decoration-white"
               >
-                Créez votre compte →
+                {t('createAccountLink')}
               </Link>
             </>
           )}
@@ -71,7 +73,7 @@ export default function LaunchBanner() {
         <button
           type="button"
           onClick={dismiss}
-          aria-label="Fermer le bandeau"
+          aria-label={t('close')}
           className="absolute right-3 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-full text-white/80 transition-colors hover:bg-white/15 hover:text-white"
         >
           <svg
