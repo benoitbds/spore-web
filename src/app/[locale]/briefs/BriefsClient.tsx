@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import EditorialBriefCard from '@/components/EditorialBriefCard';
 import NoveltyScoreTooltip from '@/components/NoveltyScoreTooltip';
 import type { Brief } from '@/lib/types';
@@ -127,6 +128,7 @@ function briefHaystack(b: Brief): string {
 }
 
 export default function BriefsClient({ briefs, allDomains }: Props) {
+  const tBriefs = useTranslations('briefsPage');
   const [sort, setSort] = useState<SortMode>('panel');
   const [selectedDomains, setSelectedDomains] = useState<Set<string>>(new Set());
   const [query, setQuery] = useState('');
@@ -198,15 +200,15 @@ export default function BriefsClient({ briefs, allDomains }: Props) {
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Rechercher un domaine, un sujet..."
-          aria-label="Rechercher parmi les briefs"
+          placeholder={tBriefs('search_placeholder')}
+          aria-label={tBriefs('search_aria')}
           className="w-full rounded-2xl border border-ink-500 bg-ink-800/40 py-3.5 pl-11 pr-12 text-sm text-mist-100 placeholder:text-mist-500 transition-colors focus:border-emerald-bio focus:outline-none focus:ring-2 focus:ring-emerald-bio/20"
         />
         {query && (
           <button
             type="button"
             onClick={() => setQuery('')}
-            aria-label="Effacer la recherche"
+            aria-label={tBriefs('search_clearAria')}
             className="absolute right-3 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-mist-500 hover:bg-ink-700/60 hover:text-mist-200"
           >
             <IconClose className="h-3.5 w-3.5" />
@@ -217,7 +219,7 @@ export default function BriefsClient({ briefs, allDomains }: Props) {
       {/* Filters bar */}
       <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-ink-500 bg-ink-800/40 p-5 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3 text-sm">
-          <span className="text-mist-500">Trier par</span>
+          <span className="text-mist-500">{tBriefs('sort_by')}</span>
           <div className="flex overflow-hidden rounded-full border border-ink-400">
             {(['panel', 'novelty', 'date'] as SortMode[]).map((mode) => (
               <button
@@ -229,7 +231,7 @@ export default function BriefsClient({ briefs, allDomains }: Props) {
                     : 'text-mist-400 hover:text-mist-100'
                 }`}
               >
-                {mode === 'panel' ? 'Panel' : mode === 'novelty' ? 'Nouveauté' : 'Date'}
+                {tBriefs(`sort_${mode}`)}
               </button>
             ))}
           </div>
@@ -238,7 +240,11 @@ export default function BriefsClient({ briefs, allDomains }: Props) {
 
         <div className="flex items-center gap-3">
           <span className="text-sm text-mist-400">
-            {filtered.length} brief{filtered.length > 1 ? 's' : ''} publié{filtered.length > 1 ? 's' : ''}
+            {filtered.length === 0
+              ? tBriefs('count_zero')
+              : filtered.length === 1
+                ? tBriefs('count_one', { n: filtered.length })
+                : tBriefs('count_other', { n: filtered.length })}
           </span>
           {hasFilter && (
             <button
@@ -248,7 +254,7 @@ export default function BriefsClient({ briefs, allDomains }: Props) {
               }}
               className="text-xs text-emerald-glow hover:text-emerald-bio"
             >
-              réinitialiser
+              {tBriefs('filter_reset')}
             </button>
           )}
         </div>
@@ -280,7 +286,7 @@ export default function BriefsClient({ briefs, allDomains }: Props) {
       {filtered.length === 0 ? (
         <div className="rounded-2xl border border-ink-500 bg-ink-800/40 py-16 text-center">
           <p className="text-mist-400">
-            Aucun brief ne correspond à votre recherche.
+            {tBriefs('noResults')}
           </p>
         </div>
       ) : (
