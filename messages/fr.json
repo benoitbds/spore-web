@@ -71,6 +71,37 @@
     "tooltipLink": "voir Méthodologie",
     "tooltipAria": "Comment le score Nouveauté est-il calculé ?"
   },
+  "auth": {
+    "signIn": "Se connecter",
+    "myAccount": "Mon compte",
+    "signOut": "Déconnexion",
+    "connected": "Connecté",
+    "freeAccess": "✨ Accès gratuit",
+    "connectionHeadline": "Connexion",
+    "connectionSubtext": "Un lien magique vous sera envoyé par email.",
+    "connectionCta": "Recevoir le lien"
+  },
+  "share": {
+    "label": "Partager",
+    "copyLink": "Copier le lien",
+    "linkCopied": "Lien copié ✓",
+    "shareOnX": "Partager sur X",
+    "shareOnLinkedIn": "Partager sur LinkedIn"
+  },
+  "verdicts": {
+    "publish_brief": "Publié",
+    "revise_and_resubmit": "À réviser",
+    "reject": "Rejeté",
+    "killed": "Abandonné",
+    "strong_accept": "Fortement accepté",
+    "accept": "Accepté",
+    "weak_accept": "Accepté avec réserves",
+    "weak_reject": "Réserves",
+    "novel": "Inédit",
+    "incremental": "Incrémental",
+    "already_explored": "Déjà exploré",
+    "already_proven": "Déjà démontré"
+  },
   "newsletter": {
     "headingFull": "Recevez les prochaines hypothèses SPORE",
     "subtitleFull": "Une à deux fois par mois, dans votre boîte mail. Pas de spam, désinscription en 1 clic.",
@@ -82,6 +113,11 @@
     "errorInvalidEmail": "Format d'email invalide.",
     "errorFallback": "Une erreur est survenue. Réessayez dans un instant.",
     "privacyNote": "Vos données restent privées. Aucun partage avec des tiers. Conformité RGPD."
+  },
+  "briefCard": {
+    "novelty": "nouveauté",
+    "read": "Lire →",
+    "nonProductive": "Non productive"
   },
   "brief": {
     "tabUnderstand": "💡 Comprendre",
@@ -179,7 +215,8 @@
     "pageIntroAccent": "5 relecteurs IA",
     "pageIntroAfter": ", sourcées sur Semantic Scholar.",
     "ctaHeadline": "Vous avez un domaine précis en tête ?",
-    "ctaSubtext": "Demandez une collision sur mesure — gratuite pendant le lancement. Choisissez un ou deux domaines, SPORE livre un brief complet (hypothèse, protocole, panel de 5 relecteurs) en quelques minutes."
+    "ctaSubtext": "Demandez une collision sur mesure — gratuite pendant le lancement. Choisissez un ou deux domaines, SPORE livre un brief complet (hypothèse, protocole, panel de 5 relecteurs) en quelques minutes.",
+    "ctaButton": "Demander une collision sur mesure →"
   },
   "briefDetailPage": {
     "tabUnderstand": "💡 Comprendre",
@@ -199,7 +236,13 @@
     "publishedOn": "Publié le",
     "generatedOn": "Généré le",
     "previousBrief": "Brief précédent",
-    "nextBrief": "Brief suivant"
+    "nextBrief": "Brief suivant",
+    "backToList": "Tous les briefs",
+    "notFoundTitle": "Brief introuvable",
+    "neighborsAria": "Navigation entre briefs",
+    "customCtaHeadline": "Cette collision vous inspire ?",
+    "customCtaSubtext": "Demandez la vôtre sur un domaine de votre choix — gratuite pendant le lancement. SPORE croise vos domaines, génère une hypothèse et livre un brief complet en quelques minutes.",
+    "customCtaButton": "Demander ma collision →"
   },
   "aboutPage": {
     "metaTitle": "À propos",

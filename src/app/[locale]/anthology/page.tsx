@@ -1,42 +1,48 @@
 import type { Metadata } from 'next';
-import { getLocale } from 'next-intl/server';
+import { getLocale, getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { SITE_URL } from '@/lib/seo';
+import { localeAlternates } from '@/lib/i18n-seo';
 import AnthologyClient from './AnthologyClient';
 
-const _title = 'Anthologie SPORE — 6 premiers mois';
-const _desc =
-  'Anthologie SPORE — un PDF gratuit de 8 hypothèses scientifiques ' +
-  'interdisciplinaires sélectionnées dans les 6 premiers mois du projet. ' +
-  'Envoyé par email contre votre adresse.';
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'anthologyPage' });
+  return {
+    title: t('metaTitle'),
+    description: t('metaDescription'),
+    alternates: localeAlternates(locale, '/anthology'),
+    openGraph: {
+      title: t('title'),
+      description: t('metaDescription'),
+      url: `${SITE_URL}/${locale}/anthology`,
+      type: 'article',
+      locale: locale === 'fr' ? 'fr_FR' : 'en_US',
+      images: [
+        {
+          url: '/og-default.png',
+          width: 1200,
+          height: 630,
+          alt: 'SPORE — Anthology',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: t('title'),
+      description: t('metaDescription'),
+      images: ['/og-default.png'],
+    },
+  };
+}
 
-export const metadata: Metadata = {
-  title: 'Anthologie',
-  description: _desc,
-  alternates: { canonical: '/anthology' },
-  openGraph: {
-    title: _title,
-    description: _desc,
-    url: `${SITE_URL}/anthology`,
-    type: 'article',
-    locale: 'fr_FR',
-    images: [
-      {
-        url: '/og-default.png',
-        width: 1200,
-        height: 630,
-        alt: 'SPORE — Anthologie',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: _title,
-    description: _desc,
-    images: ['/og-default.png'],
-  },
-};
-
+// The 8 anthology preview titles stay in their original French phrasing
+// (editorial signature decision in S7.2). The bilingual notice below the
+// section header explains this to /en/ visitors.
 const PREVIEW_TITLES: ReadonlyArray<{ title: string; domains: string }> = [
   {
     title:
@@ -80,26 +86,30 @@ const PREVIEW_TITLES: ReadonlyArray<{ title: string; domains: string }> = [
   },
 ];
 
-export default function AnthologyPage() {
+export default async function AnthologyPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: 'anthologyPage' });
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-16 md:py-24">
       <header className="mb-12">
         <span className="mb-4 inline-block text-xs uppercase tracking-[0.3em] text-emerald-glow">
-          Lead magnet · PDF gratuit
+          {t('kicker')}
         </span>
         <h1 className="font-display text-4xl leading-tight text-mist-100 md:text-6xl">
-          Anthologie SPORE — 6 premiers mois
+          {t('title')}
         </h1>
-        <p className="mt-6 text-mist-300 leading-relaxed">
-          Huit hypothèses scientifiques interdisciplinaires, sélectionnées
-          parmi les 38 publiées sur SPORE depuis le lancement. Format PDF
-          (≈ 350 ko, A4 imprimable), envoyé par email — gratuit, sans achat.
-        </p>
+        <p className="mt-6 text-mist-300 leading-relaxed">{t('intro')}</p>
       </header>
 
       <section className="mb-12">
         <h2 className="mb-4 font-display text-2xl text-mist-100 md:text-3xl">
-          Au sommaire
+          {t('tocTitle')}
         </h2>
         <BilingualNotice />
         <ol className="space-y-3">
@@ -133,42 +143,34 @@ export default function AnthologyPage() {
 
       <section className="mb-12 rounded-xl border border-ink-500 bg-ink-800/40 p-6 text-sm text-mist-300 leading-relaxed">
         <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-mist-500">
-          Ce que vous trouverez dans le PDF
+          {t('whatTitle')}
         </h2>
         <ul className="space-y-2 text-mist-300">
           <li className="flex gap-3">
             <span aria-hidden className="mt-1 select-none text-emerald-glow">
               •
             </span>
-            <span>
-              Pour chaque hypothèse : analogie d&apos;entrée, synthèse,
-              pourquoi c&apos;est intéressant, protocole expérimental en 3
-              phases, et l&apos;avis du panel de relecture IA.
+            <span>{t('whatBullet1')}</span>
+          </li>
+          <li className="flex gap-3">
+            <span aria-hidden className="mt-1 select-none text-emerald-glow">
+              •
             </span>
+            <span>{t('whatBullet2')}</span>
           </li>
           <li className="flex gap-3">
             <span aria-hidden className="mt-1 select-none text-emerald-glow">
               •
             </span>
             <span>
-              Lien direct vers chaque brief complet en ligne (avec sa
-              bibliographie vérifiée et ses prédictions chiffrées).
-            </span>
-          </li>
-          <li className="flex gap-3">
-            <span aria-hidden className="mt-1 select-none text-emerald-glow">
-              •
-            </span>
-            <span>
-              Préambule honnête sur ce que SPORE est, et ce qu&apos;il
-              n&apos;est pas. Lecture critique encouragée — voir{' '}
+              {t('whatBullet3_before')}
               <Link
                 href="/methodology"
                 className="text-emerald-glow underline-offset-2 hover:underline"
               >
-                la méthodologie
-              </Link>{' '}
-              pour les limites assumées.
+                {t('whatBullet3_link')}
+              </Link>
+              {t('whatBullet3_after')}
             </span>
           </li>
         </ul>

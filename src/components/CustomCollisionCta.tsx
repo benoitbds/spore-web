@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 type Variant = 'banner' | 'card';
 
@@ -35,16 +38,19 @@ interface Props {
 export default function CustomCollisionCta({
   headline,
   subtext,
-  cta = 'Demander une collision sur mesure →',
+  cta,
   href = '/custom',
   className = '',
   variant = 'banner',
 }: Props) {
+  const tNav = useTranslations('navigation');
+  const tBriefs = useTranslations('briefsPage');
   const isCard = variant === 'card';
+  const ctaLabel = cta ?? tBriefs('ctaButton');
   return (
     <section
       className={`relative overflow-hidden rounded-2xl border border-emerald-bio/30 bg-gradient-to-br from-emerald-bio/10 via-transparent to-cyan-bio/5 ${isCard ? 'p-6' : 'p-6 md:p-8'} ${className}`}
-      aria-label="Demander une collision sur mesure"
+      aria-label={tNav('custom')}
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-bio/50 to-transparent" />
 
@@ -57,7 +63,7 @@ export default function CustomCollisionCta({
       >
         <div className={isCard ? '' : 'flex-1'}>
           <div className="mb-2 inline-flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.22em] text-emerald-glow">
-            <span aria-hidden>🎯</span> Collision sur mesure
+            <span aria-hidden>🎯</span> {tNav('custom')}
           </div>
           <h2
             className={`mb-2 font-display leading-tight text-mist-100 ${
@@ -83,7 +89,7 @@ export default function CustomCollisionCta({
             isCard ? 'px-5 py-2.5 text-sm' : 'px-6 py-3 text-sm md:self-auto'
           }`}
         >
-          {cta}
+          {ctaLabel}
         </Link>
       </div>
     </section>
