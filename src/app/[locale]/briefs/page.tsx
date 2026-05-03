@@ -85,6 +85,7 @@ export default async function BriefsPage({
         <CustomCollisionCta
           headline={t('ctaHeadline')}
           subtext={t('ctaSubtext')}
+          cta={t('ctaButton')}
         />
       </div>
     </div>

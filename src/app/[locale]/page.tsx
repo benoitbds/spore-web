@@ -11,7 +11,6 @@ import {
   getStats,
 } from '@/lib/db';
 import type { Brief } from '@/lib/types';
-import { verdictLabel } from '@/lib/verdicts';
 import { localeAlternates } from '@/lib/i18n-seo';
 import { SITE_URL } from '@/lib/seo';
 
@@ -45,6 +44,7 @@ export default async function HomePage({
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'home' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const tVerdicts = await getTranslations({ locale, namespace: 'verdicts' });
 
   const stats = getStats();
   const featured = getFeaturedBrief();
@@ -68,6 +68,22 @@ export default async function HomePage({
           panelLabel={t('featured_panelLabel')}
           noveltyLabel={t('featured_noveltyLabel')}
           readBrief={t('featured_readBrief')}
+          verdictNoveltySub={(() => {
+            const v = featured.grounding.novelty_assessment.verdict;
+            try {
+              return tVerdicts(v).toLowerCase();
+            } catch {
+              return v?.toLowerCase() ?? '';
+            }
+          })()}
+          verdictPanelSub={(() => {
+            const v = featured.panel.meta_review.verdict;
+            try {
+              return tVerdicts(v).toLowerCase();
+            } catch {
+              return v?.toLowerCase() ?? '';
+            }
+          })()}
         />
       ) : (
         <EmptyHero
@@ -202,6 +218,8 @@ function FeaturedHero({
   panelLabel,
   noveltyLabel,
   readBrief,
+  verdictNoveltySub,
+  verdictPanelSub,
 }: {
   brief: Brief;
   locale: string;
@@ -212,6 +230,8 @@ function FeaturedHero({
   panelLabel: string;
   noveltyLabel: string;
   readBrief: string;
+  verdictNoveltySub: string;
+  verdictPanelSub: string;
 }) {
   const { vulgarization_fr: v, sharpened, domains, grounding, panel, brief_id, generated_at } = brief;
 
@@ -222,7 +242,6 @@ function FeaturedHero({
   const hook = v?.imagine_that || sharpened.formal_statement;
   const novelty = grounding.novelty_assessment.score;
   const panelScore = panel.meta_review.consensus_score;
-  const verdict = panel.meta_review.verdict;
 
   return (
     <section className="relative overflow-hidden border-b border-ink-500/40">
@@ -287,14 +306,14 @@ function FeaturedHero({
             <HeroBadge
               label={noveltyLabel}
               value={novelty.toFixed(2)}
-              sub={verdictLabel(grounding.novelty_assessment.verdict).toLowerCase()}
+              sub={verdictNoveltySub}
               accent="emerald"
               labelTooltip={<NoveltyScoreTooltip />}
             />
             <HeroBadge
               label={panelLabel}
               value={`${panelScore.toFixed(1)}/10`}
-              sub={verdictLabel(verdict).toLowerCase()}
+              sub={verdictPanelSub}
               accent="cyan"
             />
           </div>

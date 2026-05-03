@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
+import { routing } from '@/i18n/routing';
 import {
   briefRowToBrief,
   briefRowToTeaser,
@@ -9,7 +11,6 @@ import {
   getBriefNeighbors,
   type BriefWithBody,
 } from '@/lib/db';
-import { verdictLabel } from '@/lib/verdicts';
 import {
   SITE_URL,
   SITE_NAME,
@@ -17,27 +18,34 @@ import {
   briefMetaDescription,
   briefOgDescription,
 } from '@/lib/seo';
+import { localeAlternates } from '@/lib/i18n-seo';
 import BriefDetailClient from './BriefDetailClient';
 import StubBriefClient from './StubBriefClient';
 import BriefJsonLd from '@/components/BriefJsonLd';
 import CustomCollisionCta from '@/components/CustomCollisionCta';
 import type { Brief } from '@/lib/types';
 
-interface Params {
-  params: { id: string };
+interface RouteParams {
+  params: Promise<{ locale: string; id: string }>;
 }
 
 export async function generateStaticParams() {
-  // getAllBriefs returns BriefRow[] where the primary key lives on .id
-  // (the SPR-XXXX string). Params expect { id } — direct pass-through.
-  return getAllBriefs().map((b) => ({ id: b.id }));
+  // Cross-product of all locales × all brief IDs. Without this every
+  // /{locale}/briefs/{id} pair would fall back to dynamic rendering on
+  // first hit. getAllBriefs() returns BriefRow[] keyed on .id (SPR-XXXX).
+  const ids = getAllBriefs().map((b) => b.id);
+  return routing.locales.flatMap((locale) =>
+    ids.map((id) => ({ locale, id })),
+  );
 }
 
-export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const row = getBriefById(params.id);
+export async function generateMetadata({ params }: RouteParams): Promise<Metadata> {
+  const { locale, id } = await params;
+  const t = await getTranslations({ locale, namespace: 'briefDetailPage' });
+  const row = getBriefById(id);
   if (!row) {
     return {
-      title: 'Brief introuvable',
+      title: t('notFoundTitle'),
       robots: { index: false, follow: false },
     };
   }
@@ -49,30 +57,33 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   // that only exist on pipeline briefs (sharpened.title etc.).
   if (brief.is_stub) {
     return {
-      title: brief.sharpened.title || 'Analyse SPORE',
+      title: brief.sharpened.title || 'SPORE',
       robots: { index: false, follow: false },
     };
   }
 
+  // briefMetaTitle / briefMetaDescription are FR-only today; per S7.3-residual
+  // Lot 1 the bilingualisation of brief metadata is deferred to S7.4 (DB
+  // schema extension). We keep the FR strings on /en/ for now — better than
+  // synthesising EN from sharpened.title (formal Nature-paper register).
   const title = briefMetaTitle(brief);
   const description = briefMetaDescription(brief);
   const ogDescription = briefOgDescription(brief);
-  const url = `${SITE_URL}/briefs/${brief.brief_id}`;
+  const url = `${SITE_URL}/${locale}/briefs/${brief.brief_id}`;
 
   return {
-    title, // uses the `%s | SPORE` template from layout
+    title,
     description,
+    alternates: localeAlternates(locale, `/briefs/${brief.brief_id}`),
     openGraph: {
       type: 'article',
-      locale: 'fr_FR',
+      locale: locale === 'fr' ? 'fr_FR' : 'en_US',
       siteName: SITE_NAME,
       title,
       description: ogDescription,
       url,
       publishedTime: brief.generated_at,
       tags: brief.domains,
-      // Reuses the site-wide OG image. A per-brief dynamic image will
-      // land later (e.g. via @vercel/og or a /api/og/[id] route).
       images: [
         {
           url: '/og-default.png',
@@ -88,14 +99,16 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       description: ogDescription,
       images: ['/og-default.png'],
     },
-    alternates: {
-      canonical: `/briefs/${brief.brief_id}`,
-    },
   };
 }
 
-export default function BriefDetailPage({ params }: Params) {
-  const row = getBriefById(params.id);
+export default async function BriefDetailPage({ params }: RouteParams) {
+  const { locale, id } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: 'briefDetailPage' });
+  const tVerdicts = await getTranslations({ locale, namespace: 'verdicts' });
+
+  const row = getBriefById(id);
   if (!row) notFound();
 
   const brief: BriefWithBody = briefRowToBrief(row);
@@ -112,11 +125,11 @@ export default function BriefDetailPage({ params }: Params) {
           className="group mb-8 inline-flex items-center gap-2 text-sm text-mist-400 hover:text-emerald-glow transition-colors"
         >
           <span className="transition-transform group-hover:-translate-x-1">←</span>
-          Tous les briefs
+          {t('backToList')}
         </Link>
         <StubBriefClient
-          briefId={brief.brief_id || params.id}
-          title={brief.sharpened.title || 'Analyse SPORE'}
+          briefId={brief.brief_id || id}
+          title={brief.sharpened.title || 'SPORE'}
           domainA={brief.domains[0] ?? '?'}
           domainB={brief.domains[1] ?? '?'}
           markdown={brief.body_markdown}
@@ -135,31 +148,64 @@ export default function BriefDetailPage({ params }: Params) {
   // db.getBriefNeighbors returns {previous, next}; the local neighbors
   // component was built against the briefs.ts shape {prev, next}.
   // Alias the destructure so we don't need to rename the component API.
-  const { previous: prev, next } = getBriefNeighbors(params.id);
+  const { previous: prev, next } = getBriefNeighbors(id);
+
+  const verdictLabel = (v: string | null | undefined): string => {
+    if (!v) return '—';
+    // tVerdicts will gracefully fall back to the key if missing.
+    try {
+      return tVerdicts(v);
+    } catch {
+      return v;
+    }
+  };
+
+  // Locale-translated verdict tokens for the JSON-LD keywords blob — keeps
+  // SEO copy in the active locale instead of leaking FR-only labels.
+  const verdictKeywords = [
+    brief.grounding?.novelty_assessment?.verdict,
+    brief.panel?.meta_review?.verdict,
+  ]
+    .filter((v): v is string => typeof v === 'string' && v.length > 0)
+    .map((v) => {
+      try {
+        return tVerdicts(v);
+      } catch {
+        return null;
+      }
+    })
+    .filter((v): v is string => typeof v === 'string' && v.length > 0);
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
-      <BriefJsonLd brief={brief} />
+      <BriefJsonLd brief={brief} verdictKeywords={verdictKeywords} />
 
       <Link
         href="/briefs"
         className="group mb-8 inline-flex items-center gap-2 text-sm text-mist-400 hover:text-emerald-glow transition-colors"
       >
         <span className="transition-transform group-hover:-translate-x-1">←</span>
-        Tous les briefs
+        {t('backToList')}
       </Link>
 
       <BriefDetailClient teaser={teaser} />
 
       <div className="mt-20">
         <CustomCollisionCta
-          headline="Cette collision vous inspire ?"
-          subtext="Demandez la vôtre sur un domaine de votre choix — gratuite pendant le lancement. SPORE croise vos domaines, génère une hypothèse et livre un brief complet en quelques minutes."
-          cta="Demander ma collision →"
+          headline={t('customCtaHeadline')}
+          subtext={t('customCtaSubtext')}
+          cta={t('customCtaButton')}
         />
       </div>
 
-      <BriefNeighbors prev={prev} next={next} />
+      <BriefNeighbors
+        prev={prev}
+        next={next}
+        previousLabel={t('previousBrief')}
+        nextLabel={t('nextBrief')}
+        ariaLabel={t('neighborsAria')}
+        verdictLabel={verdictLabel}
+      />
     </div>
   );
 }
@@ -168,11 +214,25 @@ function neighborTitle(b: Brief): string {
   return b.vulgarization_fr?.title_fr || b.sharpened.title;
 }
 
-function BriefNeighbors({ prev, next }: { prev: Brief | null; next: Brief | null }) {
+function BriefNeighbors({
+  prev,
+  next,
+  previousLabel,
+  nextLabel,
+  ariaLabel,
+  verdictLabel,
+}: {
+  prev: Brief | null;
+  next: Brief | null;
+  previousLabel: string;
+  nextLabel: string;
+  ariaLabel: string;
+  verdictLabel: (v: string | null | undefined) => string;
+}) {
   if (!prev && !next) return null;
   return (
     <nav
-      aria-label="Navigation entre briefs"
+      aria-label={ariaLabel}
       className="mt-20 grid gap-4 border-t border-ink-500/60 pt-10 md:grid-cols-2"
     >
       {prev ? (
@@ -182,7 +242,7 @@ function BriefNeighbors({ prev, next }: { prev: Brief | null; next: Brief | null
         >
           <div className="mb-2 flex items-center gap-2 text-[11px] uppercase tracking-widest text-mist-500">
             <span className="transition-transform group-hover:-translate-x-1">←</span>
-            Brief précédent
+            {previousLabel}
           </div>
           <div className="font-display text-lg leading-tight text-mist-100 line-clamp-2">
             {neighborTitle(prev)}
@@ -202,7 +262,7 @@ function BriefNeighbors({ prev, next }: { prev: Brief | null; next: Brief | null
           className="group rounded-2xl border border-ink-500 bg-ink-800/40 p-5 text-right transition-all hover:border-emerald-bio/40 hover:bg-ink-800/70"
         >
           <div className="mb-2 flex items-center justify-end gap-2 text-[11px] uppercase tracking-widest text-mist-500">
-            Brief suivant
+            {nextLabel}
             <span className="transition-transform group-hover:translate-x-1">→</span>
           </div>
           <div className="font-display text-lg leading-tight text-mist-100 line-clamp-2">

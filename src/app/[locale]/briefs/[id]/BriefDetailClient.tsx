@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import DomainBridge from '@/components/DomainBridge';
 import ReviewerPanel from '@/components/ReviewerPanel';
@@ -116,6 +116,17 @@ function reshapeFull(res: FullBriefResponse): UnlockedBrief {
 
 export default function BriefDetailClient({ teaser }: Props) {
   const t = useTranslations('briefDetailPage');
+  const tVerdicts = useTranslations('verdicts');
+  const locale = useLocale();
+  const dateLocale = locale === 'fr' ? 'fr-FR' : 'en-US';
+  const safeVerdictLabel = (v: string | null | undefined): string => {
+    if (!v) return '—';
+    try {
+      return tVerdicts(v);
+    } catch {
+      return v;
+    }
+  };
   const [tab, setTab] = useState<Tab>('comprendre');
   const [lang, setLang] = useState<Lang>('fr');
   const { user, isAuthenticated, isLoading, refresh } = useAuth();
@@ -162,7 +173,7 @@ export default function BriefDetailClient({ teaser }: Props) {
           <span className="font-mono text-mist-500">{teaser.brief_id}</span>
           <span className="text-mist-600">·</span>
           <span className="text-mist-500">
-            {new Date(teaser.generated_at).toLocaleDateString('fr-FR', {
+            {new Date(teaser.generated_at).toLocaleDateString(dateLocale, {
               day: 'numeric',
               month: 'long',
               year: 'numeric',
@@ -171,7 +182,7 @@ export default function BriefDetailClient({ teaser }: Props) {
           <span
             className={`rounded-full px-2.5 py-1 font-medium ${verdictChipClasses(teaser.verdict)}`}
           >
-            {verdictLabel(teaser.verdict)}
+            {safeVerdictLabel(teaser.verdict)}
           </span>
 
           <div className="ml-auto flex rounded-full border border-ink-500 bg-ink-800/60 p-0.5">
