@@ -24,6 +24,7 @@ import type {
   Review,
   Sharpened,
   VulgarizationFr,
+  VulgarizationEn,
 } from '@/lib/types';
 import { verdictLabel, verdictChipClasses } from '@/lib/verdicts';
 import { label } from '@/lib/labels';
@@ -127,8 +128,26 @@ export default function BriefDetailClient({ teaser }: Props) {
       return v;
     }
   };
-  const [tab, setTab] = useState<Tab>('comprendre');
-  const [lang, setLang] = useState<Lang>('fr');
+  // Default tab + content language follow the page locale.
+  // - On /en/, the user landed expecting EN content. Default lang=en and
+  //   default tab=recherche (the technical EN content lives there
+  //   natively — sharpened.title, formal predictions, references).
+  // - On /fr/, default lang=fr and default tab=comprendre (the FR
+  //   vulgarisation is the editorial entry point for the FR audience).
+  // The user can flip both at any time via the controls.
+  const [tab, setTab] = useState<Tab>(locale === 'en' ? 'recherche' : 'comprendre');
+  const [lang, setLang] = useState<Lang>(locale === 'en' ? 'en' : 'fr');
+
+  // When the user picks a language whose payload is missing, surface the
+  // fallback transparently instead of rendering an empty section. The
+  // toggle keeps the user's choice; only the rendered content & labels
+  // follow ``effectiveLang``.
+  const effectiveLang: Lang = (() => {
+    if (lang === 'en' && !teaser.vulgarization_en) return 'fr';
+    if (lang === 'fr' && !teaser.vulgarization_fr) return 'en';
+    return lang;
+  })();
+  const showLangFallbackBadge = effectiveLang !== lang;
   const { user, isAuthenticated, isLoading, refresh } = useAuth();
   const [full, setFull] = useState<UnlockedBrief | null>(null);
   const [loadState, setLoadState] = useState<'idle' | 'loading' | 'error' | 'payment_required'>(
@@ -136,10 +155,15 @@ export default function BriefDetailClient({ teaser }: Props) {
   );
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const headerTitle =
-    lang === 'fr' && teaser.vulgarization_fr?.title_fr
-      ? teaser.vulgarization_fr.title_fr
-      : teaser.title;
+  const headerTitle = (() => {
+    if (effectiveLang === 'en' && teaser.vulgarization_en?.title) {
+      return teaser.vulgarization_en.title;
+    }
+    if (effectiveLang === 'fr' && teaser.vulgarization_fr?.title_fr) {
+      return teaser.vulgarization_fr.title_fr;
+    }
+    return teaser.title;
+  })();
 
   const fetchFull = useCallback(async () => {
     setLoadState('loading');
@@ -185,13 +209,27 @@ export default function BriefDetailClient({ teaser }: Props) {
             {safeVerdictLabel(teaser.verdict)}
           </span>
 
-          <div className="ml-auto flex rounded-full border border-ink-500 bg-ink-800/60 p-0.5">
-            <LangButton active={lang === 'fr'} onClick={() => setLang('fr')}>
-              🇫🇷 FR
-            </LangButton>
-            <LangButton active={lang === 'en'} onClick={() => setLang('en')}>
-              🇬🇧 EN
-            </LangButton>
+          <div className="ml-auto flex items-center gap-2">
+            {showLangFallbackBadge && (
+              <span
+                className="rounded-full border border-amber-bio/40 bg-amber-bio/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-glow"
+                title={
+                  lang === 'en'
+                    ? 'English vulgarisation is pending for this brief — showing the French version.'
+                    : 'La vulgarisation française est en attente pour ce brief — affichage de la version anglaise.'
+                }
+              >
+                {lang === 'en' ? 'FR fallback' : 'EN fallback'}
+              </span>
+            )}
+            <div className="flex rounded-full border border-ink-500 bg-ink-800/60 p-0.5">
+              <LangButton active={lang === 'fr'} onClick={() => setLang('fr')}>
+                🇫🇷 FR
+              </LangButton>
+              <LangButton active={lang === 'en'} onClick={() => setLang('en')}>
+                🇬🇧 EN
+              </LangButton>
+            </div>
           </div>
         </div>
 
@@ -230,18 +268,18 @@ export default function BriefDetailClient({ teaser }: Props) {
       <AnimatePresence mode="wait">
         {tab === 'comprendre' ? (
           <motion.div
-            key={`comprendre-${lang}`}
+            key={`comprendre-${effectiveLang}`}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3 }}
             className="space-y-12"
           >
-            <ComprendreTab teaser={teaser} lang={lang} />
+            <ComprendreTab teaser={teaser} lang={effectiveLang} />
           </motion.div>
         ) : (
           <motion.div
-            key={`recherche-${lang}`}
+            key={`recherche-${effectiveLang}`}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
@@ -257,7 +295,7 @@ export default function BriefDetailClient({ teaser }: Props) {
                 protocol={full.protocol}
                 markdown={full.markdown}
                 briefId={teaser.brief_id}
-                lang={lang}
+                lang={effectiveLang}
               />
             ) : (
               <>
@@ -822,10 +860,89 @@ function RechercheSections({
 
 // ── Comprendre tab (teaser-only) ──────────────────────────────────
 //
-// FR path uses `vulgarization_fr` which is intended to be public. EN
-// path falls back to a short preview (title + formal_statement) and a
-// gentle nudge to try the Recherche tab. No gated fields leak here.
+// FR path uses `vulgarization_fr` which is public. EN path uses
+// ``vulgarization_en`` (S7.4 Phase 2 backfill — Nature-grade UK
+// translation of every published brief). Both render the same five-
+// section layout (hypothesis / why / imagine / concretely / reviewers).
+//
+// The summary-based fallback at the bottom of this function only fires
+// for legacy briefs that have neither vulgarisation payload — at the
+// time of writing that is a no-op in production (every public brief
+// has at least the FR layer) but the path stays as a safety net.
 function ComprendreTab({ teaser, lang }: { teaser: BriefTeaser; lang: Lang }) {
+  if (lang === 'en' && teaser.vulgarization_en) {
+    const v: VulgarizationEn = teaser.vulgarization_en;
+    return (
+      <>
+        <section>
+          <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-emerald-glow">
+            The hypothesis in brief
+          </h2>
+          <p className="text-xl leading-relaxed text-mist-100 font-display">
+            {v.hypothesis_in_brief}
+          </p>
+        </section>
+
+        <section>
+          <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-amber-glow">
+            Why it matters
+          </h2>
+          <div className="rounded-xl border border-amber-bio/20 bg-amber-bio/5 p-6">
+            <p className="text-sm text-mist-200 leading-relaxed whitespace-pre-line">
+              {v.why_it_matters}
+            </p>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-cyan-glow">
+            Imagine that...
+          </h2>
+          <div className="rounded-xl border border-cyan-bio/20 bg-cyan-bio/5 p-6">
+            <p className="text-base italic text-mist-100 leading-relaxed whitespace-pre-line">
+              {v.imagine_that}
+            </p>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="mb-4 text-xs font-medium uppercase tracking-widest text-emerald-glow">
+            Concretely
+          </h2>
+          {v.concretely?.intro && (
+            <p className="mb-4 text-sm text-mist-300">{v.concretely.intro}</p>
+          )}
+          <ol className="space-y-3">
+            {[v.concretely?.phase1, v.concretely?.phase2, v.concretely?.phase3]
+              .filter(Boolean)
+              .map((step, i) => (
+                <li
+                  key={i}
+                  className="flex gap-4 rounded-xl border border-ink-500 bg-ink-800/40 p-4"
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-bio/15 font-mono text-sm text-emerald-glow">
+                    {i + 1}
+                  </span>
+                  <p className="text-sm text-mist-300 leading-relaxed">{step}</p>
+                </li>
+              ))}
+          </ol>
+        </section>
+
+        <section>
+          <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-mist-400">
+            What the reviewers say
+          </h2>
+          <div className="rounded-xl border border-ink-500 bg-ink-800/40 p-6">
+            <p className="text-sm text-mist-200 leading-relaxed whitespace-pre-line">
+              {v.reviewers_say}
+            </p>
+          </div>
+        </section>
+      </>
+    );
+  }
+
   if (lang === 'fr' && teaser.vulgarization_fr) {
     const v: VulgarizationFr = teaser.vulgarization_fr;
     return (
@@ -899,9 +1016,10 @@ function ComprendreTab({ teaser, lang }: { teaser: BriefTeaser; lang: Lang }) {
     );
   }
 
-  // EN path (or FR path when vulgarization_fr is missing): a five-
-  // section structured view mirroring the FR layout, fed by the
-  // non-sensitive summary fields denormalised on the teaser.
+  // Legacy fallback: lang/payload mismatch reaches here only when the
+  // brief has neither ``vulgarization_en`` nor ``vulgarization_fr``.
+  // Rare in production now that S7.4 Phase 2 backfilled every published
+  // brief; kept as a safety net so the page never renders empty.
   const pendingCopy =
     'Data pending — this brief was generated with limited literature access.';
 
