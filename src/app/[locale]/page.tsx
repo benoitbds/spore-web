@@ -1,5 +1,6 @@
+import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
-import Counter from '@/components/Counter';
 import EditorialBriefCard from '@/components/EditorialBriefCard';
 import MyceliumBackground from '@/components/MyceliumBackground';
 import NoveltyScoreTooltip from '@/components/NoveltyScoreTooltip';
@@ -11,46 +12,87 @@ import {
 } from '@/lib/db';
 import type { Brief } from '@/lib/types';
 import { verdictLabel } from '@/lib/verdicts';
+import { localeAlternates } from '@/lib/i18n-seo';
+import { SITE_URL } from '@/lib/seo';
 
-export default function HomePage() {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'home' });
+  return {
+    title: t('metaTitle'),
+    description: t('metaDescription'),
+    alternates: localeAlternates(locale, '/'),
+    openGraph: {
+      title: t('metaTitle'),
+      description: t('metaDescription'),
+      url: `${SITE_URL}/${locale}`,
+      type: 'website',
+      locale: locale === 'fr' ? 'fr_FR' : 'en_US',
+    },
+  };
+}
+
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: 'home' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
+
   const stats = getStats();
   const featured = getFeaturedBrief();
-  // db.getAllBriefs returns BriefRow[]; EditorialBriefCard consumes the
-  // nested Brief shape from @/lib/types, so we adapt each row here.
-  // The filter-and-slice below runs on already-adapted objects so the
-  // final array shipped to <EditorialBriefCard /> matches its prop type.
   const all: Brief[] = getAllBriefs().map(briefRowToBrief);
   const others = all
     .filter((b) => b.brief_id !== featured?.brief_id)
     .slice(0, 6);
 
+  const dateLocale = locale === 'fr' ? 'fr-FR' : 'en-US';
+
   return (
     <>
-      {/* ── BLOC 1 — HERO : LE DERNIER BRIEF ──────────────────── */}
       {featured ? (
-        <FeaturedHero brief={featured} />
+        <FeaturedHero
+          brief={featured}
+          locale={locale}
+          dateLocale={dateLocale}
+          manifesto={tCommon('manifesto')}
+          subtitle={t('tagline_subtitle')}
+          kickerLastBrief={t('kicker_lastBrief')}
+          panelLabel={t('featured_panelLabel')}
+          noveltyLabel={t('featured_noveltyLabel')}
+          readBrief={t('featured_readBrief')}
+        />
       ) : (
-        <EmptyHero />
+        <EmptyHero
+          title={t('empty_title')}
+          desc={t('empty_desc')}
+        />
       )}
 
-      {/* ── BLOC 2 — LES AUTRES BRIEFS ────────────────────────── */}
       {others.length > 0 && (
         <section className="relative border-t border-ink-500/50 py-24">
           <div className="mx-auto max-w-6xl px-6">
             <div className="mb-12 flex items-end justify-between gap-4">
               <div>
                 <span className="mb-3 inline-block text-xs uppercase tracking-[0.3em] text-emerald-glow">
-                  Les autres briefs
+                  {t('others_kicker')}
                 </span>
                 <h2 className="font-display text-3xl text-mist-100 md:text-4xl">
-                  D'autres idées à explorer
+                  {t('others_title')}
                 </h2>
               </div>
               <Link
                 href="/briefs"
                 className="hidden whitespace-nowrap text-sm text-emerald-glow transition-colors hover:text-emerald-bio md:inline-flex"
               >
-                Voir tous les briefs →
+                {t('others_allLink')}
               </Link>
             </div>
 
@@ -65,27 +107,24 @@ export default function HomePage() {
                 href="/briefs"
                 className="text-sm text-emerald-glow transition-colors hover:text-emerald-bio"
               >
-                Voir tous les briefs →
+                {t('others_allLink')}
               </Link>
             </div>
           </div>
         </section>
       )}
 
-      {/* ── BLOC 3 — LE PITCH SYSTÈME (COMPACT) ───────────────── */}
       <section className="relative border-t border-ink-500/50 bg-ink-800/30 py-24">
         <div className="mx-auto max-w-5xl px-6">
           <div className="mb-14 text-center">
             <span className="mb-3 inline-block text-xs uppercase tracking-[0.3em] text-cyan-glow">
-              Comment SPORE fonctionne
+              {t('pitch_kicker')}
             </span>
             <h2 className="font-display text-3xl text-mist-100 md:text-5xl">
-              Collision, validation, publication
+              {t('pitch_title')}
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-mist-400 md:text-base">
-              Une IA qui croise aléatoirement des domaines scientifiques éloignés,
-              interroge la littérature réelle, et ne publie que ce qui résiste à un
-              panel de cinq relecteurs spécialisés.
+              {t('pitch_subtitle')}
             </p>
           </div>
 
@@ -93,22 +132,22 @@ export default function HomePage() {
             <StepCard
               step="01"
               icon="🎲"
-              title="Collision"
-              description="Deux domaines très éloignés sont tirés au sort. Un filtre rejette les paires banales."
+              title={t('step1_title')}
+              description={t('step1_desc')}
               accent="emerald"
             />
             <StepCard
               step="02"
               icon="🧪"
-              title="Validation"
-              description="Cinq relecteurs IA — méthodologue, expert du domaine, avocat du diable, industriel, stratège financement — challengent l'hypothèse."
+              title={t('step2_title')}
+              description={t('step2_desc')}
               accent="cyan"
             />
             <StepCard
               step="03"
               icon="📄"
-              title="Publication"
-              description="Un brief sourcé sur Semantic Scholar, avec un protocole en trois phases et un démarrage rapide actionnable."
+              title={t('step3_title')}
+              description={t('step3_desc')}
               accent="amber"
             />
           </div>
@@ -116,12 +155,12 @@ export default function HomePage() {
           {stats && (
             <div className="mt-16 grid gap-4 border-t border-ink-500/70 pt-10 md:grid-cols-4">
               <MiniStat
-                value={formatInt(stats.totals.collisions)}
-                label="Collisions explorées"
+                value={formatInt(stats.totals.collisions, dateLocale)}
+                label={t('metric_collisions')}
               />
               <MiniStat
-                value={formatInt(stats.totals.briefs)}
-                label="Briefs publiés"
+                value={formatInt(stats.totals.briefs, dateLocale)}
+                label={t('metric_briefs')}
               />
               <MiniStat
                 value={
@@ -129,10 +168,10 @@ export default function HomePage() {
                     ? stats.quality.avg_novelty_score.toFixed(2)
                     : '—'
                 }
-                label="Nouveauté moyenne"
+                label={t('metric_avgNovelty')}
                 labelTooltip={<NoveltyScoreTooltip />}
               />
-              <MiniStat value="100%" label="Références vérifiées" />
+              <MiniStat value={t('metric_referencesPercentage')} label={t('metric_referencesVerified')} />
             </div>
           )}
 
@@ -141,7 +180,7 @@ export default function HomePage() {
               href="/how-it-works"
               className="group inline-flex items-center gap-2 text-sm text-mist-300 transition-colors hover:text-emerald-glow"
             >
-              En savoir plus sur le pipeline
+              {t('moreOnPipeline')}
               <span className="transition-transform group-hover:translate-x-1">→</span>
             </Link>
           </div>
@@ -153,9 +192,32 @@ export default function HomePage() {
 
 // ── Featured hero ───────────────────────────────────────────────
 
-function FeaturedHero({ brief }: { brief: Brief }) {
+function FeaturedHero({
+  brief,
+  locale,
+  dateLocale,
+  manifesto,
+  subtitle,
+  kickerLastBrief,
+  panelLabel,
+  noveltyLabel,
+  readBrief,
+}: {
+  brief: Brief;
+  locale: string;
+  dateLocale: string;
+  manifesto: string;
+  subtitle: string;
+  kickerLastBrief: string;
+  panelLabel: string;
+  noveltyLabel: string;
+  readBrief: string;
+}) {
   const { vulgarization_fr: v, sharpened, domains, grounding, panel, brief_id, generated_at } = brief;
 
+  // Featured brief: keep the FR title even on /en/ as a temporary measure
+  // until S7.4 brings bilingual brief content. The chrome around it
+  // (kicker, badges, CTA) is localised; the brief title and hook stay FR.
   const title = v?.title_fr || sharpened.title;
   const hook = v?.imagine_that || sharpened.formal_statement;
   const novelty = grounding.novelty_assessment.score;
@@ -164,35 +226,31 @@ function FeaturedHero({ brief }: { brief: Brief }) {
 
   return (
     <section className="relative overflow-hidden border-b border-ink-500/40">
-      {/* ambient background: mycelium + gradient wash */}
       <MyceliumBackground density={0.5} className="opacity-40" />
       <div className="pointer-events-none absolute inset-0 bg-mesh-1 opacity-60" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-bio/50 to-transparent" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-b from-transparent to-ink-900" />
 
       <div className="relative mx-auto flex max-w-6xl flex-col px-6 py-16 md:py-24 lg:py-28">
-        {/* tagline — manifeste épistémique, identifié comme la meilleure phrase
-            du site par 2 personas indépendants lors des tests utilisateurs */}
         <p className="mb-3 max-w-3xl text-sm leading-relaxed text-mist-200/70 md:text-base">
           <span className="font-display text-base italic text-mist-100 md:text-lg">SPORE</span>
           <span className="mx-2 text-mist-600">—</span>
-          Une hypothèse nulle bien documentée vaut mieux qu'une fausse promesse d'unification.
+          {manifesto}
         </p>
         <p className="mb-6 max-w-3xl text-xs italic leading-relaxed text-mist-400 md:text-sm">
-          Des hypothèses scientifiques interdisciplinaires que personne n'a encore proposées.
+          {subtitle}
         </p>
 
-        {/* kicker */}
         <div className="mb-8 flex flex-wrap items-center gap-3 text-[11px]">
           <span className="inline-flex items-center gap-2 rounded-full border border-emerald-bio/30 bg-emerald-bio/5 px-3 py-1 uppercase tracking-[0.22em] text-emerald-glow">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-glow" />
-            Le dernier brief
+            {kickerLastBrief}
           </span>
           <time
             className="font-mono text-mist-500"
             dateTime={generated_at}
           >
-            {new Date(generated_at).toLocaleDateString('fr-FR', {
+            {new Date(generated_at).toLocaleDateString(dateLocale, {
               day: 'numeric',
               month: 'long',
               year: 'numeric',
@@ -202,7 +260,6 @@ function FeaturedHero({ brief }: { brief: Brief }) {
           <span className="font-mono text-mist-500">{brief_id}</span>
         </div>
 
-        {/* domains pills */}
         <div className="mb-8 flex flex-wrap items-center gap-3 text-sm">
           <span className="rounded-full border border-emerald-bio/40 bg-emerald-bio/10 px-3 py-1 text-emerald-glow">
             {domains[0]}
@@ -213,12 +270,10 @@ function FeaturedHero({ brief }: { brief: Brief }) {
           </span>
         </div>
 
-        {/* title — editorial serif, huge */}
         <h1 className="max-w-5xl font-display text-[2.25rem] leading-[1.05] tracking-tight text-mist-100 md:text-6xl lg:text-7xl">
           {title}
         </h1>
 
-        {/* hook — imagine_that, pull quote style */}
         {hook && (
           <blockquote className="relative mt-10 max-w-3xl border-l-2 border-emerald-bio/40 pl-6">
             <p className="font-display text-xl italic leading-relaxed text-mist-200 md:text-2xl">
@@ -227,18 +282,17 @@ function FeaturedHero({ brief }: { brief: Brief }) {
           </blockquote>
         )}
 
-        {/* metrics + CTA row */}
         <div className="mt-12 flex flex-col items-start gap-8 md:flex-row md:items-end md:justify-between">
           <div className="flex flex-wrap gap-6">
             <HeroBadge
-              label="Nouveauté"
+              label={noveltyLabel}
               value={novelty.toFixed(2)}
               sub={verdictLabel(grounding.novelty_assessment.verdict).toLowerCase()}
               accent="emerald"
               labelTooltip={<NoveltyScoreTooltip />}
             />
             <HeroBadge
-              label="Consensus du panel"
+              label={panelLabel}
               value={`${panelScore.toFixed(1)}/10`}
               sub={verdictLabel(verdict).toLowerCase()}
               accent="cyan"
@@ -249,7 +303,7 @@ function FeaturedHero({ brief }: { brief: Brief }) {
             href={`/briefs/${brief_id}`}
             className="group inline-flex items-center gap-2 rounded-full border border-emerald-bio/50 bg-emerald-bio/10 px-6 py-3 text-sm font-medium text-emerald-glow transition-all hover:border-emerald-bio hover:bg-emerald-bio/20 hover:shadow-[0_0_50px_rgba(16,185,129,0.3)]"
           >
-            Lire ce brief
+            {readBrief}
             <span className="transition-transform group-hover:translate-x-1">→</span>
           </Link>
         </div>
@@ -258,25 +312,17 @@ function FeaturedHero({ brief }: { brief: Brief }) {
   );
 }
 
-// ── Empty hero fallback (no briefs yet) ─────────────────────────
-
-function EmptyHero() {
+function EmptyHero({ title, desc }: { title: string; desc: string }) {
   return (
     <section className="relative flex min-h-[60vh] items-center border-b border-ink-500/40">
       <MyceliumBackground density={0.4} className="opacity-40" />
       <div className="relative mx-auto max-w-3xl px-6 py-24 text-center">
-        <h1 className="font-display text-4xl text-mist-100 md:text-6xl">
-          Aucun brief publié pour l'instant
-        </h1>
-        <p className="mt-6 text-mist-400">
-          Le pipeline tourne — les prochains briefs apparaîtront ici.
-        </p>
+        <h1 className="font-display text-4xl text-mist-100 md:text-6xl">{title}</h1>
+        <p className="mt-6 text-mist-400">{desc}</p>
       </div>
     </section>
   );
 }
-
-// ── Small components ────────────────────────────────────────────
 
 function HeroBadge({
   label,
@@ -357,7 +403,7 @@ function MiniStat({
   );
 }
 
-function formatInt(n: number | undefined): string {
+function formatInt(n: number | undefined, dateLocale: string): string {
   if (n == null) return '—';
-  return new Intl.NumberFormat('fr-FR').format(n);
+  return new Intl.NumberFormat(dateLocale).format(n);
 }
