@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import DomainBridge from '@/components/DomainBridge';
 import ReviewerPanel from '@/components/ReviewerPanel';
@@ -114,6 +115,7 @@ function reshapeFull(res: FullBriefResponse): UnlockedBrief {
 }
 
 export default function BriefDetailClient({ teaser }: Props) {
+  const t = useTranslations('briefDetailPage');
   const [tab, setTab] = useState<Tab>('comprendre');
   const [lang, setLang] = useState<Lang>('fr');
   const { user, isAuthenticated, isLoading, refresh } = useAuth();
@@ -188,7 +190,7 @@ export default function BriefDetailClient({ teaser }: Props) {
 
         {/* Badge épistémique — honnêteté sur le statut du contenu (test users N1.4) */}
         <p className="mb-6 text-xs uppercase tracking-[0.18em] text-mist-500">
-          Hypothèse générée par IA <span className="text-mist-600">·</span> Pré-publication <span className="text-mist-600">·</span> À tester expérimentalement
+          {t('epistemicBadge')}
         </p>
 
         <DomainBridge
@@ -207,10 +209,10 @@ export default function BriefDetailClient({ teaser }: Props) {
       {/* TABS */}
       <div className="flex gap-1 rounded-full border border-ink-500 bg-ink-800/60 p-1 w-fit mx-auto md:mx-0">
         <TabButton active={tab === 'comprendre'} onClick={() => setTab('comprendre')}>
-          💡 Comprendre
+          {t('tabUnderstand')}
         </TabButton>
         <TabButton active={tab === 'recherche'} onClick={() => setTab('recherche')}>
-          🔬 Recherche
+          {t('tabResearch')}
         </TabButton>
       </div>
 
