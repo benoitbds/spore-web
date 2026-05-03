@@ -152,7 +152,11 @@
     "section4_b4_strong": "Pas un projet financé ou affilié",
     "section4_b4_after": ". Pas de label, pas de tutelle, pas d'agenda caché. Juste un développeur curieux qui pense qu'on peut outiller la pensée analogique.",
     "section5_title": "Limites assumées",
-    "section5_p1": "SPORE croise des textes sur la science, pas la science elle-même. La littérature scientifique est une représentation filtrée, retardée et socialement construite du réel. SPORE peut identifier des lacunes dans le discours scientifique, pas dans la nature. Les ponts générés sont plausibles au sens linguistique — pas nécessairement féconds au sens expérimental. Cette distinction est centrale et SPORE l'assume.",
+    "section5_p1_a": "SPORE croise des textes sur la science, pas la science elle-même. La littérature scientifique est une représentation filtrée, retardée et socialement construite du réel. SPORE peut identifier des lacunes dans le discours scientifique, pas dans la nature. Les ponts générés sont ",
+    "section5_p1_em1": "plausibles",
+    "section5_p1_b": " au sens linguistique — pas nécessairement ",
+    "section5_p1_em2": "féconds",
+    "section5_p1_c": " au sens expérimental. Cette distinction est centrale et SPORE l'assume.",
     "section5_p2": "Le panel de 5 reviewers IA ne constitue pas une validation indépendante : ce sont des projections du même espace de représentation que le générateur. Ils détectent les incohérences internes, pas la contradiction du réel. La seule validation qui compte est expérimentale, et elle dépasse le périmètre de SPORE.",
     "section6_title": "Comment soutenir le projet",
     "section6_intro": "SPORE est gratuit pendant la phase de lancement. À terme :",
@@ -296,6 +300,64 @@
     "methodologyPointer_link": "page Méthodologie",
     "methodologyPointer_after": ".",
     "ctaPrompt": "Prêt à explorer ?",
-    "ctaButton": "Voir les briefs →"
+    "ctaButton": "Voir les briefs →",
+    "postFireBadge": "Post 🔥",
+    "steps": {
+      "collision": {
+        "title": "Collision",
+        "description": "500 domaines scientifiques. Un tirage aléatoire croise deux d'entre eux.",
+        "metric": "~100 collisions/jour"
+      },
+      "gate": {
+        "title": "Filtre",
+        "description": "Un filtre rejette les paires triviales ou déjà explorées.",
+        "metric": "30-60% passent"
+      },
+      "synthesis": {
+        "title": "Synthèse",
+        "description": "Un LLM génère un pont causal entre les deux domaines.",
+        "metric": "~70% de ponts"
+      },
+      "critics": {
+        "title": "Critiques",
+        "description": "Un avocat du diable et un avocat de l'ange débattent.",
+        "metric": "5 scores produits"
+      },
+      "curator": {
+        "title": "Sélection",
+        "description": "Top 15% retenu sur score composite.",
+        "metric": "Top 15%"
+      },
+      "reviewer": {
+        "title": "Relecture",
+        "description": "Verdict calibré : rejeté / intéressant / à tester 🔥.",
+        "metric": "~15-20% 🔥"
+      },
+      "literature_grounding": {
+        "title": "Ancrage littérature",
+        "description": "8-12 requêtes Semantic Scholar. Zéro hallucination — chaque DOI est vérifié.",
+        "metric": "5+ références"
+      },
+      "hypothesis_sharpening": {
+        "title": "Affinage hypothèse",
+        "description": "Formulation rigoureuse avec variables, prédictions quantitatives, H0, tests statistiques.",
+        "metric": ""
+      },
+      "protocol": {
+        "title": "Protocole",
+        "description": "3 phases : in silico (€0-2k) → minimal (€2-15k) → full (€15-200k).",
+        "metric": ""
+      },
+      "panel": {
+        "title": "Panel (5 relecteurs)",
+        "description": "Méthodologue, expert du domaine, avocat du diable, industriel, stratège financement.",
+        "metric": ""
+      },
+      "research_brief": {
+        "title": "Brief de recherche",
+        "description": "Document publication-ready de 4-6 pages. Markdown + JSON.",
+        "metric": ""
+      }
+    }
   }
 }
