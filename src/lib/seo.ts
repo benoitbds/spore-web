@@ -47,29 +47,54 @@ export function toIsoUtc(timestamp: string): string {
   return timestamp.replace(' ', 'T') + 'Z';
 }
 
-/** The description text to use in meta tags for a brief — FR vulgarisation first. */
-export function briefMetaDescription(brief: Brief): string {
-  const v = brief.vulgarization_fr;
-  const candidate =
-    v?.why_it_matters ||
-    v?.hypothesis_in_brief ||
-    brief.sharpened.formal_statement ||
-    '';
-  return truncate(candidate, 155);
+/** Pick the locale-appropriate vulgarisation prose, falling back across
+ *  layers: ``en`` row → ``fr`` row → sharpened formal_statement →
+ *  empty. The function returns objects with the same shape the helpers
+ *  below need, so each helper just pulls the field it cares about. */
+function _localisedSummary(brief: Brief, locale: string) {
+  const ve = brief.vulgarization_en;
+  const vf = brief.vulgarization_fr;
+  const fallbackSharpened = brief.sharpened.formal_statement || '';
+  if (locale === 'en' && ve) {
+    return {
+      title: ve.title || brief.sharpened.title,
+      description:
+        ve.why_it_matters ||
+        ve.hypothesis_in_brief ||
+        fallbackSharpened,
+    };
+  }
+  if (vf) {
+    return {
+      title: vf.title_fr || brief.sharpened.title,
+      description:
+        vf.why_it_matters ||
+        vf.hypothesis_in_brief ||
+        fallbackSharpened,
+    };
+  }
+  return {
+    title: brief.sharpened.title,
+    description: fallbackSharpened,
+  };
+}
+
+/** The description text to use in meta tags for a brief.
+ *
+ * Locale-aware: prefers ``vulgarization_en.why_it_matters`` when locale
+ * is 'en' and the EN payload exists; otherwise falls back to the FR
+ * payload, then to the sharpened formal_statement.
+ */
+export function briefMetaDescription(brief: Brief, locale: string = 'fr'): string {
+  return truncate(_localisedSummary(brief, locale).description, 155);
 }
 
 /** Longer description (OpenGraph allows more than Google SERP). */
-export function briefOgDescription(brief: Brief): string {
-  const v = brief.vulgarization_fr;
-  const candidate =
-    v?.why_it_matters ||
-    v?.hypothesis_in_brief ||
-    brief.sharpened.formal_statement ||
-    '';
-  return truncate(candidate, 200);
+export function briefOgDescription(brief: Brief, locale: string = 'fr'): string {
+  return truncate(_localisedSummary(brief, locale).description, 200);
 }
 
-/** The title to use in meta tags for a brief — FR vulgarisation first. */
-export function briefMetaTitle(brief: Brief): string {
-  return brief.vulgarization_fr?.title_fr || brief.sharpened.title;
+/** The title to use in meta tags for a brief — locale-aware. */
+export function briefMetaTitle(brief: Brief, locale: string = 'fr'): string {
+  return _localisedSummary(brief, locale).title;
 }

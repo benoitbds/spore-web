@@ -22,10 +22,32 @@ export default function EditorialBriefCard({ brief, index = 0 }: Props) {
   const tVerdicts = useTranslations('verdicts');
   const locale = useLocale();
   const dateLocale = locale === 'fr' ? 'fr-FR' : 'en-US';
-  const { vulgarization_fr: v, sharpened, domains, grounding, panel, brief_id, generated_at, is_stub } = brief;
+  const {
+    vulgarization_fr: vf,
+    vulgarization_en: ve,
+    sharpened,
+    domains,
+    grounding,
+    panel,
+    brief_id,
+    generated_at,
+    is_stub,
+  } = brief;
 
-  const title = v?.title_fr || sharpened.title;
-  const hook = v?.imagine_that || sharpened.formal_statement;
+  // Cards follow the page locale, falling back across languages when
+  // the preferred payload is missing (rare in prod after S7.4 Phase 2).
+  // The two-level fallback keeps the card usable for legacy briefs:
+  // /en card -> ve.title -> vf.title_fr -> sharpened.title.
+  const title =
+    (locale === 'en' ? ve?.title : vf?.title_fr) ||
+    ve?.title ||
+    vf?.title_fr ||
+    sharpened.title;
+  const hook =
+    (locale === 'en' ? ve?.imagine_that : vf?.imagine_that) ||
+    ve?.imagine_that ||
+    vf?.imagine_that ||
+    sharpened.formal_statement;
   // Hook comes in the form "Imaginez que…" — keep the flavour without
   // repeating the lead-in on each card; trim to ~180 chars.
   const hookTrimmed = hook.length > 180 ? hook.slice(0, 177).trimEnd() + '…' : hook;

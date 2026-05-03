@@ -173,6 +173,28 @@ export interface VulgarizationFr {
   reviewers_say: string;
 }
 
+/** English vulgarisation, written by the S7.4 translation script.
+ *
+ * Mirrors VulgarizationFr's shape with neutral keys — the column itself
+ * is ``vulgarization_data_en`` so the inner ``title_fr`` -> ``title``
+ * rename keeps the JSON tidy. May be absent (``undefined``) on briefs
+ * whose translation has not been backfilled yet. Frontend code must
+ * therefore guard for null/undefined and fall back to the FR payload.
+ */
+export interface VulgarizationEn {
+  title: string;
+  hypothesis_in_brief: string;
+  why_it_matters: string;
+  imagine_that: string;
+  concretely: {
+    intro: string;
+    phase1: string;
+    phase2: string;
+    phase3: string;
+  };
+  reviewers_say: string;
+}
+
 export interface Brief {
   brief_id: string;
   generated_at: string;
@@ -183,6 +205,7 @@ export interface Brief {
   protocol: Protocol;
   panel: Panel;
   vulgarization_fr?: VulgarizationFr;
+  vulgarization_en?: VulgarizationEn;
   /**
    * Set by the db adapter (``briefRowToBrief``) when the row carries
    * ``is_stub=1`` — i.e. an honest "no bridge found" analysis rather
@@ -208,6 +231,7 @@ export interface BriefTeaser {
   formal_statement: string; // sharpened.formal_statement — the one-liner
   verdict: string;          // panel.meta_review.verdict (for the chip only)
   vulgarization_fr?: VulgarizationFr;
+  vulgarization_en?: VulgarizationEn;
 
   // ── EN "Comprendre" summaries ───────────────────────────────────
   // Denormalised, non-sensitive extracts from the full brief used to
@@ -302,6 +326,7 @@ export function briefToTeaser(b: Brief): BriefTeaser {
     formal_statement: b.sharpened.formal_statement,
     verdict: b.panel.meta_review.verdict,
     vulgarization_fr: b.vulgarization_fr,
+    vulgarization_en: b.vulgarization_en,
     mechanism_summary,
     novelty_summary,
     protocol_summary: protocol_summary.length > 0 ? protocol_summary : undefined,

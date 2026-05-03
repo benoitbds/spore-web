@@ -31,6 +31,7 @@ import {
   type Protocol,
   type Panel,
   type VulgarizationFr,
+  type VulgarizationEn,
   type Stats,
 } from './types';
 
@@ -110,6 +111,9 @@ export interface BriefRow {
   protocol_data: unknown;
   panel_data: unknown;
   vulgarization_data: unknown;
+  /** S7.4 Phase 1+2: Nature-grade EN translation of vulgarization_data.
+   *  NULL on rows that pre-date the translation script run. */
+  vulgarization_data_en: unknown;
   low_confidence: number;
   low_evidence: number;
   is_stub: number;
@@ -157,6 +161,7 @@ const JSON_COLUMNS = [
   'protocol_data',
   'panel_data',
   'vulgarization_data',
+  'vulgarization_data_en',
 ] as const;
 
 function parseJsonColumn(value: unknown): unknown {
@@ -517,6 +522,11 @@ export function briefRowToBrief(row: BriefRow): BriefWithBody {
     ? (vulgRaw as unknown as VulgarizationFr)
     : undefined;
 
+  const vulgEnRaw = asObjectOrNull(row.vulgarization_data_en);
+  const vulgarization_en = vulgEnRaw
+    ? (vulgEnRaw as unknown as VulgarizationEn)
+    : undefined;
+
   // Domains live inside the JSON sidecars — most often on the panel /
   // protocol or in the original_hypothesis blob. We surface a best-effort
   // list from sharpened_data.domains then grounding_data.domains; fall
@@ -545,6 +555,7 @@ export function briefRowToBrief(row: BriefRow): BriefWithBody {
     protocol,
     panel,
     vulgarization_fr,
+    vulgarization_en,
     is_stub: row.is_stub === 1,
     stub_reason: row.stub_reason,
   };

@@ -62,13 +62,14 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
     };
   }
 
-  // briefMetaTitle / briefMetaDescription are FR-only today; per S7.3-residual
-  // Lot 1 the bilingualisation of brief metadata is deferred to S7.4 (DB
-  // schema extension). We keep the FR strings on /en/ for now — better than
-  // synthesising EN from sharpened.title (formal Nature-paper register).
-  const title = briefMetaTitle(brief);
-  const description = briefMetaDescription(brief);
-  const ogDescription = briefOgDescription(brief);
+  // S7.4 Phase 3: briefMeta* helpers now accept the active locale and
+  // prefer ``vulgarization_en`` when present. Briefs that have not yet
+  // been backfilled to EN fall back to the FR payload — by design, so a
+  // freshly published brief still has SEO metadata even before the
+  // translation script has run.
+  const title = briefMetaTitle(brief, locale);
+  const description = briefMetaDescription(brief, locale);
+  const ogDescription = briefOgDescription(brief, locale);
   const url = `${SITE_URL}/${locale}/briefs/${brief.brief_id}`;
 
   return {
