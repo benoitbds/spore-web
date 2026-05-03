@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { api, ApiError } from '@/lib/api';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -13,6 +14,7 @@ type State =
 
 export default function AnthologyClient() {
   const router = useRouter();
+  const t = useTranslations('anthologyPage');
   const [email, setEmail] = useState('');
   const [state, setState] = useState<State>({ kind: 'idle' });
 
@@ -20,7 +22,7 @@ export default function AnthologyClient() {
     e.preventDefault();
     const trimmed = email.trim().toLowerCase();
     if (!EMAIL_RE.test(trimmed)) {
-      setState({ kind: 'error', message: "Format d'email invalide." });
+      setState({ kind: 'error', message: t('form_errorInvalidEmail') });
       return;
     }
 
@@ -29,7 +31,7 @@ export default function AnthologyClient() {
       await api.requestAnthology({ email: trimmed });
       router.push('/anthology/sent');
     } catch (err) {
-      const fallback = "Une erreur est survenue. Réessayez dans un instant.";
+      const fallback = t('form_errorFallback');
       const msg =
         err instanceof ApiError
           ? typeof err.message === 'string' && err.message.length > 0
@@ -51,7 +53,7 @@ export default function AnthologyClient() {
         htmlFor="anthology-email"
         className="mb-2 block text-xs font-medium uppercase tracking-widest text-emerald-glow"
       >
-        Recevoir l&apos;anthologie par email
+        {t('form_label')}
       </label>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
         <input
@@ -62,7 +64,7 @@ export default function AnthologyClient() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={isBusy}
-          placeholder="votre@email.fr"
+          placeholder={t('form_emailPlaceholder')}
           className="flex-1 rounded-xl border border-ink-500 bg-ink-900/60 px-4 py-3 text-sm text-mist-100 placeholder:text-mist-500 focus:border-emerald-bio/60 focus:outline-none focus:ring-1 focus:ring-emerald-bio/40 disabled:opacity-60"
         />
         <button
@@ -70,7 +72,7 @@ export default function AnthologyClient() {
           disabled={isBusy}
           className="rounded-xl bg-emerald-bio px-5 py-3 text-sm font-semibold text-ink-900 transition-colors hover:bg-emerald-glow disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isBusy ? 'Envoi en cours…' : "Recevoir l'anthologie"}
+          {isBusy ? t('form_buttonLoading') : t('form_buttonIdle')}
         </button>
       </div>
 
@@ -81,9 +83,7 @@ export default function AnthologyClient() {
       </div>
 
       <p className="mt-4 text-[11px] leading-relaxed text-mist-500">
-        En soumettant votre email vous serez aussi pré-inscrit à la newsletter
-        SPORE (1 à 2 emails par mois). Désinscription en 1 clic à tout
-        moment. Conformité RGPD.
+        {t('form_privacyNote')}
       </p>
     </form>
   );
