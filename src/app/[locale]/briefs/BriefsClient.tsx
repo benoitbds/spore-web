@@ -24,6 +24,8 @@ interface Props {
  *   - hypothesis formulations (formal_statement, original, brief)
  *   - FR vulgarisation (imagine_that, why_it_matters, reviewers_say,
  *     concretely.phase1/2/3)
+ *   - EN vulgarisation, same five sections (S7.4 Phase 2 backfill) so
+ *     search matches in either language regardless of page locale
  *   - sharpened technical text (theoretical_framework, mechanism
  *     causal_chain + assumptions + known unknowns, prediction
  *     statements, variable names)
@@ -42,6 +44,7 @@ interface Props {
  */
 function briefHaystack(b: Brief): string {
   const v = b.vulgarization_fr;
+  const ve = b.vulgarization_en;
   const s = b.sharpened;
   const mech = s?.proposed_mechanism;
   const concretely = v?.concretely;
@@ -107,6 +110,18 @@ function briefHaystack(b: Brief): string {
     concretely?.phase1,
     concretely?.phase2,
     concretely?.phase3,
+    // EN vulgarisation narrative — indexed alongside FR so search
+    // matches whichever locale the user is typing in. Same brief turns
+    // up via "metalloproteins" (EN) or "métalloprotéines" (FR).
+    ve?.title,
+    ve?.hypothesis_in_brief,
+    ve?.imagine_that,
+    ve?.why_it_matters,
+    ve?.reviewers_say,
+    ve?.concretely?.intro,
+    ve?.concretely?.phase1,
+    ve?.concretely?.phase2,
+    ve?.concretely?.phase3,
     // Sharpened — mechanism prose + framework + predictions
     s?.theoretical_framework,
     ...(mech?.causal_chain ?? []),
