@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   /** Text used as the share message on X and the visible label. */
@@ -17,6 +18,7 @@ interface Props {
  * touch target of 44×44px via p-2.5 on a 24px icon.
  */
 export default function ShareButtons({ title, url, className = '' }: Props) {
+  const t = useTranslations('share');
   const [copied, setCopied] = useState(false);
 
   const resolveUrl = () => {
@@ -56,13 +58,13 @@ export default function ShareButtons({ title, url, className = '' }: Props) {
   return (
     <div className={`flex flex-wrap items-center gap-2 ${className}`}>
       <span className="mr-1 text-[11px] uppercase tracking-widest text-mist-500">
-        Partager
+        {t('label')}
       </span>
 
-      <button type="button" onClick={onCopy} className={btn} aria-label="Copier le lien">
+      <button type="button" onClick={onCopy} className={btn} aria-label={t('copyLink')}>
         <IconLink className="h-4 w-4" />
         <span className="hidden sm:inline">
-          {copied ? 'Lien copié ✓' : 'Copier le lien'}
+          {copied ? t('linkCopied') : t('copyLink')}
         </span>
       </button>
 
@@ -71,7 +73,7 @@ export default function ShareButtons({ title, url, className = '' }: Props) {
         target="_blank"
         rel="noopener noreferrer"
         className={btn}
-        aria-label="Partager sur X"
+        aria-label={t('shareOnX')}
       >
         <IconX className="h-4 w-4" />
         <span className="hidden sm:inline">X</span>
@@ -82,7 +84,7 @@ export default function ShareButtons({ title, url, className = '' }: Props) {
         target="_blank"
         rel="noopener noreferrer"
         className={btn}
-        aria-label="Partager sur LinkedIn"
+        aria-label={t('shareOnLinkedIn')}
       >
         <IconLinkedIn className="h-4 w-4" />
         <span className="hidden sm:inline">LinkedIn</span>
