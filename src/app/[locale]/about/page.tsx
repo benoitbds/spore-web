@@ -144,7 +144,13 @@ export default async function AboutPage({
       </Section>
 
       <Section title={t('section5_title')}>
-        <P>{t('section5_p1')}</P>
+        <P>
+          {t('section5_p1_a')}
+          <em>{t('section5_p1_em1')}</em>
+          {t('section5_p1_b')}
+          <em>{t('section5_p1_em2')}</em>
+          {t('section5_p1_c')}
+        </P>
         <P>{t('section5_p2')}</P>
       </Section>
 

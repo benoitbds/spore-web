@@ -128,7 +128,7 @@
     "section1_legal_label": "Legal status",
     "section1_legal_value": "SoBaq — micro-entreprise registered May 2026.",
     "section2_title": "Why SPORE exists",
-    "section2_p1": "The most disruptive scientific advances often arise at the intersection of distant domains. Penicillin (microbiology × mould chemistry), CRISPR (bacterial immunology × genome editing), PageRank (academic citations × linear algebra), AlphaFold (bioinformatics × deep learning) — each one a case where the meeting of distant disciplines yielded an advance no isolated field would have formulated.",
+    "section2_p1": "The most disruptive scientific advances often arise at the intersection of distant domains. Penicillin (microbiology × mould chemistry), CRISPR (bacterial immunology × genome editing), PageRank (academic citations × linear algebra), AlphaFold (bioinformatics × deep learning) — each one born from the meeting of distant disciplines, yielding advances no isolated field could have produced.",
     "section2_p2_before": "SPORE rests on a wager: to automate the ",
     "section2_p2_em": "detection",
     "section2_p2_after": " of these unexplored intersections. Not to replace scientific work — an LLM does not run experiments and validates nothing against the real — but to generate, continuously, the plausible bridges no one has had the time or reflex to formulate. A structured serendipity engine.",
@@ -148,12 +148,16 @@
     "section4_b2_strong": "Not a public-facing science media outlet",
     "section4_b2_after": ". The French vulgarisation layer aids diffusion, but the product addresses primarily researchers, R&D engineers, working polymaths, and PhD students.",
     "section4_b3_strong": "Not a peer-reviewed scientific publication",
-    "section4_b3_after": ". Each brief carries a badge: « AI-generated hypothesis · Pre-publication · To be tested experimentally ». This is the epistemically correct stance.",
+    "section4_b3_after": ". Each brief carries a badge: \"AI-generated hypothesis · Pre-publication · To be tested experimentally\". This is the epistemically correct stance.",
     "section4_b4_strong": "Not a funded or affiliated project",
     "section4_b4_after": ". No badge, no oversight, no hidden agenda. Just a curious developer who believes analogical thinking can be tooled.",
     "section5_title": "Acknowledged limitations",
-    "section5_p1": "SPORE crosses texts about science, not science itself. The scientific literature is a filtered, delayed, and socially constructed representation of reality. SPORE can identify gaps in the scientific discourse, not in nature. The bridges it produces are plausible in a linguistic sense — not necessarily productive in an experimental one. This distinction is central, and SPORE owns it.",
-    "section5_p2": "The five AI reviewers do not constitute independent validation: they are projections of the same representational space as the generator. They detect internal inconsistencies, not contradiction by reality. The only validation that matters is experimental, and it lies beyond SPORE's perimeter.",
+    "section5_p1_a": "SPORE crosses texts about science, not science itself. The scientific literature is a filtered, delayed, and socially constructed representation of reality. SPORE can identify gaps in the scientific discourse, not in nature. The bridges it produces are ",
+    "section5_p1_em1": "plausible",
+    "section5_p1_b": " in a linguistic sense — not necessarily ",
+    "section5_p1_em2": "productive",
+    "section5_p1_c": " in an experimental one. This distinction is central, and SPORE owns it.",
+    "section5_p2": "The five AI reviewers do not constitute independent validation: they are projections of the same linguistic representational space as the generator. They detect internal inconsistencies, not empirical contradiction. The only validation that matters is experimental, and it lies beyond SPORE's perimeter.",
     "section6_title": "How to support the project",
     "section6_intro": "SPORE is free during the launch phase. In the longer term:",
     "section6_b1_strong": "Single brief €9",
@@ -184,7 +188,7 @@
     "novelty_what_text": "an estimate, by the LLM itself, of how original the formulated hypothesis is relative to the recent scientific literature found through Semantic Scholar.",
     "novelty_how_label": "How it is produced",
     "novelty_how_textBefore": "after querying the Semantic Scholar API on the hypothesis's keywords, SPORE submits the full set of papers returned to the LLM (DeepSeek or Claude depending on the stage) with an explicit instruction: ",
-    "novelty_how_quote": "« assess how novel this hypothesis is against what already exists »",
+    "novelty_how_quote": "\"assess how novel this hypothesis is against what already exists\"",
     "novelty_how_textAfter": ". The LLM returns a score between 0 and 1 and a categorical verdict ",
     "novelty_how_verdicts": "(novel · incremental · already_explored · already_proven)",
     "novelty_how_period": ".",
@@ -193,12 +197,12 @@
     "novelty_limits_title": "Acknowledged limitations",
     "novelty_limit1": "The score reflects the LLM's self-evaluation bias (a tendency to overrate its own outputs, or to underrate them when trained for caution).",
     "novelty_limit2": "The temporal window of comparison depends on the Semantic Scholar results and is not strictly bounded.",
-    "novelty_limit3": "A « rediscovered » concept that has existed for 30 years but does not appear in the Semantic Scholar top 10 may be scored as novel.",
+    "novelty_limit3": "A \"rediscovered\" concept that has existed for 30 years but does not appear in the Semantic Scholar top 10 may be scored as novel.",
     "novelty_limit4": "The mean score observed across published briefs is 0.80 — this is a signal of systematic over-evaluation, not a neutral measurement.",
     "novelty_read_label": "How to read it",
     "novelty_read_textBefore": "use the novelty score as a ",
     "novelty_read_em": "relative",
-    "novelty_read_textAfter": " indicator (this hypothesis seems more novel than that one, according to the model), not as an absolute measure. To assess the genuine novelty of a hypothesis, read the « Novelty assessment » section of the brief, which lists the closest existing works identified.",
+    "novelty_read_textAfter": " indicator (this hypothesis seems more novel than that one, according to the model), not as an absolute measure. To assess the genuine novelty of a hypothesis, read the \"Novelty assessment\" section of the brief, which lists the closest existing works identified.",
     "novelty_planned_label": "Planned evolution",
     "novelty_planned_textBefore": "a future sprint (referenced in the backlog as ",
     "novelty_planned_code": "N2.7-bis",
@@ -207,7 +211,7 @@
     "panel_what_label": "What it is",
     "panel_what_text": "the weighted average of the individual scores given by the five AI reviewers of the post-publication panel.",
     "panel_how_label": "How it is produced",
-    "panel_how_textBefore": "each reviewer (Methodologist, Domain expert, Devil's advocate, Industrial reviewer, Funding strategist) attaches a score out of 10 according to its own criteria, accompanied by a categorical verdict ",
+    "panel_how_textBefore": "each reviewer (Methodologist, Domain expert, Devil's advocate, Industry reviewer, Funding strategist) attaches a score out of 10 according to its own criteria, accompanied by a categorical verdict ",
     "panel_how_verdicts": "(strong_accept · accept · weak_accept · weak_reject · reject)",
     "panel_how_textAfter": " and a confidence rating (0 to 1). The ",
     "panel_how_code": "consensus_score",
@@ -291,11 +295,69 @@
     "principle2_title": "Zero bibliographic hallucination",
     "principle2_desc": "Every reference is verified through Semantic Scholar. If a DOI does not resolve, it is dropped. Citations are the foundation.",
     "principle3_title": "Five reviewers, five perspectives",
-    "principle3_desc": "Methodologist, domain expert, devil's advocate, industrial reviewer, funding strategist. No blind spot. Every doubt is voiced.",
+    "principle3_desc": "Methodologist, domain expert, devil's advocate, industry reviewer, funding strategist. No blind spot. Every doubt is voiced.",
     "methodologyPointer_before": "For a detailed account of how each metric is computed — including its limits — see the ",
     "methodologyPointer_link": "Methodology page",
     "methodologyPointer_after": ".",
     "ctaPrompt": "Ready to explore?",
-    "ctaButton": "Browse the briefs →"
+    "ctaButton": "Browse the briefs →",
+    "postFireBadge": "Post 🔥",
+    "steps": {
+      "collision": {
+        "title": "Collision",
+        "description": "500 scientific domains. A random draw collides two of them.",
+        "metric": "~100 collisions/day"
+      },
+      "gate": {
+        "title": "Filter",
+        "description": "A filter rejects trivial or already-explored pairs.",
+        "metric": "30-60% pass"
+      },
+      "synthesis": {
+        "title": "Synthesis",
+        "description": "An LLM generates a causal bridge between the two domains.",
+        "metric": "~70% bridges"
+      },
+      "critics": {
+        "title": "Critique",
+        "description": "A devil's advocate and an angel's advocate debate.",
+        "metric": "5 scores produced"
+      },
+      "curator": {
+        "title": "Selection",
+        "description": "Top 15% retained on composite score.",
+        "metric": "Top 15%"
+      },
+      "reviewer": {
+        "title": "Review",
+        "description": "Calibrated verdict: rejected / interesting / to test 🔥.",
+        "metric": "~15-20% 🔥"
+      },
+      "literature_grounding": {
+        "title": "Literature grounding",
+        "description": "8-12 Semantic Scholar queries. Zero hallucination — every DOI is verified.",
+        "metric": "5+ references"
+      },
+      "hypothesis_sharpening": {
+        "title": "Hypothesis sharpening",
+        "description": "Rigorous formulation with variables, quantitative predictions, H0, statistical tests.",
+        "metric": ""
+      },
+      "protocol": {
+        "title": "Protocol",
+        "description": "Three phases: in silico (€0-2k) → minimal (€2-15k) → full (€15-200k).",
+        "metric": ""
+      },
+      "panel": {
+        "title": "Panel (5 reviewers)",
+        "description": "Methodologist, domain expert, devil's advocate, industry reviewer, funding strategist.",
+        "metric": ""
+      },
+      "research_brief": {
+        "title": "Research brief",
+        "description": "Publication-ready document of 4-6 pages. Markdown + JSON.",
+        "metric": ""
+      }
+    }
   }
 }
