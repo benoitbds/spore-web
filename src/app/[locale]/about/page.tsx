@@ -1,80 +1,82 @@
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { SITE_URL } from '@/lib/seo';
+import { localeAlternates } from '@/lib/i18n-seo';
 
-const _title = 'À propos — SPORE';
-const _desc =
-  "SPORE est développé par Benoît Baqué de Sariac, ingénieur basé à Nantes. " +
-  "Solo developer, side project transparent, micro-entreprise SoBaq. " +
-  "Découvrez la démarche derrière ce moteur d'hypothèses scientifiques " +
-  'interdisciplinaires.';
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'aboutPage' });
+  const title = t('metaTitle');
+  const desc = t('metaDescription');
+  return {
+    title,
+    description: desc,
+    alternates: localeAlternates(locale, '/about'),
+    openGraph: {
+      title: `${title} — SPORE`,
+      description: desc,
+      url: `${SITE_URL}/${locale}/about`,
+      type: 'article',
+      locale: locale === 'fr' ? 'fr_FR' : 'en_US',
+      images: [
+        {
+          url: '/og-default.png',
+          width: 1200,
+          height: 630,
+          alt: 'SPORE',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} — SPORE`,
+      description: desc,
+      images: ['/og-default.png'],
+    },
+  };
+}
 
-export const metadata: Metadata = {
-  title: 'À propos',
-  description: _desc,
-  alternates: { canonical: '/about' },
-  openGraph: {
-    title: _title,
-    description: _desc,
-    url: `${SITE_URL}/about`,
-    type: 'article',
-    locale: 'fr_FR',
-    images: [
-      {
-        url: '/og-default.png',
-        width: 1200,
-        height: 630,
-        alt: 'SPORE — Le moteur d\'hypothèses interdisciplinaires',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: _title,
-    description: _desc,
-    images: ['/og-default.png'],
-  },
-};
+export default async function AboutPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'aboutPage' });
 
-export default function AboutPage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-16 md:py-24">
       <header className="mb-12">
         <span className="mb-4 inline-block text-xs uppercase tracking-[0.3em] text-emerald-glow">
-          Le projet
+          {t('kicker')}
         </span>
         <h1 className="font-display text-4xl leading-tight text-mist-100 md:text-6xl">
-          À propos de SPORE
+          {t('title')}
         </h1>
       </header>
 
-      <Section title="Qui est derrière ce projet">
+      <Section title={t('section1_title')}>
         <P>
-          SPORE est conçu, développé et opéré par{' '}
-          <Strong>Benoît Baqué de Sariac</Strong> depuis Nantes. Solo developer,
-          ingénieur de formation, polymathe par tempérament. Side project
-          structuré, hébergé et maintenu en autonomie.
+          {t('section1_p1_before')}
+          <Strong>{t('section1_p1_lead')}</Strong>
+          {t('section1_p1_after')}
         </P>
-        <P>
-          Pas d&apos;équipe, pas de levée de fonds, pas de label institutionnel.
-          Une seule personne qui code, lit, ajuste les prompts, paie le serveur,
-          et regarde les hypothèses sortir. Cette transparence est constitutive
-          du projet : SPORE revendique une rigueur scientifique, et la rigueur
-          commence par dire qui parle.
-        </P>
-        <P>
-          Si vous souhaitez échanger sur le projet, proposer un retour, signaler
-          une erreur, ou imaginer une collaboration : un email suffit.
-        </P>
+        <P>{t('section1_p2')}</P>
+        <P>{t('section1_p3')}</P>
         <ul className="mt-6 space-y-2 text-sm text-mist-300">
           <li>
-            <Strong>Contact</Strong> :{' '}
+            <Strong>{t('section1_contact_label')}</Strong> :{' '}
             <A href="mailto:benoit@spore-research.com">
               benoit@spore-research.com
             </A>
           </li>
           <li>
-            <Strong>Code source (frontend)</Strong> :{' '}
+            <Strong>{t('section1_source_label')}</Strong> :{' '}
             <A
               href="https://github.com/benoitbds/spore-web"
               target="_blank"
@@ -84,168 +86,113 @@ export default function AboutPage() {
             </A>
           </li>
           <li>
-            <Strong>Statut juridique</Strong> : SoBaq — micro-entreprise
-            enregistrée en mai 2026.
+            <Strong>{t('section1_legal_label')}</Strong> :{' '}
+            {t('section1_legal_value')}
           </li>
         </ul>
       </Section>
 
-      <Section title="Pourquoi SPORE existe">
+      <Section title={t('section2_title')}>
+        <P>{t('section2_p1')}</P>
         <P>
-          Les découvertes scientifiques les plus disruptives naissent souvent à
-          l&apos;intersection de domaines éloignés. La pénicilline
-          (microbiologie × chimie des moisissures), CRISPR (immunologie
-          bactérienne × édition génomique), PageRank (citations académiques ×
-          algèbre linéaire), AlphaFold (bioinformatique × deep learning) —
-          autant de cas où la rencontre entre disciplines distantes a produit
-          une avancée qu&apos;aucune discipline isolée n&apos;aurait formulée.
-        </P>
-        <P>
-          SPORE part d&apos;un pari : automatiser la <em>détection</em> de ces
-          intersections non-explorées. Pas pour remplacer le travail
-          scientifique — un LLM ne fait pas d&apos;expériences, ne valide rien
-          par le réel — mais pour générer en continu les ponts plausibles que
-          personne n&apos;a encore eu le temps ou le réflexe de formuler. Un
-          moteur de sérendipité structurée.
+          {t('section2_p2_before')}
+          <em>{t('section2_p2_em')}</em>
+          {t('section2_p2_after')}
         </P>
       </Section>
 
-      <Section title="Ce que SPORE fait, concrètement">
-        <P>À chaque cycle, le système :</P>
+      <Section title={t('section3_title')}>
+        <P>{t('section3_intro')}</P>
         <ol className="mb-6 space-y-3 text-mist-300">
-          <Step n={1}>
-            Tire au sort deux domaines scientifiques parmi 500 (sourcés
-            OpenAlex)
-          </Step>
-          <Step n={2}>
-            Génère via LLM (DeepSeek + Claude) un pont causal hypothétique entre
-            les deux
-          </Step>
-          <Step n={3}>
-            Soumet ce pont à un pipeline de critique : avocat du diable,
-            méthodologue, expert du domaine, panel de 5 reviewers IA
-          </Step>
-          <Step n={4}>
-            Vérifie chaque référence bibliographique via l&apos;API Semantic
-            Scholar (zéro hallucination tolérée)
-          </Step>
-          <Step n={5}>
-            Publie le résultat sous forme de brief structuré : hypothèse
-            formelle, protocole expérimental en 3 phases avec critères GO/NO-GO
-            chiffrés, prédictions falsifiables, base de preuves cliquable
-          </Step>
+          <Step n={1}>{t('section3_step1')}</Step>
+          <Step n={2}>{t('section3_step2')}</Step>
+          <Step n={3}>{t('section3_step3')}</Step>
+          <Step n={4}>{t('section3_step4')}</Step>
+          <Step n={5}>{t('section3_step5')}</Step>
         </ol>
         <P>
-          Sur 2095 collisions explorées, 38 briefs publiés. Le taux de rejet
-          (98,2%) est public et assumé. Le coût moyen par brief est de $0.51,
-          pour un total cumulé de $19.49 — chiffres consultables en temps réel
-          sur la <Link href="/stats" className="text-emerald-glow underline-offset-2 hover:underline">page Statistiques</Link>.
+          {t('section3_outro_before')}
+          <Link
+            href="/stats"
+            className="text-emerald-glow underline-offset-2 hover:underline"
+          >
+            {t('section3_outro_link')}
+          </Link>
+          {t('section3_outro_after')}
         </P>
       </Section>
 
-      <Section title="Ce que SPORE n'est pas">
+      <Section title={t('section4_title')}>
         <ul className="space-y-4 text-mist-300">
           <Bullet>
-            <Strong>Pas un outil de découverte scientifique</Strong> au sens
-            classique. SPORE produit des hypothèses, pas des résultats. Les
-            hypothèses doivent être confrontées au réel par des chercheurs
-            humains.
+            <Strong>{t('section4_b1_strong')}</Strong>
+            {t('section4_b1_after')}
           </Bullet>
           <Bullet>
-            <Strong>Pas un media de vulgarisation grand public</Strong>. La
-            couche de vulgarisation française aide à la diffusion, mais le
-            produit s&apos;adresse principalement aux chercheurs, ingénieurs
-            R&amp;D, polymathes professionnels et étudiants en thèse.
+            <Strong>{t('section4_b2_strong')}</Strong>
+            {t('section4_b2_after')}
           </Bullet>
           <Bullet>
-            <Strong>Pas une publication scientifique validée par des pairs</Strong>.
-            Chaque brief porte un badge «&nbsp;Hypothèse générée par IA ·
-            Pré-publication · À tester expérimentalement&nbsp;». C&apos;est la
-            position épistémiquement correcte.
+            <Strong>{t('section4_b3_strong')}</Strong>
+            {t('section4_b3_after')}
           </Bullet>
           <Bullet>
-            <Strong>Pas un projet financé ou affilié</Strong>. Pas de label, pas
-            de tutelle, pas d&apos;agenda caché. Juste un développeur curieux
-            qui pense qu&apos;on peut outiller la pensée analogique.
+            <Strong>{t('section4_b4_strong')}</Strong>
+            {t('section4_b4_after')}
           </Bullet>
         </ul>
       </Section>
 
-      <Section title="Limites assumées">
-        <P>
-          SPORE croise des <em>textes</em> sur la science, pas la science
-          elle-même. La littérature scientifique est une représentation filtrée,
-          retardée et socialement construite du réel. SPORE peut identifier des
-          lacunes dans le discours scientifique, pas dans la nature. Les ponts
-          générés sont <em>plausibles</em> au sens linguistique — pas
-          nécessairement <em>féconds</em> au sens expérimental. Cette
-          distinction est centrale et SPORE l&apos;assume.
-        </P>
-        <P>
-          Le panel de 5 reviewers IA ne constitue pas une validation
-          indépendante : ce sont des projections du même espace de
-          représentation que le générateur. Ils détectent les incohérences
-          internes, pas la contradiction du réel. La seule validation qui compte
-          est expérimentale, et elle dépasse le périmètre de SPORE.
-        </P>
+      <Section title={t('section5_title')}>
+        <P>{t('section5_p1')}</P>
+        <P>{t('section5_p2')}</P>
       </Section>
 
-      <Section title="Comment soutenir le projet">
-        <P>SPORE est gratuit pendant la phase de lancement. À terme :</P>
+      <Section title={t('section6_title')}>
+        <P>{t('section6_intro')}</P>
         <ul className="mb-6 space-y-3 text-mist-300">
           <Bullet>
-            <Strong>Brief unitaire 9€</Strong> — paiement à l&apos;acte, accès
-            illimité au brief acheté.
+            <Strong>{t('section6_b1_strong')}</Strong>
+            {t('section6_b1_after')}
           </Bullet>
           <Bullet>
-            <Strong>Abonnement thématique 15€/mois</Strong> — 5 briefs/mois sur
-            les domaines de votre choix (en préparation, prévu juin 2026).
+            <Strong>{t('section6_b2_strong')}</Strong>
+            {t('section6_b2_after')}
           </Bullet>
           <Bullet>
-            <Strong>Collision sur mesure 25€</Strong> — vous proposez deux
-            domaines, SPORE génère une hypothèse inédite avec protocole et
-            bibliographie en 24h. Première collision offerte pendant le
-            lancement.
+            <Strong>{t('section6_b3_strong')}</Strong>
+            {t('section6_b3_after')}
           </Bullet>
           <Bullet>
-            <Strong>Recevoir l&apos;anthologie SPORE</Strong> — un PDF gratuit
-            des 8 meilleures hypothèses des 6 premiers mois, livré par email{' '}
+            <Strong>{t('section6_b4_strong')}</Strong>
+            {t('section6_b4_middle')}
             <Link
               href="/anthology"
               className="text-emerald-glow underline-offset-2 hover:underline"
             >
-              ici
+              {t('section6_b4_link')}
             </Link>
-            .
+            {t('section6_b4_after')}
           </Bullet>
         </ul>
         <P>
-          Pour les équipes de recherche ou R&amp;D corporate intéressées par une
-          intégration sur mesure : un email à{' '}
+          {t('section6_outro_before')}
           <A href="mailto:benoit@spore-research.com">
             benoit@spore-research.com
-          </A>{' '}
-          suffit pour démarrer la conversation.
+          </A>
+          {t('section6_outro_after')}
         </P>
       </Section>
 
-      <Section title="Une dernière chose">
+      <Section title={t('section7_title')}>
         <blockquote className="my-6 border-l-2 border-emerald-bio/60 pl-6 font-display text-xl italic text-mist-100 md:text-2xl">
-          Une hypothèse nulle bien documentée vaut mieux qu&apos;une fausse
-          promesse d&apos;unification.
+          {t('section7_quote')}
         </blockquote>
-        <P>
-          C&apos;est la phrase qui guide SPORE. Le succès n&apos;est pas mesuré
-          au nombre de briefs publiés, mais à la qualité des hypothèses
-          générées et à l&apos;honnêteté de leur statut. Chaque brief est une
-          proposition exploratoire, livrée avec ses doutes intacts.
-        </P>
+        <P>{t('section7_p1')}</P>
       </Section>
 
       <hr className="my-12 border-ink-500/50" />
-      <p className="text-xs italic text-mist-500">
-        Page mise à jour : mai 2026.
-      </p>
+      <p className="text-xs italic text-mist-500">{t('footer')}</p>
     </div>
   );
 }
@@ -268,9 +215,7 @@ function Section({
 }
 
 function P({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="mb-4 text-mist-300 leading-relaxed">{children}</p>
-  );
+  return <p className="mb-4 text-mist-300 leading-relaxed">{children}</p>;
 }
 
 function Strong({ children }: { children: React.ReactNode }) {

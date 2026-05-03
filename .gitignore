@@ -31,3 +31,4 @@ next-env.d.ts
 # Generated lead-magnet artifact (N4.2) — produced on prod by
 # scripts/generate_anthology.py in spore-poc. Not tracked.
 public/downloads/
+S7-3-bis-translation-notes.md
