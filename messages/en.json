@@ -71,6 +71,37 @@
     "tooltipLink": "see Methodology",
     "tooltipAria": "How is the Novelty score computed?"
   },
+  "auth": {
+    "signIn": "Sign in",
+    "myAccount": "My account",
+    "signOut": "Sign out",
+    "connected": "Signed in",
+    "freeAccess": "✨ Free access",
+    "connectionHeadline": "Sign in",
+    "connectionSubtext": "A magic link will be sent to your inbox.",
+    "connectionCta": "Receive the link"
+  },
+  "share": {
+    "label": "Share",
+    "copyLink": "Copy link",
+    "linkCopied": "Link copied ✓",
+    "shareOnX": "Share on X",
+    "shareOnLinkedIn": "Share on LinkedIn"
+  },
+  "verdicts": {
+    "publish_brief": "Published",
+    "revise_and_resubmit": "Revise and resubmit",
+    "reject": "Rejected",
+    "killed": "Discontinued",
+    "strong_accept": "Strong accept",
+    "accept": "Accept",
+    "weak_accept": "Weak accept",
+    "weak_reject": "Weak reject",
+    "novel": "Novel",
+    "incremental": "Incremental",
+    "already_explored": "Already explored",
+    "already_proven": "Already proven"
+  },
   "newsletter": {
     "headingFull": "Receive the next SPORE hypotheses",
     "subtitleFull": "Once or twice a month, in your inbox. No spam, one-click unsubscribe.",
@@ -82,6 +113,11 @@
     "errorInvalidEmail": "Invalid email format.",
     "errorFallback": "Something went wrong. Please try again in a moment.",
     "privacyNote": "Your data stays private. No third-party sharing. GDPR-compliant."
+  },
+  "briefCard": {
+    "novelty": "novelty",
+    "read": "Read →",
+    "nonProductive": "Not productive"
   },
   "brief": {
     "tabUnderstand": "💡 Understand",
@@ -179,7 +215,8 @@
     "pageIntroAccent": "5 AI reviewers",
     "pageIntroAfter": ", grounded on Semantic Scholar.",
     "ctaHeadline": "Have a specific domain in mind?",
-    "ctaSubtext": "Request a custom collision — free during launch. Pick one or two domains, SPORE delivers a complete brief (hypothesis, protocol, panel of 5 reviewers) in minutes."
+    "ctaSubtext": "Request a custom collision — free during launch. Pick one or two domains, SPORE delivers a complete brief (hypothesis, protocol, panel of 5 reviewers) in minutes.",
+    "ctaButton": "Request a custom collision →"
   },
   "briefDetailPage": {
     "tabUnderstand": "💡 Understand",
@@ -199,7 +236,13 @@
     "publishedOn": "Published on",
     "generatedOn": "Generated on",
     "previousBrief": "Previous brief",
-    "nextBrief": "Next brief"
+    "nextBrief": "Next brief",
+    "backToList": "All briefs",
+    "notFoundTitle": "Brief not found",
+    "neighborsAria": "Brief navigation",
+    "customCtaHeadline": "Inspired by this collision?",
+    "customCtaSubtext": "Request your own on a domain of your choice — free during launch. SPORE crosses your domains, generates a hypothesis, and delivers a complete brief in minutes.",
+    "customCtaButton": "Request my collision →"
   },
   "aboutPage": {
     "metaTitle": "About",
