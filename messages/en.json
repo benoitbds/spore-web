@@ -233,13 +233,17 @@
     "topUp": "Top up"
   },
   "protocol": {
+    "timeline": "Timeline:",
     "budget": "Budget:",
     "phase": "Phase {n}",
     "cost": "Cost",
     "duration": "Duration",
     "go": "GO:",
     "noGo": "NO-GO:",
-    "quickStart": "🚀 Quick start"
+    "quickStart": "🚀 Quick start",
+    "phaseLabel_1": "In Silico",
+    "phaseLabel_2": "Minimal",
+    "phaseLabel_3": "Full protocol"
   },
   "reviewerPanel": {
     "consensus": "Consensus",

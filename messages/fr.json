@@ -233,13 +233,17 @@
     "topUp": "Recharger"
   },
   "protocol": {
+    "timeline": "Calendrier :",
     "budget": "Budget :",
     "phase": "Phase {n}",
     "cost": "Coût",
     "duration": "Durée",
     "go": "GO :",
     "noGo": "NO-GO :",
-    "quickStart": "🚀 Démarrage rapide"
+    "quickStart": "🚀 Démarrage rapide",
+    "phaseLabel_1": "In Silico",
+    "phaseLabel_2": "Minimal",
+    "phaseLabel_3": "Protocole complet"
   },
   "reviewerPanel": {
     "consensus": "Consensus",
