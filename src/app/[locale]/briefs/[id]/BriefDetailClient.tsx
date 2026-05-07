@@ -26,8 +26,7 @@ import type {
   VulgarizationFr,
   VulgarizationEn,
 } from '@/lib/types';
-import { verdictLabel, verdictChipClasses } from '@/lib/verdicts';
-import { label } from '@/lib/labels';
+import { verdictChipClasses } from '@/lib/verdicts';
 import { SITE_URL } from '@/lib/seo';
 import { useAuth } from '@/contexts/AuthContext';
 import { api, ApiError, type FullBriefResponse } from '@/lib/api';
@@ -356,49 +355,29 @@ function RecherchePreview({ teaser }: { teaser: BriefTeaser }) {
   );
 }
 
-const TOC_ITEMS: ReadonlyArray<{ icon: string; label: string; sub: string }> = [
-  {
-    icon: '🧩',
-    label: 'Hypothèse et mécanisme',
-    sub: 'Chaîne causale, hypothèses clés, inconnues résiduelles',
-  },
-  {
-    icon: '📚',
-    label: 'État de l\'art',
-    sub: 'Références vérifiées + contre-preuves (DOIs)',
-  },
-  {
-    icon: '🔮',
-    label: 'Prédictions falsifiables',
-    sub: 'Bornes quantitatives, tests statistiques, H0',
-  },
-  {
-    icon: '🧪',
-    label: 'Protocole expérimental',
-    sub: '3 phases — in silico → minimal → complet',
-  },
-  {
-    icon: '💥',
-    label: 'Analyse d\'impact',
-    sub: 'Nouveauté, lacunes résiduelles, données disponibles',
-  },
-  {
-    icon: '🎭',
-    label: 'Panel de relecture',
-    sub: '5 personas + méta-relecture',
-  },
+// TOC entries map to the briefDetailPage.toc_*_title / toc_*_sub key pairs.
+// The icon stays in the array; the labels resolve via translations at
+// render time so /en gets EN, /fr stays FR.
+const TOC_ITEMS: ReadonlyArray<{ icon: string; key: string }> = [
+  { icon: '🧩', key: 'hypothesis' },
+  { icon: '📚', key: 'stateOfArt' },
+  { icon: '🔮', key: 'predictions' },
+  { icon: '🧪', key: 'protocol' },
+  { icon: '💥', key: 'impactAnalysis' },
+  { icon: '🎭', key: 'panel' },
 ];
 
 function BriefToc() {
+  const t = useTranslations('briefDetailPage');
   return (
     <section>
       <h3 className="mb-4 text-xs font-medium uppercase tracking-widest text-emerald-glow">
-        Table des matières du brief complet
+        {t('toc_title')}
       </h3>
       <ul className="space-y-2">
         {TOC_ITEMS.map((item) => (
           <li
-            key={item.label}
+            key={item.key}
             className="flex items-start gap-3 rounded-xl border border-ink-500 bg-ink-800/40 px-4 py-3"
           >
             <span className="mt-0.5 text-xl leading-none" aria-hidden>
@@ -406,9 +385,11 @@ function BriefToc() {
             </span>
             <div>
               <div className="text-sm font-medium text-mist-100">
-                {item.label}
+                {t(`toc_${item.key}_title`)}
               </div>
-              <div className="text-xs text-mist-500">{item.sub}</div>
+              <div className="text-xs text-mist-500">
+                {t(`toc_${item.key}_sub`)}
+              </div>
             </div>
           </li>
         ))}
@@ -425,14 +406,15 @@ function ReferencesPreview({
   total: number;
 }) {
   const shown = refs.length;
+  const t = useTranslations('briefDetailPage');
   return (
     <section>
       <div className="mb-4 flex items-baseline justify-between gap-4">
         <h3 className="text-xs font-medium uppercase tracking-widest text-emerald-glow">
-          Références vérifiées
+          {t('references_title')}
         </h3>
         <span className="text-xs text-mist-500">
-          {shown} sur {total}{total > 1 ? ' références' : ' référence'}
+          {t('references_count', { verified: shown, total })}
         </span>
       </div>
       <ul className="space-y-2">
@@ -464,9 +446,7 @@ function ReferencesPreview({
       </ul>
       {total > shown && (
         <p className="mt-3 text-xs text-mist-500">
-          + {total - shown} autre{total - shown > 1 ? 's' : ''} référence
-          {total - shown > 1 ? 's' : ''} dans le brief complet
-          (contre-preuves incluses).
+          {t('references_more', { count: total - shown })}
         </p>
       )}
     </section>
@@ -478,10 +458,11 @@ function PanelPreview({
 }: {
   reviewers: NonNullable<BriefTeaser['panel_preview']>;
 }) {
+  const t = useTranslations('briefDetailPage');
   return (
     <section>
       <h3 className="mb-4 text-xs font-medium uppercase tracking-widest text-emerald-glow">
-        Scores détaillés du panel
+        {t('panelHeader_title')}
       </h3>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {reviewers.map((r, i) => (
@@ -497,6 +478,16 @@ function PanelPreviewCard({
 }: {
   reviewer: NonNullable<BriefTeaser['panel_preview']>[number];
 }) {
+  const tPersonas = useTranslations('personas');
+  const tVerdicts = useTranslations('verdicts');
+  const safe = (ns: ReturnType<typeof useTranslations>, key: string) => {
+    if (!key) return '—';
+    try {
+      return ns(key);
+    } catch {
+      return key;
+    }
+  };
   const scoreTone =
     reviewer.score >= 7
       ? 'text-emerald-glow'
@@ -507,7 +498,7 @@ function PanelPreviewCard({
     <div className="flex h-full flex-col rounded-xl border border-ink-500 bg-ink-800/40 p-4">
       <div className="mb-2 flex items-baseline justify-between gap-2">
         <span className="text-xs font-medium uppercase tracking-wider text-mist-400">
-          {label(reviewer.persona)}
+          {safe(tPersonas, reviewer.persona)}
         </span>
         <span className={`font-display text-2xl ${scoreTone}`}>
           {reviewer.score.toFixed(1)}
@@ -516,7 +507,7 @@ function PanelPreviewCard({
       <span
         className={`mb-2 inline-block w-fit rounded-full px-2 py-0.5 text-[10px] font-medium ${verdictChipClasses(reviewer.verdict)}`}
       >
-        {verdictLabel(reviewer.verdict)}
+        {safe(tVerdicts, reviewer.verdict)}
       </span>
       {reviewer.key_point && (
         <p className="mt-auto text-xs leading-relaxed text-mist-300 line-clamp-3">
@@ -548,10 +539,11 @@ function PaywallPanel({
   loadState: 'idle' | 'loading' | 'error' | 'payment_required';
   loadError: string | null;
 }) {
+  const t = useTranslations('paywall');
   if (isAuthLoading) {
     return (
       <div className="rounded-2xl border border-ink-500 bg-ink-800/40 p-6 text-sm text-mist-400">
-        Chargement de votre session…
+        {t('loadingSession')}
       </div>
     );
   }
@@ -560,18 +552,18 @@ function PaywallPanel({
     return (
       <div className="space-y-4">
         <EmailGate
-          headline="Accédez au brief scientifique complet — gratuit"
-          subtext="Panel de relecture (5 personas), base de preuves, contre-preuves, protocole expérimental, prédictions falsifiables. Tous les briefs sont gratuits pendant le lancement."
-          cta="Recevoir mon accès"
+          headline={t('headline')}
+          subtext={t('description')}
+          cta={t('cta')}
           next={`/briefs/${briefId}`}
         />
         <p className="text-center text-sm text-mist-500">
-          Déjà un compte ? Utilisez votre dernier lien magique ou{' '}
+          {t('magicLinkPrompt')}{' '}
           <Link
             href={`/auth/verify?next=/briefs/${briefId}`}
             className="text-emerald-glow hover:text-emerald-bio"
           >
-            redemandez un accès
+            {t('requestNewAccess')}
           </Link>
           .
         </p>
@@ -582,9 +574,9 @@ function PaywallPanel({
   // Authenticated → always free during launch
   return (
     <UnlockCta
-      headline="Accédez au brief complet — gratuit"
-      subtext="Hypothèse formalisée, protocole expérimental, panel de review, base de preuves. Tous les briefs sont gratuits pendant le lancement."
-      cta="Télécharger gratuitement"
+      headline={t('unlockHeadline')}
+      subtext={t('unlockDescription')}
+      cta={t('downloadCta')}
       onClick={onUnlock}
       loadState={loadState}
       loadError={loadError}
@@ -607,6 +599,7 @@ function UnlockCta({
   loadState: 'idle' | 'loading' | 'error' | 'payment_required';
   loadError: string | null;
 }) {
+  const t = useTranslations('paywall');
   return (
     <div className="rounded-2xl border border-emerald-bio/40 bg-emerald-bio/5 p-6">
       <h3 className="mb-2 font-display text-xl text-mist-100">{headline}</h3>
@@ -616,7 +609,7 @@ function UnlockCta({
         disabled={loadState === 'loading'}
         className="rounded-xl bg-emerald-bio px-5 py-3 text-sm font-semibold text-ink-900 hover:bg-emerald-glow disabled:opacity-50"
       >
-        {loadState === 'loading' ? 'Chargement…' : cta}
+        {loadState === 'loading' ? t('downloadingShort') : cta}
       </button>
       {loadState === 'error' && (
         <p className="mt-3 text-sm text-red-400" role="alert">
@@ -625,9 +618,9 @@ function UnlockCta({
       )}
       {loadState === 'payment_required' && (
         <p className="mt-3 text-sm text-amber-glow">
-          Votre quota est épuisé.{' '}
+          {t('quotaExhausted')}{' '}
           <Link href="/pricing" className="underline">
-            Recharger
+            {t('topUp')}
           </Link>
           .
         </p>
@@ -654,22 +647,33 @@ function RechercheSections({
   briefId: string;
   lang: Lang;
 }) {
+  const t = useTranslations('briefDetailPage');
+  const tSupport = useTranslations('support_type');
+  const tSeverity = useTranslations('severity');
+  const safe = (ns: ReturnType<typeof useTranslations>, key: string) => {
+    if (!key) return '—';
+    try {
+      return ns(key);
+    } catch {
+      return key;
+    }
+  };
   return (
     <>
       {lang === 'fr' && (
         <div className="rounded-xl border border-amber-bio/30 bg-amber-bio/5 p-4 text-sm text-amber-glow">
-          Traduction non disponible — contenu original en anglais.
+          {t('research_translationNotice')}
         </div>
       )}
 
       <div className="rounded-xl border border-emerald-bio/30 bg-emerald-bio/5 p-4 text-sm text-emerald-glow">
-        ✅ Brief débloqué. Tous les briefs sont gratuits pendant le lancement de SPORE.
+        {t('research_unlocked')}
       </div>
 
       {/* Panel */}
       <section>
         <h2 className="mb-6 font-display text-2xl text-mist-100">
-          Panel de relecture
+          {t('research_panelReview')}
         </h2>
         <ReviewerPanel reviews={panel.reviews} meta={panel.meta_review} />
       </section>
@@ -677,7 +681,7 @@ function RechercheSections({
       {/* Protocole */}
       <section>
         <h2 className="mb-6 text-xs font-medium uppercase tracking-widest text-emerald-glow">
-          Protocole expérimental
+          {t('research_experimentalProtocol')}
         </h2>
         <ProtocolTimeline protocol={protocol} />
       </section>
@@ -686,7 +690,7 @@ function RechercheSections({
       {sharpened.falsifiable_predictions?.length > 0 && (
         <section>
           <h2 className="mb-4 font-display text-2xl text-mist-100">
-            Prédictions falsifiables
+            {t('research_falsifiablePredictions')}
           </h2>
           <div className="space-y-4">
             {sharpened.falsifiable_predictions.map((p: Prediction, i: number) => (
@@ -703,10 +707,10 @@ function RechercheSections({
                   </p>
                 </div>
                 <dl className="grid gap-2 text-sm md:grid-cols-2">
-                  <Dt label="Borne quantitative" value={p.quantitative_bound} />
-                  <Dt label="Méthode de mesure" value={p.measurement_method} />
-                  <Dt label="Hypothèse nulle" value={p.null_hypothesis} />
-                  <Dt label="Test statistique" value={p.statistical_test} />
+                  <Dt label={t('predictions_quantitativeBound')} value={p.quantitative_bound} />
+                  <Dt label={t('predictions_measurementMethod')} value={p.measurement_method} />
+                  <Dt label={t('predictions_nullHypothesis')} value={p.null_hypothesis} />
+                  <Dt label={t('predictions_statisticalTest')} value={p.statistical_test} />
                 </dl>
               </div>
             ))}
@@ -718,7 +722,7 @@ function RechercheSections({
       {grounding.evidence_base?.length > 0 && (
         <section>
           <h2 className="mb-4 font-display text-2xl text-mist-100">
-            Base de preuves
+            {t('research_evidenceBase')}
           </h2>
           <ul className="space-y-3">
             {grounding.evidence_base.map((p, i) => (
@@ -736,7 +740,7 @@ function RechercheSections({
                           : 'bg-ink-500 text-mist-300'
                     }`}
                   >
-                    {label(p.support_type)}
+                    {safe(tSupport, p.support_type)}
                   </span>
                   <span className="text-mist-500">{p.year}</span>
                   {p.citation_count !== undefined && (
@@ -775,7 +779,7 @@ function RechercheSections({
       {grounding.counter_evidence?.length > 0 && (
         <section>
           <h2 className="mb-4 font-display text-2xl text-mist-100">
-            Contre-preuves
+            {t('research_counterEvidence')}
           </h2>
           <ul className="space-y-3">
             {grounding.counter_evidence.map((p, i) => (
@@ -785,7 +789,7 @@ function RechercheSections({
               >
                 <div className="mb-1 flex items-baseline gap-2 text-xs">
                   <span className="rounded-full bg-red-500/20 px-2 py-0.5 text-red-400">
-                    {label(p.severity)}
+                    {safe(tSeverity, p.severity)}
                   </span>
                   <span className="text-mist-500">{p.year}</span>
                 </div>
@@ -810,16 +814,16 @@ function RechercheSections({
       {/* Gap manifest */}
       <section>
         <h2 className="mb-4 font-display text-2xl text-mist-100">
-          Lacunes résiduelles
+          {t('research_residualGaps')}
         </h2>
         <div className="grid gap-3 md:grid-cols-2">
           <GapBlock
-            title="Lacunes ouvertes"
+            title={t('research_openGaps')}
             items={grounding.gap_manifest_update?.new_gaps ?? []}
             accent="amber"
           />
           <GapBlock
-            title="Données disponibles"
+            title={t('research_availableData')}
             items={grounding.gap_manifest_update?.data_available ?? []}
             accent="emerald"
           />
@@ -828,7 +832,9 @@ function RechercheSections({
 
       {/* Documents */}
       <section>
-        <h2 className="mb-4 font-display text-2xl text-mist-100">Documents</h2>
+        <h2 className="mb-4 font-display text-2xl text-mist-100">
+          {t('documents_title')}
+        </h2>
         <div className="mb-6 flex flex-wrap gap-3">
           {markdown && (
             <a
@@ -844,7 +850,7 @@ function RechercheSections({
         {markdown && (
           <details className="group rounded-xl border border-ink-500 bg-ink-800/40 p-5">
             <summary className="cursor-pointer text-sm font-medium text-mist-200 group-open:mb-4">
-              Afficher le brief complet (markdown)
+              {t('documents_viewMarkdown')}
             </summary>
             <div className="prose-bio max-w-none">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>

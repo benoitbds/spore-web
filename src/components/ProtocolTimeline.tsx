@@ -1,24 +1,22 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import type { Protocol } from '@/lib/types';
 
-const PHASE_META: Record<number, { icon: string; label: string; gradient: string; border: string }> = {
+const PHASE_META: Record<number, { icon: string; gradient: string; border: string }> = {
   1: {
     icon: '💻',
-    label: 'In Silico',
     gradient: 'from-emerald-bio/20 to-transparent',
     border: 'border-emerald-bio/40',
   },
   2: {
     icon: '🧪',
-    label: 'Minimal',
     gradient: 'from-amber-bio/20 to-transparent',
     border: 'border-amber-bio/40',
   },
   3: {
     icon: '🏗️',
-    label: 'Protocole complet',
     gradient: 'from-cyan-bio/20 to-transparent',
     border: 'border-cyan-bio/40',
   },
@@ -30,17 +28,25 @@ interface ProtocolTimelineProps {
 }
 
 export default function ProtocolTimeline({ protocol, compact = false }: ProtocolTimelineProps) {
+  const t = useTranslations('protocol');
+  const phaseLabel = (n: number) => {
+    try {
+      return t(`phaseLabel_${n}`);
+    } catch {
+      return `Phase ${n}`;
+    }
+  };
   return (
     <div className="space-y-6">
       {!compact && (
         <div className="flex flex-wrap items-center gap-4 text-sm text-mist-400">
           <span>
-            <span className="text-mist-500">Calendrier : </span>
+            <span className="text-mist-500">{t('timeline')} </span>
             <span className="font-medium text-mist-100">{protocol.overall_timeline}</span>
           </span>
           <span className="text-mist-600">·</span>
           <span>
-            <span className="text-mist-500">Budget: </span>
+            <span className="text-mist-500">{t('budget')} </span>
             <span className="font-medium text-mist-100">{protocol.overall_budget_estimate}</span>
           </span>
         </div>
@@ -63,10 +69,10 @@ export default function ProtocolTimeline({ protocol, compact = false }: Protocol
                   <span className="text-2xl">{meta.icon}</span>
                   <div>
                     <div className="text-xs uppercase tracking-wider text-mist-500">
-                      Phase {phase.phase_number}
+                      {t('phase', { n: phase.phase_number })}
                     </div>
                     <div className="text-sm font-medium text-mist-100">
-                      {meta.label}
+                      {phaseLabel(phase.phase_number)}
                     </div>
                   </div>
                 </div>
@@ -74,13 +80,13 @@ export default function ProtocolTimeline({ protocol, compact = false }: Protocol
 
               <div className="mb-3 space-y-1 text-xs">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-mist-500">Coût</span>
+                  <span className="text-mist-500">{t('cost')}</span>
                   <span className="font-medium text-mist-200">
                     {phase.required_resources.estimated_cost}
                   </span>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-mist-500">Durée</span>
+                  <span className="text-mist-500">{t('duration')}</span>
                   <span className="font-medium text-mist-200">
                     {phase.required_resources.estimated_duration}
                   </span>
@@ -94,13 +100,13 @@ export default function ProtocolTimeline({ protocol, compact = false }: Protocol
               {!compact && phase.go_nogo_decision && (
                 <div className="space-y-1.5 border-t border-ink-500 pt-3 text-xs">
                   <div>
-                    <span className="font-medium text-emerald-glow">GO:</span>{' '}
+                    <span className="font-medium text-emerald-glow">{t('go')}</span>{' '}
                     <span className="text-mist-400 line-clamp-2">
                       {phase.go_nogo_decision.go_if}
                     </span>
                   </div>
                   <div>
-                    <span className="font-medium text-red-400">NO-GO:</span>{' '}
+                    <span className="font-medium text-red-400">{t('noGo')}</span>{' '}
                     <span className="text-mist-400 line-clamp-2">
                       {phase.go_nogo_decision.nogo_if}
                     </span>
@@ -121,7 +127,7 @@ export default function ProtocolTimeline({ protocol, compact = false }: Protocol
           className="rounded-xl border border-emerald-bio/30 bg-emerald-bio/5 p-4"
         >
           <div className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-glow">
-            🚀 Démarrage rapide
+            {t('quickStart')}
           </div>
           <p className="text-sm text-mist-200">
             {protocol.phase_1_quick_start.first_action}
