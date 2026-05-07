@@ -233,13 +233,28 @@ function FeaturedHero({
   verdictNoveltySub: string;
   verdictPanelSub: string;
 }) {
-  const { vulgarization_fr: v, sharpened, domains, grounding, panel, brief_id, generated_at } = brief;
+  const {
+    vulgarization_fr: vFr,
+    vulgarization_en: vEn,
+    sharpened,
+    domains,
+    grounding,
+    panel,
+    brief_id,
+    generated_at,
+  } = brief;
 
-  // Featured brief: keep the FR title even on /en/ as a temporary measure
-  // until S7.4 brings bilingual brief content. The chrome around it
-  // (kicker, badges, CTA) is localised; the brief title and hook stay FR.
-  const title = v?.title_fr || sharpened.title;
-  const hook = v?.imagine_that || sharpened.formal_statement;
+  // Locale-aware title + hook. On /en we prefer the EN translation
+  // (S7.4 Phase 2 backfill), falling back to the FR vulgarisation, then
+  // to the formal sharpened title for legacy briefs.
+  const title =
+    locale === 'en'
+      ? vEn?.title || vFr?.title_fr || sharpened.title
+      : vFr?.title_fr || sharpened.title;
+  const hook =
+    locale === 'en'
+      ? vEn?.imagine_that || vFr?.imagine_that || sharpened.formal_statement
+      : vFr?.imagine_that || sharpened.formal_statement;
   const novelty = grounding.novelty_assessment.score;
   const panelScore = panel.meta_review.consensus_score;
 

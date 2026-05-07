@@ -206,12 +206,20 @@ export default async function BriefDetailPage({ params }: RouteParams) {
         nextLabel={t('nextBrief')}
         ariaLabel={t('neighborsAria')}
         verdictLabel={verdictLabel}
+        locale={locale}
       />
     </div>
   );
 }
 
-function neighborTitle(b: Brief): string {
+function neighborTitle(b: Brief, locale: string): string {
+  if (locale === 'en') {
+    return (
+      b.vulgarization_en?.title ||
+      b.vulgarization_fr?.title_fr ||
+      b.sharpened.title
+    );
+  }
   return b.vulgarization_fr?.title_fr || b.sharpened.title;
 }
 
@@ -222,6 +230,7 @@ function BriefNeighbors({
   nextLabel,
   ariaLabel,
   verdictLabel,
+  locale,
 }: {
   prev: Brief | null;
   next: Brief | null;
@@ -229,6 +238,7 @@ function BriefNeighbors({
   nextLabel: string;
   ariaLabel: string;
   verdictLabel: (v: string | null | undefined) => string;
+  locale: string;
 }) {
   if (!prev && !next) return null;
   return (
@@ -246,7 +256,7 @@ function BriefNeighbors({
             {previousLabel}
           </div>
           <div className="font-display text-lg leading-tight text-mist-100 line-clamp-2">
-            {neighborTitle(prev)}
+            {neighborTitle(prev, locale)}
           </div>
           <div className="mt-1 text-xs text-mist-500">
             {prev.domains[0]} × {prev.domains[1] || '—'} ·{' '}
@@ -267,7 +277,7 @@ function BriefNeighbors({
             <span className="transition-transform group-hover:translate-x-1">→</span>
           </div>
           <div className="font-display text-lg leading-tight text-mist-100 line-clamp-2">
-            {neighborTitle(next)}
+            {neighborTitle(next, locale)}
           </div>
           <div className="mt-1 text-xs text-mist-500">
             {next.domains[0]} × {next.domains[1] || '—'} ·{' '}
