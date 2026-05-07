@@ -218,6 +218,53 @@
     "ctaSubtext": "Demandez une collision sur mesure — gratuite pendant le lancement. Choisissez un ou deux domaines, SPORE livre un brief complet (hypothèse, protocole, panel de 5 relecteurs) en quelques minutes.",
     "ctaButton": "Demander une collision sur mesure →"
   },
+  "paywall": {
+    "loadingSession": "Chargement de votre session…",
+    "headline": "Accédez au brief scientifique complet — gratuit",
+    "description": "Panel de relecture (5 personas), base de preuves, contre-preuves, protocole expérimental, prédictions falsifiables. Tous les briefs sont gratuits pendant le lancement.",
+    "cta": "Recevoir mon accès",
+    "magicLinkPrompt": "Déjà un compte ? Utilisez votre dernier lien magique ou",
+    "requestNewAccess": "redemandez un accès",
+    "unlockHeadline": "Accédez au brief complet — gratuit",
+    "unlockDescription": "Hypothèse formalisée, prédictions, protocole, panel de relecture, base de preuves. Tous les briefs sont gratuits pendant le lancement.",
+    "downloadCta": "Télécharger gratuitement",
+    "downloadingShort": "Chargement…",
+    "quotaExhausted": "Votre quota est épuisé.",
+    "topUp": "Recharger"
+  },
+  "protocol": {
+    "budget": "Budget :",
+    "phase": "Phase {n}",
+    "cost": "Coût",
+    "duration": "Durée",
+    "go": "GO :",
+    "noGo": "NO-GO :",
+    "quickStart": "🚀 Démarrage rapide"
+  },
+  "reviewerPanel": {
+    "consensus": "Consensus",
+    "consensusPoints": "Points de consensus"
+  },
+  "personas": {
+    "methodologist": "Méthodologue",
+    "domain_expert": "Expert du domaine",
+    "contrarian": "Avocat du diable",
+    "industrialist": "Industriel",
+    "funding_strategist": "Stratège financement"
+  },
+  "severity": {
+    "fatal": "Fatal",
+    "serious": "Sérieuse",
+    "minor": "Mineure",
+    "addressable": "Corrigeable"
+  },
+  "support_type": {
+    "direct": "Direct",
+    "indirect": "Indirect",
+    "analogous": "Analogue",
+    "contradictory": "Contradictoire",
+    "tangential": "Tangentiel"
+  },
   "briefDetailPage": {
     "tabUnderstand": "💡 Comprendre",
     "tabResearch": "🔬 Recherche",
@@ -242,7 +289,37 @@
     "neighborsAria": "Navigation entre briefs",
     "customCtaHeadline": "Cette collision vous inspire ?",
     "customCtaSubtext": "Demandez la vôtre sur un domaine de votre choix — gratuite pendant le lancement. SPORE croise vos domaines, génère une hypothèse et livre un brief complet en quelques minutes.",
-    "customCtaButton": "Demander ma collision →"
+    "customCtaButton": "Demander ma collision →",
+    "toc_title": "Table des matières du brief complet",
+    "toc_hypothesis_title": "Hypothèse et mécanisme",
+    "toc_hypothesis_sub": "Chaîne causale, hypothèses clés, inconnues résiduelles",
+    "toc_stateOfArt_title": "État de l'art",
+    "toc_stateOfArt_sub": "Références vérifiées + contre-preuves (DOIs)",
+    "toc_predictions_title": "Prédictions falsifiables",
+    "toc_predictions_sub": "Bornes quantitatives, tests statistiques, H0",
+    "toc_protocol_title": "Protocole expérimental",
+    "toc_protocol_sub": "3 phases — in silico → minimal → complet",
+    "toc_impactAnalysis_title": "Analyse d'impact",
+    "toc_impactAnalysis_sub": "Nouveauté, lacunes résiduelles, données disponibles",
+    "toc_panel_title": "Panel de relecture",
+    "toc_panel_sub": "5 personas + méta-relecture",
+    "references_title": "Références vérifiées",
+    "references_count": "{verified} sur {total} {total, plural, one {référence} other {références}}",
+    "references_more": "+ {count, plural, one {1 autre référence} other {# autres références}}",
+    "panelHeader_title": "Scores détaillés du panel",
+    "research_unlocked": "✅ Brief débloqué. Tous les briefs sont gratuits pendant le lancement de SPORE.",
+    "research_panelReview": "Panel de relecture",
+    "research_experimentalProtocol": "Protocole expérimental",
+    "research_falsifiablePredictions": "Prédictions falsifiables",
+    "research_evidenceBase": "Base de preuves",
+    "research_counterEvidence": "Contre-preuves",
+    "research_residualGaps": "Lacunes résiduelles",
+    "research_openGaps": "Lacunes ouvertes",
+    "research_availableData": "Données disponibles",
+    "predictions_measurementMethod": "Méthode de mesure",
+    "predictions_nullHypothesis": "Hypothèse nulle",
+    "documents_title": "Documents",
+    "documents_viewMarkdown": "Afficher le brief complet (markdown)"
   },
   "aboutPage": {
     "metaTitle": "À propos",
