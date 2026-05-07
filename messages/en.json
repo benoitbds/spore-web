@@ -316,8 +316,11 @@
     "research_residualGaps": "Residual gaps",
     "research_openGaps": "Open gaps",
     "research_availableData": "Available data",
+    "predictions_quantitativeBound": "Quantitative bound",
     "predictions_measurementMethod": "Measurement method",
     "predictions_nullHypothesis": "Null hypothesis",
+    "predictions_statisticalTest": "Statistical test",
+    "research_translationNotice": "Translation unavailable — original content is in English.",
     "documents_title": "Documents",
     "documents_viewMarkdown": "View full brief (markdown)"
   },

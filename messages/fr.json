@@ -316,8 +316,11 @@
     "research_residualGaps": "Lacunes résiduelles",
     "research_openGaps": "Lacunes ouvertes",
     "research_availableData": "Données disponibles",
+    "predictions_quantitativeBound": "Borne quantitative",
     "predictions_measurementMethod": "Méthode de mesure",
     "predictions_nullHypothesis": "Hypothèse nulle",
+    "predictions_statisticalTest": "Test statistique",
+    "research_translationNotice": "Traduction non disponible — contenu original en anglais.",
     "documents_title": "Documents",
     "documents_viewMarkdown": "Afficher le brief complet (markdown)"
   },
