@@ -243,7 +243,8 @@
   },
   "reviewerPanel": {
     "consensus": "Consensus",
-    "consensusPoints": "Consensus points"
+    "consensusPoints": "Consensus points",
+    "criticalPath": "Critical path"
   },
   "personas": {
     "methodologist": "Methodologist",
