@@ -114,6 +114,11 @@ export interface BriefRow {
   /** S7.4 Phase 1+2: Nature-grade EN translation of vulgarization_data.
    *  NULL on rows that pre-date the translation script run. */
   vulgarization_data_en: unknown;
+  /** S7.4 Phase 3-fix-v2.C: Nature-grade EN translation of panel_data
+   *  prose (reviewer strengths/weaknesses/critical_questions/
+   *  recommendation + meta_review prose lists). Tokens copied
+   *  verbatim from panel_data. NULL on rows pre-Phase-3-fix-v2.C. */
+  panel_data_en: unknown;
   low_confidence: number;
   low_evidence: number;
   is_stub: number;
@@ -160,6 +165,7 @@ const JSON_COLUMNS = [
   'sharpened_data',
   'protocol_data',
   'panel_data',
+  'panel_data_en',
   'vulgarization_data',
   'vulgarization_data_en',
 ] as const;
@@ -527,6 +533,11 @@ export function briefRowToBrief(row: BriefRow): BriefWithBody {
     ? (vulgEnRaw as unknown as VulgarizationEn)
     : undefined;
 
+  const panelEnRaw = asObjectOrNull(row.panel_data_en);
+  const panel_en = panelEnRaw
+    ? (panelEnRaw as unknown as Panel)
+    : undefined;
+
   // Domains live inside the JSON sidecars — most often on the panel /
   // protocol or in the original_hypothesis blob. We surface a best-effort
   // list from sharpened_data.domains then grounding_data.domains; fall
@@ -556,6 +567,7 @@ export function briefRowToBrief(row: BriefRow): BriefWithBody {
     panel,
     vulgarization_fr,
     vulgarization_en,
+    panel_en,
     is_stub: row.is_stub === 1,
     stub_reason: row.stub_reason,
   };
