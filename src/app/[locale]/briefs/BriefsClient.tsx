@@ -45,6 +45,7 @@ interface Props {
 function briefHaystack(b: Brief): string {
   const v = b.vulgarization_fr;
   const ve = b.vulgarization_en;
+  const pe = b.panel_en;
   const s = b.sharpened;
   const mech = s?.proposed_mechanism;
   const concretely = v?.concretely;
@@ -122,6 +123,25 @@ function briefHaystack(b: Brief): string {
     ve?.concretely?.phase1,
     ve?.concretely?.phase2,
     ve?.concretely?.phase3,
+    // EN panel review prose — S7.4 Phase 3-fix-v2.C. Reviewer
+    // strengths/weaknesses/critical_questions/recommendation +
+    // meta_review prose lists. The FR equivalent already lives inside
+    // panel_data which is not on the public Brief type — only the
+    // teaser-level summaries are exposed — so we add the EN side
+    // alone to keep search matching ``catalysis`` or
+    // ``metalloproteins`` against reviewer-prose terms a user is
+    // likely to type on /en/briefs.
+    ...((pe?.reviews ?? []).flatMap((r) => [
+      ...(r.strengths ?? []),
+      ...(r.weaknesses ?? []),
+      ...(r.critical_questions ?? []),
+      r.recommendation,
+    ])),
+    pe?.meta_review?.critical_path,
+    pe?.meta_review?.final_recommendation,
+    ...(pe?.meta_review?.key_consensus ?? []),
+    ...(pe?.meta_review?.key_disagreements ?? []),
+    ...(pe?.meta_review?.revision_guidance ?? []),
     // Sharpened — mechanism prose + framework + predictions
     s?.theoretical_framework,
     ...(mech?.causal_chain ?? []),

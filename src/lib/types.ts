@@ -204,6 +204,12 @@ export interface Brief {
   sharpened: Sharpened;
   protocol: Protocol;
   panel: Panel;
+  /** S7.4 Phase 3-fix-v2.C: EN translation of ``panel_data`` with the
+   *  same shape — only the prose (strengths / weaknesses /
+   *  critical_questions / recommendation per reviewer + meta_review
+   *  prose lists) is translated; tokens (reviewer_persona, verdict,
+   *  scores) are copied verbatim. May be absent on legacy briefs. */
+  panel_en?: Panel;
   vulgarization_fr?: VulgarizationFr;
   vulgarization_en?: VulgarizationEn;
   /**
@@ -232,6 +238,9 @@ export interface BriefTeaser {
   verdict: string;          // panel.meta_review.verdict (for the chip only)
   vulgarization_fr?: VulgarizationFr;
   vulgarization_en?: VulgarizationEn;
+  /** S7.4 Phase 3-fix-v2.C: forwarded to the client so the post-unlock
+   *  RechercheSections can render reviewer prose in the active locale. */
+  panel_en?: Panel;
 
   // ── EN "Comprendre" summaries ───────────────────────────────────
   // Denormalised, non-sensitive extracts from the full brief used to
@@ -261,6 +270,16 @@ export interface BriefTeaser {
   }>;
   references_total?: number;
   panel_preview?: Array<{
+    persona: string;
+    score: number;
+    verdict: string;
+    key_point: string;
+  }>;
+  /** Same shape as ``panel_preview`` but built from ``panel_en.reviews``
+   *  when an EN translation is available. Optional; the client picks
+   *  this on /en/ and falls back to the FR ``panel_preview`` when
+   *  absent. */
+  panel_preview_en?: Array<{
     persona: string;
     score: number;
     verdict: string;
@@ -317,6 +336,22 @@ export function briefToTeaser(b: Brief): BriefTeaser {
     verdict: r.verdict ?? '',
     key_point: r.strengths?.[0] || r.recommendation || '',
   }));
+  // Same projection on the EN payload when present. Numbers and tokens
+  // come from the FR side (canonical) so this is purely the prose swap.
+  const reviewsEn = b.panel_en?.reviews ?? [];
+  const panel_preview_en =
+    reviewsEn.length > 0
+      ? reviews.slice(0, 5).map((r, i) => {
+          const en = reviewsEn[i];
+          return {
+            persona: r.reviewer_persona,
+            score: r.overall_score ?? 0,
+            verdict: r.verdict ?? '',
+            key_point:
+              en?.strengths?.[0] || en?.recommendation || r.strengths?.[0] || '',
+          };
+        })
+      : undefined;
 
   return {
     brief_id: b.brief_id,
@@ -327,6 +362,7 @@ export function briefToTeaser(b: Brief): BriefTeaser {
     verdict: b.panel.meta_review.verdict,
     vulgarization_fr: b.vulgarization_fr,
     vulgarization_en: b.vulgarization_en,
+    panel_en: b.panel_en,
     mechanism_summary,
     novelty_summary,
     protocol_summary: protocol_summary.length > 0 ? protocol_summary : undefined,
@@ -335,6 +371,7 @@ export function briefToTeaser(b: Brief): BriefTeaser {
       references_preview.length > 0 ? references_preview : undefined,
     references_total: references_total > 0 ? references_total : undefined,
     panel_preview: panel_preview.length > 0 ? panel_preview : undefined,
+    panel_preview_en,
   };
 }
 

@@ -290,6 +290,7 @@ export default function BriefDetailClient({ teaser }: Props) {
               <RechercheSections
                 sharpened={full.sharpened}
                 panel={full.panel}
+                panelEn={teaser.panel_en}
                 grounding={full.grounding}
                 protocol={full.protocol}
                 markdown={full.markdown}
@@ -298,7 +299,7 @@ export default function BriefDetailClient({ teaser }: Props) {
               />
             ) : (
               <>
-                <RecherchePreview teaser={teaser} />
+                <RecherchePreview teaser={teaser} lang={effectiveLang} />
                 <PaywallPanel
                   briefId={teaser.brief_id}
                   isAuthenticated={isAuthenticated}
@@ -335,12 +336,23 @@ export default function BriefDetailClient({ teaser }: Props) {
 // whose data isn't available on a given brief (e.g. grounding_degraded
 // with zero references) is silently dropped so the preview never
 // renders an empty shell.
-function RecherchePreview({ teaser }: { teaser: BriefTeaser }) {
+function RecherchePreview({
+  teaser,
+  lang,
+}: {
+  teaser: BriefTeaser;
+  lang: Lang;
+}) {
   const hasRefs =
     Array.isArray(teaser.references_preview) &&
     teaser.references_preview.length > 0;
-  const hasPanel =
-    Array.isArray(teaser.panel_preview) && teaser.panel_preview.length > 0;
+  // Prefer the EN panel_preview when the active content language is EN
+  // and the EN payload is present. Falls back to FR otherwise.
+  const reviewers =
+    lang === 'en' && teaser.panel_preview_en
+      ? teaser.panel_preview_en
+      : teaser.panel_preview;
+  const hasPanel = Array.isArray(reviewers) && reviewers.length > 0;
   return (
     <div className="space-y-8">
       <BriefToc />
@@ -350,7 +362,7 @@ function RecherchePreview({ teaser }: { teaser: BriefTeaser }) {
           total={teaser.references_total ?? teaser.references_preview!.length}
         />
       )}
-      {hasPanel && <PanelPreview reviewers={teaser.panel_preview!} />}
+      {hasPanel && <PanelPreview reviewers={reviewers!} />}
     </div>
   );
 }
@@ -633,6 +645,7 @@ function UnlockCta({
 function RechercheSections({
   sharpened,
   panel,
+  panelEn,
   grounding,
   protocol,
   markdown,
@@ -641,12 +654,20 @@ function RechercheSections({
 }: {
   sharpened: Sharpened;
   panel: Panel;
+  /** EN translation forwarded from BriefTeaser. When ``lang === 'en'``
+   *  and present, this replaces the FR ``panel`` for prose rendering;
+   *  scores and tokens come from ``panel`` (canonical) in either case. */
+  panelEn?: Panel;
   grounding: UnlockedBrief['grounding'];
   protocol: Protocol;
   markdown: string | null;
   briefId: string;
   lang: Lang;
 }) {
+  // Pick the locale-appropriate panel for the prose rendering. The
+  // numbers and verdicts come from the FR canonical regardless — they
+  // are tokens/numbers, not language-dependent.
+  const panelForProse = lang === 'en' && panelEn ? panelEn : panel;
   const t = useTranslations('briefDetailPage');
   const tSupport = useTranslations('support_type');
   const tSeverity = useTranslations('severity');
@@ -675,7 +696,10 @@ function RechercheSections({
         <h2 className="mb-6 font-display text-2xl text-mist-100">
           {t('research_panelReview')}
         </h2>
-        <ReviewerPanel reviews={panel.reviews} meta={panel.meta_review} />
+        <ReviewerPanel
+          reviews={panelForProse.reviews}
+          meta={panelForProse.meta_review}
+        />
       </section>
 
       {/* Protocole */}
