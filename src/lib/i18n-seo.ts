@@ -12,7 +12,7 @@
 //     };
 //   }
 
-import { routing } from '@/i18n/routing';
+import { routing, ROOT_LOCALE } from '@/i18n/routing';
 
 export function localeAlternates(locale: string, path: string) {
   // Strip a leading slash if any so we always emit "/{locale}/{rest}".
@@ -21,8 +21,11 @@ export function localeAlternates(locale: string, path: string) {
   for (const l of routing.locales) {
     languages[l] = `/${l}${cleanPath === '/' ? '' : cleanPath}`;
   }
-  // x-default points at the routing default locale per Google's guidance.
-  languages['x-default'] = `/${routing.defaultLocale}${cleanPath === '/' ? '' : cleanPath}`;
+  // x-default points at whatever locale "/" redirects to (ROOT_LOCALE),
+  // not at routing.defaultLocale. Google resolves x-default by following
+  // the entry point, so advertising a locale the root never serves is
+  // read as a contradiction.
+  languages['x-default'] = `/${ROOT_LOCALE}${cleanPath === '/' ? '' : cleanPath}`;
   return {
     canonical: `/${locale}${cleanPath === '/' ? '' : cleanPath}`,
     languages,

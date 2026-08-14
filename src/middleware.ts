@@ -7,9 +7,33 @@
 
 import createMiddleware from 'next-intl/middleware';
 import { type NextRequest, NextResponse } from 'next/server';
-import { routing } from './i18n/routing';
+import { ROOT_LOCALE, routing } from './i18n/routing';
+import { SITE_URL } from './lib/seo';
 
 const intlMiddleware = createMiddleware(routing);
+
+const SITE_ORIGIN = new URL(SITE_URL).origin;
+const SITE_HOSTNAME = new URL(SITE_URL).hostname;
+
+/**
+ * Origin to mint absolute redirects from.
+ *
+ * In production the reverse proxy forwards Host and X-Forwarded-Proto
+ * but no X-Forwarded-Port, so anything derived from ``request.url`` /
+ * ``request.nextUrl`` carries the internal listening port and produces
+ * ``https://spore-research.com:3012/...`` — a dead URL from outside.
+ * For requests that really target the public host we therefore ignore
+ * the request origin entirely and use SITE_URL.
+ *
+ * Any other host (localhost in dev, a preview deploy, direct hits on
+ * the pm2 port) keeps its own origin, so redirects stay inside whatever
+ * environment issued them.
+ */
+function redirectOrigin(request: NextRequest): string {
+  const host = request.headers.get('x-forwarded-host') ?? request.headers.get('host') ?? '';
+  const hostname = host.split(':')[0].toLowerCase();
+  return hostname === SITE_HOSTNAME ? SITE_ORIGIN : request.nextUrl.origin;
+}
 
 /**
  * Routes left at the non-localised root in S7.2.
@@ -40,14 +64,22 @@ export default function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 2. Smart locale detection on the bare root.
+  // 2. Bare root — deterministic 308 to ROOT_LOCALE (S1/GSC-F1).
+  //
+  // Was: Accept-Language sniffing, sending header-less clients to /en
+  // and French browsers to /fr. Two problems. The 307 kept "/" itself
+  // indexed carrying EN content, which collided with /en's own
+  // canonical and got the EN home dropped as a duplicate; and the
+  // varying target contradicted the x-default annotation.
+  //
+  // 308 hands the indexing signals to the target instead of retaining
+  // the source, and the target now matches the x-default emitted by
+  // localeAlternates — both read ROOT_LOCALE.
   if (pathname === '/' || pathname === '') {
-    const acceptLanguage = request.headers.get('accept-language') || '';
-    const prefersFrench = acceptLanguage.toLowerCase().includes('fr');
-    const targetLocale = prefersFrench ? 'fr' : 'en';
-    const url = request.nextUrl.clone();
-    url.pathname = `/${targetLocale}`;
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(
+      new URL(`/${ROOT_LOCALE}${request.nextUrl.search}`, redirectOrigin(request)),
+      308,
+    );
   }
 
   // 3. Standard intlMiddleware for everything else.
