@@ -3,6 +3,11 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+// Two Link flavours on purpose (S1/F01): /account lives at the
+// non-localised root (src/app/account/page.tsx) and must keep the plain
+// next/link, while /custom only exists under src/app/[locale]/ and needs
+// the locale-prefixing Link. Converting the whole file would 404 /account.
+import { Link as LocalizedLink } from '@/i18n/routing';
 import { useAuth } from '@/contexts/AuthContext';
 import EmailGate from '@/components/EmailGate';
 
@@ -156,13 +161,13 @@ export default function AuthWidget({
             {t('myAccount')}
           </Link>
           {/* pricing link hidden during launch */}
-          <Link
+          <LocalizedLink
             href="/custom"
             onClick={() => setOpen(false)}
             className="block px-4 py-2 text-sm text-mist-200 hover:bg-ink-700/60"
           >
             {tNav('custom')}
-          </Link>
+          </LocalizedLink>
           <button
             onClick={() => {
               logout();
