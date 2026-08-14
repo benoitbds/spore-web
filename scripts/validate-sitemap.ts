@@ -34,13 +34,34 @@ function matchAll(xml: string, tag: string): string[] {
   return [...xml.matchAll(re)].map((m) => m[1]);
 }
 
-async function main() {
-  const res = await fetch(SITEMAP_URL);
-  if (!res.ok) {
-    console.error(`FAIL  fetch ${SITEMAP_URL} → HTTP ${res.status}`);
-    process.exit(1);
+/**
+ * Fetch with retries.
+ *
+ * spore-research.com currently has two A records and one of them
+ * (213.186.33.5, OVH) answers nothing on 443, so roughly one connection
+ * in five dies with ECONNRESET before reaching us. That is a DNS defect
+ * to fix at the registrar, not something this script can assert on —
+ * retrying keeps the sitemap checks meaningful in the meantime. Pass
+ * http://127.0.0.1:3012/sitemap.xml to bypass DNS entirely.
+ */
+async function fetchWithRetry(url: string, attempts = 4): Promise<string> {
+  let lastErr: unknown;
+  for (let i = 1; i <= attempts; i++) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (i > 1) console.log(`note  fetch succeeded on attempt ${i}/${attempts}`);
+      return await res.text();
+    } catch (err) {
+      lastErr = err;
+      console.log(`note  attempt ${i}/${attempts} failed: ${(err as Error).message}`);
+    }
   }
-  const xml = await res.text();
+  throw lastErr;
+}
+
+async function main() {
+  const xml = await fetchWithRetry(SITEMAP_URL);
 
   const locs = matchAll(xml, 'loc');
   const lastmods = matchAll(xml, 'lastmod');
