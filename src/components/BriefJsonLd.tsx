@@ -1,8 +1,14 @@
 import type { Brief } from '@/lib/types';
 import { SITE_URL, SITE_NAME, briefMetaTitle, briefOgDescription, toIsoUtc } from '@/lib/seo';
+import { localeUrl } from '@/lib/i18n-seo';
 
 interface Props {
   brief: Brief;
+  /** Locale of the page embedding this payload. Required: without it the
+   * Article url can't match the page's own canonical, which is what F08
+   * was — /fr/briefs/X and /en/briefs/X both claimed to be
+   * /briefs/{id}, a URL that doesn't exist. */
+  locale: string;
   /** Locale-translated verdict labels to embed in the keywords array.
    * Computed by the parent page via getTranslations so the JSON-LD blob
    * carries the active-locale labels into SEO. */
@@ -14,8 +20,11 @@ interface Props {
  * `<script type="application/ld+json">` tag. Server-component safe
  * (no hooks, no client-only APIs).
  */
-export default function BriefJsonLd({ brief, verdictKeywords = [] }: Props) {
-  const url = `${SITE_URL}/briefs/${brief.brief_id}`;
+export default function BriefJsonLd({ brief, locale, verdictKeywords = [] }: Props) {
+  // Same helper the page's canonical goes through (localeAlternates also
+  // calls localePath), so url / mainEntityOfPage and <link rel=canonical>
+  // resolve to the same string by construction.
+  const url = localeUrl(locale, `/briefs/${brief.brief_id}`);
   const headline = briefMetaTitle(brief);
   const description = briefOgDescription(brief);
   const datePublished = brief.generated_at;

@@ -18,7 +18,7 @@ import {
   briefMetaDescription,
   briefOgDescription,
 } from '@/lib/seo';
-import { localeAlternates } from '@/lib/i18n-seo';
+import { localeAlternates, localeUrl } from '@/lib/i18n-seo';
 import BriefDetailClient from './BriefDetailClient';
 import StubBriefClient from './StubBriefClient';
 import BriefJsonLd from '@/components/BriefJsonLd';
@@ -70,7 +70,8 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
   const title = briefMetaTitle(brief, locale);
   const description = briefMetaDescription(brief, locale);
   const ogDescription = briefOgDescription(brief, locale);
-  const url = `${SITE_URL}/${locale}/briefs/${brief.brief_id}`;
+  // Same derivation as the canonical and the JSON-LD (F08).
+  const url = localeUrl(locale, `/briefs/${brief.brief_id}`);
 
   return {
     title,
@@ -179,7 +180,7 @@ export default async function BriefDetailPage({ params }: RouteParams) {
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
-      <BriefJsonLd brief={brief} verdictKeywords={verdictKeywords} />
+      <BriefJsonLd brief={brief} locale={locale} verdictKeywords={verdictKeywords} />
 
       <Link
         href="/briefs"

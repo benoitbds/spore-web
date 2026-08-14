@@ -27,7 +27,7 @@ import type {
   VulgarizationEn,
 } from '@/lib/types';
 import { verdictChipClasses } from '@/lib/verdicts';
-import { SITE_URL } from '@/lib/seo';
+import { localeUrl } from '@/lib/i18n-seo';
 import { useAuth } from '@/contexts/AuthContext';
 import { api, ApiError, type FullBriefResponse } from '@/lib/api';
 
@@ -249,7 +249,7 @@ export default function BriefDetailClient({ teaser }: Props) {
 
         <ShareButtons
           title={`${headerTitle} — SPORE`}
-          url={`${SITE_URL}/briefs/${teaser.brief_id}`}
+          url={localeUrl(locale, `/briefs/${teaser.brief_id}`)}
           className="mt-6"
         />
       </header>
