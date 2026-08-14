@@ -6,6 +6,9 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
+// /auth/verify lives at the non-localised root (SKIP_LOCALE_PATHS), so
+// it must NOT go through the locale-prefixing Link — see PaywallPanel.
+import NextLink from 'next/link';
 import DomainBridge from '@/components/DomainBridge';
 import ReviewerPanel from '@/components/ReviewerPanel';
 import ProtocolTimeline from '@/components/ProtocolTimeline';
@@ -27,7 +30,7 @@ import type {
   VulgarizationEn,
 } from '@/lib/types';
 import { verdictChipClasses } from '@/lib/verdicts';
-import { localeUrl } from '@/lib/i18n-seo';
+import { localePath, localeUrl } from '@/lib/i18n-seo';
 import { useAuth } from '@/contexts/AuthContext';
 import { api, ApiError, type FullBriefResponse } from '@/lib/api';
 
@@ -552,6 +555,13 @@ function PaywallPanel({
   loadError: string | null;
 }) {
   const t = useTranslations('paywall');
+  const locale = useLocale();
+  // Where the reader comes back to once the magic link is verified.
+  // Carries the locale they were reading in: /auth/verify hands this
+  // straight to router.replace, and an unprefixed /briefs/{id} would go
+  // through the rescue redirect, whose locale depends on a cookie
+  // rather than on the page the reader left (GSC-F9).
+  const returnPath = localePath(locale, `/briefs/${briefId}`);
   if (isAuthLoading) {
     return (
       <div className="rounded-2xl border border-ink-500 bg-ink-800/40 p-6 text-sm text-mist-400">
@@ -567,16 +577,16 @@ function PaywallPanel({
           headline={t('headline')}
           subtext={t('description')}
           cta={t('cta')}
-          next={`/briefs/${briefId}`}
+          next={returnPath}
         />
         <p className="text-center text-sm text-mist-500">
           {t('magicLinkPrompt')}{' '}
-          <Link
-            href={`/auth/verify?next=/briefs/${briefId}`}
+          <NextLink
+            href={`/auth/verify?next=${encodeURIComponent(returnPath)}`}
             className="text-emerald-glow hover:text-emerald-bio"
           >
             {t('requestNewAccess')}
-          </Link>
+          </NextLink>
           .
         </p>
       </div>

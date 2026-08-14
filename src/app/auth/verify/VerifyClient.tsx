@@ -5,8 +5,23 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { getToken } from '@/lib/auth-storage';
+import { ROOT_LOCALE } from '@/i18n/routing';
 
 type VerifyStatus = 'pending' | 'success' | 'error';
+
+/** Landing page for a verified link, from the ?next= query parameter.
+ *
+ * Two things this guards. The value is handed to router.replace, and it
+ * comes from a URL the user can be sent by anyone, so it must be a path
+ * on this site — a single leading slash, since "//evil.com" is
+ * protocol-relative and would leave the origin. And the fallback has to
+ * carry a locale: a bare /briefs would go through the middleware's
+ * rescue redirect, landing the reader in whichever locale their cookie
+ * says rather than the one they were reading (GSC-F9). Callers all pass
+ * a prefixed path now; this only catches hand-edited links. */
+function safeRedirect(next: string | null): string {
+  return next && /^\/(?!\/)/.test(next) ? next : `/${ROOT_LOCALE}/briefs`;
+}
 
 function VerifyClient() {
   const params = useSearchParams();
@@ -34,7 +49,7 @@ function VerifyClient() {
       try {
         await verify(token);
         setStatus('success');
-        const redirect = params.get('next') || '/briefs';
+        const redirect = safeRedirect(params.get('next'));
         // Small delay so the user sees the confirmation before redirect.
         setTimeout(() => router.replace(redirect), 900);
       } catch (err) {
@@ -49,7 +64,7 @@ function VerifyClient() {
         }
         if (getToken()) {
           setStatus('success');
-          const redirect = params.get('next') || '/briefs';
+          const redirect = safeRedirect(params.get('next'));
           setTimeout(() => router.replace(redirect), 900);
           return;
         }
@@ -92,7 +107,7 @@ function VerifyClient() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
-              href="/briefs"
+              href={`/${ROOT_LOCALE}/briefs`}
               className="rounded-xl border border-ink-500 bg-ink-800/60 px-5 py-3 text-sm text-mist-200 hover:text-mist-100"
             >
               ← Retour aux briefs
