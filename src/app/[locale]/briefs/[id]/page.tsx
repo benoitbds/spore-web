@@ -52,15 +52,22 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
 
   const brief: BriefWithBody = briefRowToBrief(row);
 
-  // Stub briefs are user-specific honest-failure analyses; they shouldn't
-  // appear in search, and the regular briefMetaTitle helper reads fields
-  // that only exist on pipeline briefs (sharpened.title etc.).
-  if (brief.is_stub) {
-    return {
-      title: brief.sharpened.title || 'SPORE',
-      robots: { index: false, follow: false },
-    };
-  }
+  // S2b/C7c — indexability of stub briefs (honest "this collision led
+  // nowhere" analyses) depends on the LOCALE, not just on the type.
+  //
+  // FR: indexable. The page renders real, substantial prose.
+  // EN: not indexable, because it renders that same FRENCH prose. A
+  //     stub's body comes from body_markdown, and there is no
+  //     body_markdown_en column — only the chrome around it is
+  //     translated. Indexing it would put French content under an
+  //     English shell.
+  //
+  // The condition is on the body, not on the type: the vulgarization
+  // payload these pages take their title and description from IS
+  // already bilingual. Lift the EN half as soon as the bodies are
+  // translated — do not let this outlive that, and do not widen it back
+  // to `if (brief.is_stub)` without re-reading this.
+  const isFrenchOnlyBody = brief.is_stub && locale !== 'fr';
 
   // S7.4 Phase 3: briefMeta* helpers now accept the active locale and
   // prefer ``vulgarization_en`` when present. Briefs that have not yet
@@ -77,6 +84,12 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
     title,
     description,
     alternates: localeAlternates(locale, `/briefs/${brief.brief_id}`),
+    // The key is omitted, not set to undefined: an explicit undefined
+    // overrides the parent metadata instead of deferring to it, which
+    // would drop the layout's googleBot directives (max-snippet,
+    // max-image-preview) from every brief page. Only the EN half of a
+    // stub opts out; everything else inherits.
+    ...(isFrenchOnlyBody ? { robots: { index: false, follow: false } } : {}),
     openGraph: {
       type: 'article',
       locale: locale === 'fr' ? 'fr_FR' : 'en_US',
