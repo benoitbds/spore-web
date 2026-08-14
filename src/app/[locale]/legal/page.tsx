@@ -1,10 +1,20 @@
 import type { Metadata } from 'next';
+import { localeAlternates } from '@/lib/i18n-seo';
 
-export const metadata: Metadata = {
-  title: 'Mentions légales',
-  description: 'Informations légales sur le site SPORE.',
-  alternates: { canonical: '/legal' },
-};
+// S1/F02 — same static-canonical bug as pricing/custom/privacy/stats.
+// Not in the sprint's enumeration; found during the Phase 1 audit.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    title: 'Mentions légales',
+    description: 'Informations légales sur le site SPORE.',
+    alternates: localeAlternates(locale, '/legal'),
+  };
+}
 
 export default function LegalPage() {
   return (

@@ -1,10 +1,19 @@
 import type { Metadata } from 'next';
+import { localeAlternates } from '@/lib/i18n-seo';
 
-export const metadata: Metadata = {
-  title: 'Politique de confidentialité',
-  description: 'Comment SPORE protège vos données personnelles.',
-  alternates: { canonical: '/privacy' },
-};
+// S1/F02 — see pricing/page.tsx for the rationale.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    title: 'Politique de confidentialité',
+    description: 'Comment SPORE protège vos données personnelles.',
+    alternates: localeAlternates(locale, '/privacy'),
+  };
+}
 
 export default function PrivacyPage() {
   return (
