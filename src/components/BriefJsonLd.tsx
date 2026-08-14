@@ -25,8 +25,11 @@ export default function BriefJsonLd({ brief, locale, verdictKeywords = [] }: Pro
   // calls localePath), so url / mainEntityOfPage and <link rel=canonical>
   // resolve to the same string by construction.
   const url = localeUrl(locale, `/briefs/${brief.brief_id}`);
-  const headline = briefMetaTitle(brief);
-  const description = briefOgDescription(brief);
+  // S2/F03: both helpers take the locale and prefer vulgarization_en on
+  // EN pages. Called bare, they defaulted to 'fr' and put French prose
+  // in the structured data of every /en/briefs/... page.
+  const headline = briefMetaTitle(brief, locale);
+  const description = briefOgDescription(brief, locale);
   const datePublished = brief.generated_at;
 
   const about = (brief.domains || [])
@@ -44,7 +47,9 @@ export default function BriefJsonLd({ brief, locale, verdictKeywords = [] }: Pro
     description,
     datePublished: toIsoUtc(datePublished),
     dateModified: toIsoUtc(datePublished),
-    inLanguage: ['fr-FR', 'en'],
+    // One language per page, not both: this payload describes the page
+    // it sits on, and headline/description above are now in that one.
+    inLanguage: locale === 'fr' ? 'fr-FR' : 'en',
     url,
     mainEntityOfPage: url,
     identifier: brief.brief_id,

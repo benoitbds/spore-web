@@ -1,38 +1,38 @@
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { getStats, getAllBriefs } from '@/lib/db';
-import { SITE_URL } from '@/lib/seo';
-import { localeAlternates } from '@/lib/i18n-seo';
+import { localeAlternates, localeUrl } from '@/lib/i18n-seo';
 import StatsClient from './StatsClient';
-
-const _desc =
-  'Métriques publiques de SPORE : collisions explorées, briefs publiés, scores de nouveauté, coûts par brief. Transparence totale sur ce que produit le pipeline.';
 
 // Static metadata can't see the locale, so this page used to declare
 // canonical /stats from both /fr/stats and /en/stats — an URL that only
-// exists as a middleware rescue redirect. generateMetadata gets params,
-// hence the active locale (S1/F02). The copy stays FR-only for now:
-// translating it is content i18n, out of this sprint's scope.
+// exists as a middleware rescue redirect (S1/F02) — and served the
+// French title and description on /en/stats (S2/F03). generateMetadata
+// gets params, hence the locale, hence both fixes.
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'stats' });
+  const title = t('metaTitle');
+  const description = t('metaDescription');
   return {
-    title: 'Statistiques',
-    description: _desc,
+    title,
+    description,
     alternates: localeAlternates(locale, '/stats'),
     openGraph: {
-      title: 'Statistiques | SPORE',
-      description: _desc,
-      url: `${SITE_URL}/${locale}/stats`,
+      title: `${title} | SPORE`,
+      description,
+      url: localeUrl(locale, '/stats'),
       type: 'website',
       locale: locale === 'fr' ? 'fr_FR' : 'en_US',
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Statistiques | SPORE',
-      description: _desc,
+      title: `${title} | SPORE`,
+      description,
     },
   };
 }

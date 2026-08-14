@@ -130,6 +130,8 @@
     "sort_by": "Sort by"
   },
   "stats": {
+    "metaTitle": "Statistics",
+    "metaDescription": "SPORE public metrics: collisions explored, briefs published, novelty scores, cost per brief. Full transparency on what the pipeline produces.",
     "card_avgNovelty": "Average novelty",
     "card_panelConsensus": "Panel consensus",
     "card_costPerBrief": "Cost per brief",
@@ -576,5 +578,17 @@
         "metric": ""
       }
     }
+  },
+  "pricingPage": {
+    "metaTitle": "Pricing",
+    "metaDescription": "SPORE launch offer: every research brief is free. Hypothesis, protocol, review panel, DOIs verified against Semantic Scholar. Sign up to get access."
+  },
+  "privacyPage": {
+    "metaTitle": "Privacy policy",
+    "metaDescription": "How SPORE protects your personal data."
+  },
+  "legalPage": {
+    "metaTitle": "Legal notice",
+    "metaDescription": "Legal information about the SPORE website."
   }
 }

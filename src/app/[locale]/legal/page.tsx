@@ -1,17 +1,19 @@
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { localeAlternates } from '@/lib/i18n-seo';
 
-// S1/F02 — same static-canonical bug as pricing/custom/privacy/stats.
-// Not in the sprint's enumeration; found during the Phase 1 audit.
+// S1/F02 + S2/F03 — same as privacy: metadata translated, French legal
+// body left alone.
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'legalPage' });
   return {
-    title: 'Mentions légales',
-    description: 'Informations légales sur le site SPORE.',
+    title: t('metaTitle'),
+    description: t('metaDescription'),
     alternates: localeAlternates(locale, '/legal'),
   };
 }

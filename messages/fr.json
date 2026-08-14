@@ -130,6 +130,8 @@
     "sort_by": "Trier par"
   },
   "stats": {
+    "metaTitle": "Statistiques",
+    "metaDescription": "Métriques publiques de SPORE : collisions explorées, briefs publiés, scores de nouveauté, coûts par brief. Transparence totale sur ce que produit le pipeline.",
     "card_avgNovelty": "Nouveauté moyenne",
     "card_panelConsensus": "Consensus du panel",
     "card_costPerBrief": "Coût par brief",
@@ -576,5 +578,17 @@
         "metric": ""
       }
     }
+  },
+  "pricingPage": {
+    "metaTitle": "Tarifs",
+    "metaDescription": "Offre de lancement SPORE : tous les briefs de recherche sont gratuits. Hypothèse, protocole, panel de review, DOIs vérifiés sur Semantic Scholar. Inscrivez-vous pour accéder au service."
+  },
+  "privacyPage": {
+    "metaTitle": "Politique de confidentialité",
+    "metaDescription": "Comment SPORE protège vos données personnelles."
+  },
+  "legalPage": {
+    "metaTitle": "Mentions légales",
+    "metaDescription": "Informations légales sur le site SPORE."
   }
 }
