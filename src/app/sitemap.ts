@@ -2,11 +2,33 @@ import type { MetadataRoute } from 'next';
 import { getAllBriefs } from '@/lib/db';
 import { ROOT_LOCALE, routing } from '@/i18n/routing';
 import { localeUrl } from '@/lib/i18n-seo';
+import { toIsoUtc } from '@/lib/seo';
 
 // ISR cadence — Next caches the sitemap response and re-renders it at
 // most every 5 min. Plenty fresh for Google to discover newly-published
 // briefs without hammering the DB on every crawl.
 export const revalidate = 300;
+
+/**
+ * Coerce a DB timestamp into W3C Datetime, the only format Google
+ * accepts in <lastmod> (GSC-F3).
+ *
+ * briefs.created_at is written by SQLite's CURRENT_TIMESTAMP, so it
+ * reads "2026-04-11 20:08:15" — a space instead of the T separator and
+ * no timezone at all. Passed straight through, that made Search Console
+ * reject the whole file with "invalid date" and stop reading it: no
+ * re-crawl since 2026-05-02.
+ *
+ * toIsoUtc handles the separator and the missing Z (SQLite stores UTC by
+ * contract) and is idempotent, so rows already in ISO pass through
+ * untouched. The Date round-trip is the actual validity check —
+ * anything unparseable returns null and the caller drops the field.
+ */
+function w3cDatetime(raw: string | null | undefined): string | null {
+  if (!raw || !raw.trim()) return null;
+  const parsed = new Date(toIsoUtc(raw.trim()));
+  return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+}
 
 /** Build the alternates map for a given path; returned as-is for every
  * locale entry of that path so each sitemap row points at every other
@@ -72,13 +94,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // declaring its hreflang siblings via alternates.languages so search
   // engines don't treat /fr/briefs/SPR-X and /en/briefs/SPR-X as
   // duplicate content.
-  const briefEntries: MetadataRoute.Sitemap = briefs.flatMap((b) =>
-    bilingualEntries(`/briefs/${b.id}`, {
-      lastModified: b.created_at || now,
+  const briefEntries: MetadataRoute.Sitemap = briefs.flatMap((b) => {
+    const lastModified = w3cDatetime(b.created_at);
+    return bilingualEntries(`/briefs/${b.id}`, {
+      // Omitted entirely rather than faked when the row carries no
+      // usable date: <lastmod> is optional in the sitemap protocol, and
+      // substituting the render time would tell Google every dateless
+      // brief changed on every re-render.
+      ...(lastModified ? { lastModified } : {}),
       changeFrequency: 'monthly',
       priority: 0.8,
-    }),
-  );
+    });
+  });
 
   return [...staticEntries, ...briefEntries];
 }
