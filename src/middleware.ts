@@ -36,6 +36,40 @@ function redirectOrigin(request: NextRequest): string {
 }
 
 /**
+ * Re-base a self-referencing Location header onto SITE_ORIGIN.
+ *
+ * The redirects next-intl emits internally — the locale-prefix rescue
+ * on /pricing, /briefs/SPR-XXXX, and every other unprefixed path — are
+ * built from the request origin, which we can't reach into. On the
+ * public host that origin resolves to ``https://spore-research.com:3012``
+ * because the proxy forwards no X-Forwarded-Port, so those redirects
+ * land users and crawlers on a port that isn't reachable from outside.
+ *
+ * Rewriting the header after the fact fixes them all at once, whatever
+ * next-intl does upstream. Only requests arriving on the public host
+ * are touched, and only Locations pointing back at ourselves — an
+ * external redirect (none today) would pass through untouched.
+ */
+function normalizeLocation(response: NextResponse, request: NextRequest): NextResponse {
+  const location = response.headers.get('location');
+  if (!location || redirectOrigin(request) !== SITE_ORIGIN) return response;
+
+  let target: URL;
+  try {
+    target = new URL(location, SITE_ORIGIN);
+  } catch {
+    return response;
+  }
+  if (target.hostname !== SITE_HOSTNAME) return response;
+
+  response.headers.set(
+    'location',
+    `${SITE_ORIGIN}${target.pathname}${target.search}${target.hash}`,
+  );
+  return response;
+}
+
+/**
  * Routes left at the non-localised root in S7.2.
  *
  * These are reached from external sources (email links, Stripe
@@ -82,8 +116,9 @@ export default function middleware(request: NextRequest) {
     );
   }
 
-  // 3. Standard intlMiddleware for everything else.
-  return intlMiddleware(request);
+  // 3. Standard intlMiddleware for everything else, with its Location
+  //    header re-based on the public origin (S1/F02).
+  return normalizeLocation(intlMiddleware(request), request);
 }
 
 export const config = {
