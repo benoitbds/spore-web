@@ -35,14 +35,19 @@ function matchAll(xml: string, tag: string): string[] {
 }
 
 /**
- * Fetch with retries.
+ * Fetch with retries, reporting each failed attempt.
  *
- * spore-research.com currently has two A records and one of them
- * (213.186.33.5, OVH) answers nothing on 443, so roughly one connection
- * in five dies with ECONNRESET before reaching us. That is a DNS defect
- * to fix at the registrar, not something this script can assert on —
- * retrying keeps the sitemap checks meaningful in the meantime. Pass
- * http://127.0.0.1:3012/sitemap.xml to bypass DNS entirely.
+ * Added when the apex carried a stale second A record pointing at an
+ * OVH host that accepted no TLS connection, so roughly one HTTPS
+ * request in five died with ECONNRESET before reaching the app. That
+ * record was removed on 2026-08-14 and the apex now resolves to a
+ * single address.
+ *
+ * The retry stays: this script asserts on sitemap content, and a
+ * transport hiccup should not read as a content failure. The per-attempt
+ * logging is the point — it keeps any recurrence visible instead of
+ * silently absorbed. Pass http://127.0.0.1:3012/sitemap.xml to bypass
+ * DNS entirely.
  */
 async function fetchWithRetry(url: string, attempts = 4): Promise<string> {
   let lastErr: unknown;
