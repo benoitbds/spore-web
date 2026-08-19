@@ -2,13 +2,19 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+// Two Link flavours on purpose (S1/F01): /account lives at the
+// non-localised root (src/app/account/page.tsx) and must keep the plain
+// next/link, while /custom only exists under src/app/[locale]/ and needs
+// the locale-prefixing Link. Converting the whole file would 404 /account.
+import { Link as LocalizedLink } from '@/i18n/routing';
 import { useAuth } from '@/contexts/AuthContext';
 import EmailGate from '@/components/EmailGate';
 
 /**
  * Header auth slot. Renders:
  *   - skeleton dot while rehydrating
- *   - "Se connecter" button (opens inline EmailGate dropdown) if anonymous
+ *   - sign-in button (opens inline EmailGate dropdown) if anonymous
  *   - email + credits badge + logout menu if signed in
  *
  * Desktop-first; mobile surface is handled by the drawer separately.
@@ -18,6 +24,8 @@ export default function AuthWidget({
 }: {
   orientation?: 'horizontal' | 'vertical';
 }) {
+  const t = useTranslations('auth');
+  const tNav = useTranslations('navigation');
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const [showGate, setShowGate] = useState(false);
@@ -51,9 +59,9 @@ export default function AuthWidget({
         <div className="border-t border-ink-500/50 px-4 pt-4">
           {showGate ? (
             <EmailGate
-              headline="Connexion"
-              subtext="Un lien magique vous sera envoyé par email."
-              cta="Recevoir le lien"
+              headline={t('connectionHeadline')}
+              subtext={t('connectionSubtext')}
+              cta={t('connectionCta')}
               onSent={() => setShowGate(false)}
             />
           ) : (
@@ -61,7 +69,7 @@ export default function AuthWidget({
               onClick={() => setShowGate(true)}
               className="w-full rounded-xl border border-emerald-bio bg-emerald-bio/10 px-4 py-3 text-sm font-semibold text-emerald-glow hover:bg-emerald-bio/20"
             >
-              Se connecter
+              {t('signIn')}
             </button>
           )}
         </div>
@@ -74,14 +82,14 @@ export default function AuthWidget({
           onClick={() => setShowGate((s) => !s)}
           className="text-sm text-mist-400 hover:text-emerald-glow"
         >
-          Se connecter
+          {t('signIn')}
         </button>
         {showGate && (
           <div className="absolute right-0 top-full z-50 mt-3 w-80">
             <EmailGate
-              headline="Connexion"
-              subtext="Un lien magique vous sera envoyé par email."
-              cta="Recevoir le lien"
+              headline={t('connectionHeadline')}
+              subtext={t('connectionSubtext')}
+              cta={t('connectionCta')}
               onSent={() => setShowGate(false)}
             />
           </div>
@@ -91,16 +99,14 @@ export default function AuthWidget({
   }
 
   const email = user?.email ?? '';
-  const credits = user?.credits ?? 0;
-  const freeAvailable = user ? !user.free_brief_used : false;
   const emailShort = email.length > 22 ? `${email.slice(0, 20)}…` : email;
   // Launch mode: everything is free
-  const creditLabel = '✨ Accès gratuit';
+  const creditLabel = t('freeAccess');
 
   if (orientation === 'vertical') {
     return (
       <div className="space-y-1 border-t border-ink-500/50 pt-4">
-        <div className="px-4 text-xs text-mist-500">Connecté</div>
+        <div className="px-4 text-xs text-mist-500">{t('connected')}</div>
         <div className="px-4 text-sm text-mist-200">{emailShort}</div>
         <div className="px-4 text-xs text-emerald-glow">
           {creditLabel}
@@ -109,13 +115,13 @@ export default function AuthWidget({
           href="/account"
           className="mt-2 block rounded-xl px-4 py-2 text-sm text-mist-200 hover:bg-ink-800/60"
         >
-          Mon compte
+          {t('myAccount')}
         </Link>
         <button
           onClick={logout}
           className="w-full rounded-xl px-4 py-2 text-left text-sm text-mist-400 hover:bg-ink-800/60 hover:text-red-400"
         >
-          Déconnexion
+          {t('signOut')}
         </button>
       </div>
     );
@@ -141,7 +147,7 @@ export default function AuthWidget({
           className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-ink-500 bg-ink-800 shadow-2xl"
         >
           <div className="border-b border-ink-500/50 px-4 py-3">
-            <div className="text-xs text-mist-500">Connecté</div>
+            <div className="text-xs text-mist-500">{t('connected')}</div>
             <div className="text-sm text-mist-100">{emailShort}</div>
             <div className="mt-1 text-xs text-emerald-glow">
               {creditLabel}
@@ -152,16 +158,16 @@ export default function AuthWidget({
             onClick={() => setOpen(false)}
             className="block px-4 py-2 text-sm text-mist-200 hover:bg-ink-700/60"
           >
-            Mon compte
+            {t('myAccount')}
           </Link>
           {/* pricing link hidden during launch */}
-          <Link
+          <LocalizedLink
             href="/custom"
             onClick={() => setOpen(false)}
             className="block px-4 py-2 text-sm text-mist-200 hover:bg-ink-700/60"
           >
-            Collision sur mesure
-          </Link>
+            {tNav('custom')}
+          </LocalizedLink>
           <button
             onClick={() => {
               logout();
@@ -169,7 +175,7 @@ export default function AuthWidget({
             }}
             className="block w-full px-4 py-2 text-left text-sm text-mist-400 hover:bg-ink-700/60 hover:text-red-400"
           >
-            Déconnexion
+            {t('signOut')}
           </button>
         </div>
       )}

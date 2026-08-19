@@ -173,6 +173,28 @@ export interface VulgarizationFr {
   reviewers_say: string;
 }
 
+/** English vulgarisation, written by the S7.4 translation script.
+ *
+ * Mirrors VulgarizationFr's shape with neutral keys — the column itself
+ * is ``vulgarization_data_en`` so the inner ``title_fr`` -> ``title``
+ * rename keeps the JSON tidy. May be absent (``undefined``) on briefs
+ * whose translation has not been backfilled yet. Frontend code must
+ * therefore guard for null/undefined and fall back to the FR payload.
+ */
+export interface VulgarizationEn {
+  title: string;
+  hypothesis_in_brief: string;
+  why_it_matters: string;
+  imagine_that: string;
+  concretely: {
+    intro: string;
+    phase1: string;
+    phase2: string;
+    phase3: string;
+  };
+  reviewers_say: string;
+}
+
 export interface Brief {
   brief_id: string;
   generated_at: string;
@@ -182,7 +204,14 @@ export interface Brief {
   sharpened: Sharpened;
   protocol: Protocol;
   panel: Panel;
+  /** S7.4 Phase 3-fix-v2.C: EN translation of ``panel_data`` with the
+   *  same shape — only the prose (strengths / weaknesses /
+   *  critical_questions / recommendation per reviewer + meta_review
+   *  prose lists) is translated; tokens (reviewer_persona, verdict,
+   *  scores) are copied verbatim. May be absent on legacy briefs. */
+  panel_en?: Panel;
   vulgarization_fr?: VulgarizationFr;
+  vulgarization_en?: VulgarizationEn;
   /**
    * Set by the db adapter (``briefRowToBrief``) when the row carries
    * ``is_stub=1`` — i.e. an honest "no bridge found" analysis rather
@@ -190,6 +219,17 @@ export interface Brief {
    * with any mock/fixture payloads that predate the stub flow.
    */
   is_stub?: boolean;
+  /**
+   * Markdown body mirrored from ``briefs.body_markdown``. Set by the db
+   * adapter (``briefRowToBrief``) whenever the column is non-NULL, so it
+   * is present at runtime on every brief the app builds from SQLite.
+   *
+   * Declared here — not only on ``BriefWithBody`` — because the stub
+   * fallbacks in ``lib/seo.ts`` derive a stub's title and excerpt from
+   * this body, and those helpers run on both the server (metadata) and
+   * the client (cards), which only ever see the plain ``Brief`` type.
+   */
+  body_markdown?: string;
 }
 
 /**
@@ -208,6 +248,10 @@ export interface BriefTeaser {
   formal_statement: string; // sharpened.formal_statement — the one-liner
   verdict: string;          // panel.meta_review.verdict (for the chip only)
   vulgarization_fr?: VulgarizationFr;
+  vulgarization_en?: VulgarizationEn;
+  /** S7.4 Phase 3-fix-v2.C: forwarded to the client so the post-unlock
+   *  RechercheSections can render reviewer prose in the active locale. */
+  panel_en?: Panel;
 
   // ── EN "Comprendre" summaries ───────────────────────────────────
   // Denormalised, non-sensitive extracts from the full brief used to
@@ -237,6 +281,16 @@ export interface BriefTeaser {
   }>;
   references_total?: number;
   panel_preview?: Array<{
+    persona: string;
+    score: number;
+    verdict: string;
+    key_point: string;
+  }>;
+  /** Same shape as ``panel_preview`` but built from ``panel_en.reviews``
+   *  when an EN translation is available. Optional; the client picks
+   *  this on /en/ and falls back to the FR ``panel_preview`` when
+   *  absent. */
+  panel_preview_en?: Array<{
     persona: string;
     score: number;
     verdict: string;
@@ -293,6 +347,22 @@ export function briefToTeaser(b: Brief): BriefTeaser {
     verdict: r.verdict ?? '',
     key_point: r.strengths?.[0] || r.recommendation || '',
   }));
+  // Same projection on the EN payload when present. Numbers and tokens
+  // come from the FR side (canonical) so this is purely the prose swap.
+  const reviewsEn = b.panel_en?.reviews ?? [];
+  const panel_preview_en =
+    reviewsEn.length > 0
+      ? reviews.slice(0, 5).map((r, i) => {
+          const en = reviewsEn[i];
+          return {
+            persona: r.reviewer_persona,
+            score: r.overall_score ?? 0,
+            verdict: r.verdict ?? '',
+            key_point:
+              en?.strengths?.[0] || en?.recommendation || r.strengths?.[0] || '',
+          };
+        })
+      : undefined;
 
   return {
     brief_id: b.brief_id,
@@ -302,6 +372,8 @@ export function briefToTeaser(b: Brief): BriefTeaser {
     formal_statement: b.sharpened.formal_statement,
     verdict: b.panel.meta_review.verdict,
     vulgarization_fr: b.vulgarization_fr,
+    vulgarization_en: b.vulgarization_en,
+    panel_en: b.panel_en,
     mechanism_summary,
     novelty_summary,
     protocol_summary: protocol_summary.length > 0 ? protocol_summary : undefined,
@@ -310,6 +382,7 @@ export function briefToTeaser(b: Brief): BriefTeaser {
       references_preview.length > 0 ? references_preview : undefined,
     references_total: references_total > 0 ? references_total : undefined,
     panel_preview: panel_preview.length > 0 ? panel_preview : undefined,
+    panel_preview_en,
   };
 }
 

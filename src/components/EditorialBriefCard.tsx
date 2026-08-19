@@ -1,9 +1,10 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { motion } from 'framer-motion';
+import { useLocale, useTranslations } from 'next-intl';
 import type { Brief } from '@/lib/types';
-import { verdictLabel } from '@/lib/verdicts';
+import { briefCardHook, briefCardTitle } from '@/lib/seo';
 
 interface Props {
   brief: Brief;
@@ -16,19 +17,40 @@ interface Props {
  * Uses the French vulgarization (title_fr + imagine_that) when available,
  * falls back to the academic title + formal statement otherwise. Built
  * for the "grand public" reader: hook first, metrics as secondary detail.
+ *
+ * S2c/C13-C14 — stub briefs are the exception on both counts: their
+ * title and hook come from the Markdown body (never the vulgarisation,
+ * which is fabricated for a collision that produced no hypothesis), and
+ * their score row is hidden because a stub was never evaluated.
  */
 export default function EditorialBriefCard({ brief, index = 0 }: Props) {
-  const { vulgarization_fr: v, sharpened, domains, grounding, panel, brief_id, generated_at, is_stub } = brief;
+  const t = useTranslations('briefCard');
+  const tVerdicts = useTranslations('verdicts');
+  const locale = useLocale();
+  const dateLocale = locale === 'fr' ? 'fr-FR' : 'en-US';
+  const { domains, grounding, panel, brief_id, generated_at, is_stub } = brief;
 
-  const title = v?.title_fr || sharpened.title;
-  const hook = v?.imagine_that || sharpened.formal_statement;
+  // Cards follow the page locale, falling back across languages when
+  // the preferred payload is missing (rare in prod after S7.4 Phase 2).
+  // The two-level fallback keeps the card usable for legacy briefs:
+  // /en card -> ve.title -> vf.title_fr -> sharpened.title. Stubs skip
+  // the vulgarisation entirely — see lib/seo.ts.
+  const title = briefCardTitle(brief, locale);
+  const hook = briefCardHook(brief, locale);
   // Hook comes in the form "Imaginez que…" — keep the flavour without
   // repeating the lead-in on each card; trim to ~180 chars.
   const hookTrimmed = hook.length > 180 ? hook.slice(0, 177).trimEnd() + '…' : hook;
 
+  // S2c/C14 — the scores rendered here are NOT the DB values: a stub has
+  // novelty_score and panel_consensus_score NULL, and briefRowToBrief's
+  // defaultGrounding/defaultPanel collapse that to 0, which the card then
+  // printed as "nouveauté 0.00 · panel 0.0". A stub was never evaluated;
+  // zero is a claim about quality it never earned. The whole row is
+  // hidden rather than labelled "non évalué" — the card already carries
+  // the `nonProductive` badge, so a second disclaimer is redundant.
   const novelty = grounding.novelty_assessment.score;
   const panelScore = panel.meta_review.consensus_score;
-  const isPublished = panel.meta_review.verdict === 'publish_brief';
+  const isPublished = !is_stub && panel.meta_review.verdict === 'publish_brief';
 
   return (
     <motion.div
@@ -44,7 +66,7 @@ export default function EditorialBriefCard({ brief, index = 0 }: Props) {
         <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-ink-500 bg-ink-800/40 p-7 transition-all duration-500 hover:-translate-y-0.5 hover:border-emerald-bio/50 hover:bg-ink-800/70 hover:shadow-[0_0_80px_rgba(16,185,129,0.10)]">
           {is_stub && (
             <span className="absolute right-4 top-4 rounded-full border border-mist-500/40 bg-ink-900/60 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-mist-400">
-              Non productive
+              {t('nonProductive')}
             </span>
           )}
           {/* top accent hairline on hover */}
@@ -74,29 +96,33 @@ export default function EditorialBriefCard({ brief, index = 0 }: Props) {
           {/* Footer — metrics + date */}
           <div className="mt-auto flex items-center justify-between border-t border-ink-500/70 pt-4 text-xs">
             <div className="flex items-center gap-4">
-              <span className="flex items-center gap-1.5 text-mist-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-glow" />
-                <span className="font-mono">nouveauté {novelty.toFixed(2)}</span>
-              </span>
-              <span
-                className={`font-mono ${
-                  panelScore >= 7
-                    ? 'text-emerald-glow'
-                    : panelScore >= 5.5
-                      ? 'text-amber-glow'
-                      : 'text-mist-500'
-                }`}
-              >
-                panel {panelScore.toFixed(1)}
-              </span>
+              {!is_stub && (
+                <>
+                  <span className="flex items-center gap-1.5 text-mist-400">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-glow" />
+                    <span className="font-mono">{t('novelty')} {novelty.toFixed(2)}</span>
+                  </span>
+                  <span
+                    className={`font-mono ${
+                      panelScore >= 7
+                        ? 'text-emerald-glow'
+                        : panelScore >= 5.5
+                          ? 'text-amber-glow'
+                          : 'text-mist-500'
+                    }`}
+                  >
+                    panel {panelScore.toFixed(1)}
+                  </span>
+                </>
+              )}
               {isPublished && (
                 <span className="rounded-full bg-emerald-bio/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-emerald-glow">
-                  {verdictLabel('publish_brief')}
+                  {tVerdicts('publish_brief')}
                 </span>
               )}
             </div>
             <time className="text-mist-500" dateTime={generated_at}>
-              {new Date(generated_at).toLocaleDateString('fr-FR', {
+              {new Date(generated_at).toLocaleDateString(dateLocale, {
                 day: '2-digit',
                 month: 'short',
               })}
@@ -109,7 +135,7 @@ export default function EditorialBriefCard({ brief, index = 0 }: Props) {
               {brief_id}
             </span>
             <span className="text-emerald-glow opacity-0 transition-opacity group-hover:opacity-100">
-              Lire →
+              {t('read')}
             </span>
           </div>
         </article>

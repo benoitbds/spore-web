@@ -1,10 +1,20 @@
+// Root layout (S7.3). Owns the HTML shell, fonts, and the AuthProvider.
+// The chrome (Header / Footer / LaunchBanner) lives in
+// app/[locale]/layout.tsx so it can call useTranslations.
+//
+// <html lang> is now driven by getLocale() from next-intl/server. The
+// next-intl middleware injects an x-next-intl-locale header on every
+// localised request which getLocale picks up here. Non-localised
+// routes (auth, newsletter, payment, account, anthology/sent,
+// custom/[id]/status) fall back to the routing default (fr) since the
+// middleware skips them and no locale header is set.
+
 import type { Metadata } from 'next';
 import { Instrument_Serif, Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import LaunchBanner from '@/components/LaunchBanner';
+import { getLocale } from 'next-intl/server';
 import { AuthProvider } from '@/contexts/AuthContext';
 import '@/styles/globals.css';
+import { SITE_URL, SITE_NAME, SITE_TAGLINE, SITE_DESCRIPTION } from '@/lib/seo';
 
 const display = Instrument_Serif({
   subsets: ['latin'],
@@ -27,8 +37,6 @@ const mono = JetBrains_Mono({
   variable: '--font-mono',
   display: 'swap',
 });
-
-import { SITE_URL, SITE_NAME, SITE_TAGLINE, SITE_DESCRIPTION } from '@/lib/seo';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -85,21 +93,14 @@ export const metadata: Metadata = {
       'max-video-preview': -1,
     },
   },
-  alternates: {
-    canonical: '/',
-  },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale();
   return (
-    <html lang="fr" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
+    <html lang={locale} className={`${display.variable} ${sans.variable} ${mono.variable}`}>
       <body className="bg-ink-900 text-mist-200 antialiased font-sans">
-        <AuthProvider>
-          <LaunchBanner />
-          <Header />
-          <main className="min-h-screen">{children}</main>
-          <Footer />
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

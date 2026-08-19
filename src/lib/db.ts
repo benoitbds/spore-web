@@ -31,6 +31,7 @@ import {
   type Protocol,
   type Panel,
   type VulgarizationFr,
+  type VulgarizationEn,
   type Stats,
 } from './types';
 
@@ -110,6 +111,14 @@ export interface BriefRow {
   protocol_data: unknown;
   panel_data: unknown;
   vulgarization_data: unknown;
+  /** S7.4 Phase 1+2: Nature-grade EN translation of vulgarization_data.
+   *  NULL on rows that pre-date the translation script run. */
+  vulgarization_data_en: unknown;
+  /** S7.4 Phase 3-fix-v2.C: Nature-grade EN translation of panel_data
+   *  prose (reviewer strengths/weaknesses/critical_questions/
+   *  recommendation + meta_review prose lists). Tokens copied
+   *  verbatim from panel_data. NULL on rows pre-Phase-3-fix-v2.C. */
+  panel_data_en: unknown;
   low_confidence: number;
   low_evidence: number;
   is_stub: number;
@@ -156,7 +165,9 @@ const JSON_COLUMNS = [
   'sharpened_data',
   'protocol_data',
   'panel_data',
+  'panel_data_en',
   'vulgarization_data',
+  'vulgarization_data_en',
 ] as const;
 
 function parseJsonColumn(value: unknown): unknown {
@@ -204,16 +215,26 @@ function extractDomainsFromBrief(row: BriefRow): string[] {
 }
 
 function extractTitle(row: BriefRow): string | null {
+  // S2c/C13 — stubs first: their title is the H1 of the Markdown body.
+  // (The comment that used to sit at the bottom of this function claimed
+  // stubs "carry their title in vulgarization-like shape". They don't —
+  // that misreading is what let fabricated vulgarisation titles reach
+  // the public surfaces in the first place.)
+  if (row.is_stub === 1) {
+    return extractMarkdownTitle(row.body_markdown) || row.formal_statement || null;
+  }
   const sharpened = row.sharpened_data as { title?: unknown } | null;
   if (sharpened && typeof sharpened === 'object' && typeof sharpened.title === 'string') {
     return sharpened.title;
   }
-  // Stubs carry their title in vulgarization-like shape; fall back to formal_statement.
   if (row.formal_statement) return row.formal_statement;
   return null;
 }
 
 function extractImagineThat(row: BriefRow): string | null {
+  // Stubs have no hypothesis and therefore no "imagine that" hook.
+  // Callers render the body excerpt instead (see lib/seo.ts).
+  if (row.is_stub === 1) return null;
   const v = row.vulgarization_data as { imagine_that?: unknown } | null;
   if (v && typeof v === 'object' && typeof v.imagine_that === 'string') {
     return v.imagine_that;
@@ -517,6 +538,16 @@ export function briefRowToBrief(row: BriefRow): BriefWithBody {
     ? (vulgRaw as unknown as VulgarizationFr)
     : undefined;
 
+  const vulgEnRaw = asObjectOrNull(row.vulgarization_data_en);
+  const vulgarization_en = vulgEnRaw
+    ? (vulgEnRaw as unknown as VulgarizationEn)
+    : undefined;
+
+  const panelEnRaw = asObjectOrNull(row.panel_data_en);
+  const panel_en = panelEnRaw
+    ? (panelEnRaw as unknown as Panel)
+    : undefined;
+
   // Domains live inside the JSON sidecars — most often on the panel /
   // protocol or in the original_hypothesis blob. We surface a best-effort
   // list from sharpened_data.domains then grounding_data.domains; fall
@@ -545,6 +576,8 @@ export function briefRowToBrief(row: BriefRow): BriefWithBody {
     protocol,
     panel,
     vulgarization_fr,
+    vulgarization_en,
+    panel_en,
     is_stub: row.is_stub === 1,
     stub_reason: row.stub_reason,
   };
@@ -770,10 +803,17 @@ export function getStats(): Stats | null {
 
 /**
  * Replacement for ``briefs.ts::getFeaturedBrief`` — three-tier preference:
- *   1. brief with vulgarization_data AND panel_verdict='publish_brief'
- *   2. brief with vulgarization_data (any verdict)
+ *   1. non-stub brief with vulgarization_data AND panel_verdict='publish_brief'
+ *   2. non-stub brief with vulgarization_data (any verdict)
  *   3. most recent brief overall
  * Each tier is a single-row LIMIT 1 query, evaluated in order.
+ *
+ * S2c/C13 — tiers 1 and 2 exclude stubs. A stub is a "this collision
+ * produced nothing" analysis; it has no business being the homepage
+ * hero, and it only ever qualified for tier 2 because it carried a
+ * fabricated vulgarization payload. Tier 3 stays unconditional so the
+ * hero is never empty, which is why FeaturedHero also guards on
+ * ``is_stub`` for its title, hook and score badges.
  */
 export function getFeaturedBrief(): BriefWithBody | null {
   const conn = db();
@@ -783,6 +823,7 @@ export function getFeaturedBrief(): BriefWithBody | null {
         `SELECT * FROM briefs
          WHERE vulgarization_data IS NOT NULL
            AND panel_verdict = 'publish_brief'
+           AND is_stub = 0
          ORDER BY created_at DESC LIMIT 1`,
       )
       .get() as Record<string, unknown> | undefined;
@@ -792,6 +833,7 @@ export function getFeaturedBrief(): BriefWithBody | null {
       .prepare(
         `SELECT * FROM briefs
          WHERE vulgarization_data IS NOT NULL
+           AND is_stub = 0
          ORDER BY created_at DESC LIMIT 1`,
       )
       .get() as Record<string, unknown> | undefined;

@@ -238,4 +238,20 @@ export const api = {
     apiFetch<AccountCustomRequest[]>('/api/account/custom-requests'),
   accountPurchases: () =>
     apiFetch<AccountPurchase[]>('/api/account/purchases'),
+  subscribeNewsletter: (payload: {
+    email: string;
+    source: string;
+    brief_id?: string;
+  }) =>
+    apiFetch<{ ok: boolean; message: string }>('/api/newsletter/subscribe', {
+      method: 'POST',
+      body: payload,
+      auth: false,
+    }),
+  requestAnthology: (payload: { email: string }) =>
+    apiFetch<{ ok: boolean; message: string }>('/api/anthology/request', {
+      method: 'POST',
+      body: payload,
+      auth: false,
+    }),
 };

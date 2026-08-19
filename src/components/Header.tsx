@@ -1,21 +1,26 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslations } from 'next-intl';
+import { Link, usePathname } from '@/i18n/routing';
 import AuthWidget from '@/components/AuthWidget';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
-const NAV = [
-  { href: '/', label: 'Accueil' },
-  { href: '/briefs', label: 'Briefs' },
-  { href: '/how-it-works', label: 'Comment ça marche' },
-  { href: '/pricing', label: 'Tarifs' },
-  { href: '/stats', label: 'Statistiques' },
+type NavItem = { href: '/' | '/briefs' | '/custom' | '/how-it-works' | '/pricing' | '/stats'; key: string };
+
+const NAV: readonly NavItem[] = [
+  { href: '/', key: 'home' },
+  { href: '/briefs', key: 'briefs' },
+  { href: '/custom', key: 'custom' },
+  { href: '/how-it-works', key: 'howItWorks' },
+  { href: '/pricing', key: 'pricing' },
+  { href: '/stats', key: 'stats' },
 ];
 
 export default function Header() {
   const pathname = usePathname();
+  const t = useTranslations('navigation');
   const [mobileOpen, setMobileOpen] = useState(false);
   // Mount flag so the portal only renders on the client (avoids SSR document ref).
   const [mounted, setMounted] = useState(false);
@@ -70,11 +75,11 @@ export default function Header() {
         aria-modal="true"
       >
         <div className="flex items-center justify-between border-b border-ink-500/50 px-6 py-4">
-          <span className="font-display text-lg text-mist-100">Menu</span>
+          <span className="font-display text-lg text-mist-100">{t('menu')}</span>
           <button
             type="button"
             onClick={() => setMobileOpen(false)}
-            aria-label="Fermer le menu"
+            aria-label={t('closeMenu')}
             className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-ink-500 text-mist-300 hover:text-mist-100"
           >
             <IconClose className="h-5 w-5" />
@@ -93,14 +98,17 @@ export default function Header() {
                     : 'text-mist-200 hover:bg-ink-800/60 hover:text-mist-100'
                 }`}
               >
-                <span>{item.label}</span>
+                <span>{t(item.key)}</span>
                 <span className="text-mist-500">→</span>
               </Link>
             </li>
           ))}
         </ul>
 
-        <div className="mt-auto px-4 pb-6">
+        <div className="mt-auto flex flex-col gap-3 px-4 pb-6">
+          <div className="flex justify-start">
+            <LanguageSwitcher />
+          </div>
           <AuthWidget orientation="vertical" />
         </div>
       </div>
@@ -133,7 +141,7 @@ export default function Header() {
                       : 'text-mist-400 hover:text-mist-100'
                   }`}
                 >
-                  {item.label}
+                  {t(item.key)}
                   {isActive(item.href) && (
                     <span className="absolute -bottom-5 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-bio to-transparent" />
                   )}
@@ -142,8 +150,9 @@ export default function Header() {
             ))}
           </ul>
 
-          {/* Desktop auth slot */}
-          <div className="hidden md:block">
+          {/* Desktop auth slot + locale switcher */}
+          <div className="hidden md:flex md:items-center md:gap-3">
+            <LanguageSwitcher />
             <AuthWidget />
           </div>
 
@@ -151,7 +160,7 @@ export default function Header() {
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
-            aria-label="Ouvrir le menu"
+            aria-label={t('openMenu')}
             aria-expanded={mobileOpen}
             aria-controls="mobile-nav"
             className="md:hidden inline-flex h-11 w-11 items-center justify-center rounded-full border border-ink-500 bg-ink-800/50 text-mist-200 hover:text-mist-100"

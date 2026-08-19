@@ -1,9 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import type { Review, MetaReview } from '@/lib/types';
-import { verdictLabel } from '@/lib/verdicts';
-import { label } from '@/lib/labels';
 
 const PERSONA_META: Record<string, { icon: string; color: string }> = {
   methodologist: { icon: '🔬', color: '#10B981' },
@@ -25,6 +24,17 @@ interface ReviewerPanelProps {
 }
 
 export default function ReviewerPanel({ reviews, meta }: ReviewerPanelProps) {
+  const tPersonas = useTranslations('personas');
+  const tVerdicts = useTranslations('verdicts');
+  const tPanel = useTranslations('reviewerPanel');
+  const safe = (ns: ReturnType<typeof useTranslations>, key: string) => {
+    if (!key) return '—';
+    try {
+      return ns(key);
+    } catch {
+      return key;
+    }
+  };
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
@@ -33,7 +43,7 @@ export default function ReviewerPanel({ reviews, meta }: ReviewerPanelProps) {
             icon: '👤',
             color: '#71717a',
           };
-          const personaLabel = label(r.reviewer_persona);
+          const personaLabel = safe(tPersonas, r.reviewer_persona);
           const keyPoint =
             r.strengths[0] || r.recommendation || '';
 
@@ -61,7 +71,7 @@ export default function ReviewerPanel({ reviews, meta }: ReviewerPanelProps) {
                 {personaLabel}
               </div>
               <div className="mb-2 text-xs text-mist-500">
-                {verdictLabel(r.verdict)} · conf {Math.round(r.confidence * 100)}%
+                {safe(tVerdicts, r.verdict)} · conf {Math.round(r.confidence * 100)}%
               </div>
               {keyPoint && (
                 <div className="text-xs leading-relaxed text-mist-300 line-clamp-3">
@@ -83,7 +93,7 @@ export default function ReviewerPanel({ reviews, meta }: ReviewerPanelProps) {
         <div className="flex flex-col items-start gap-6 md:flex-row md:items-center">
           <div className="md:border-r md:border-ink-500 md:pr-6">
             <div className="text-xs uppercase tracking-widest text-mist-500">
-              Consensus
+              {tPanel('consensus')}
             </div>
             <div
               className={`font-display text-5xl md:text-6xl ${scoreTone(
@@ -94,7 +104,7 @@ export default function ReviewerPanel({ reviews, meta }: ReviewerPanelProps) {
               <span className="text-xl text-mist-500">/10</span>
             </div>
             <div className="mt-1 text-sm font-medium text-mist-300">
-              {verdictLabel(meta.verdict)}
+              {safe(tVerdicts, meta.verdict)}
             </div>
           </div>
 
@@ -102,7 +112,7 @@ export default function ReviewerPanel({ reviews, meta }: ReviewerPanelProps) {
             {meta.key_consensus?.length > 0 && (
               <div>
                 <div className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-glow">
-                  Points de consensus
+                  {tPanel('consensusPoints')}
                 </div>
                 <ul className="space-y-1 text-sm text-mist-300">
                   {meta.key_consensus.slice(0, 3).map((p, i) => (
@@ -117,7 +127,7 @@ export default function ReviewerPanel({ reviews, meta }: ReviewerPanelProps) {
             {meta.critical_path && (
               <div className="border-l-2 border-amber-bio pl-3">
                 <div className="mb-1 text-xs font-medium uppercase tracking-wider text-amber-glow">
-                  Chemin critique
+                  {tPanel('criticalPath')}
                 </div>
                 <p className="text-sm text-mist-300 leading-relaxed">
                   {meta.critical_path}
