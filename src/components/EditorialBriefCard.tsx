@@ -4,6 +4,7 @@ import { Link } from '@/i18n/routing';
 import { motion } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 import type { Brief } from '@/lib/types';
+import { briefCardHook, briefCardTitle } from '@/lib/seo';
 
 interface Props {
   brief: Brief;
@@ -16,45 +17,40 @@ interface Props {
  * Uses the French vulgarization (title_fr + imagine_that) when available,
  * falls back to the academic title + formal statement otherwise. Built
  * for the "grand public" reader: hook first, metrics as secondary detail.
+ *
+ * S2c/C13-C14 — stub briefs are the exception on both counts: their
+ * title and hook come from the Markdown body (never the vulgarisation,
+ * which is fabricated for a collision that produced no hypothesis), and
+ * their score row is hidden because a stub was never evaluated.
  */
 export default function EditorialBriefCard({ brief, index = 0 }: Props) {
   const t = useTranslations('briefCard');
   const tVerdicts = useTranslations('verdicts');
   const locale = useLocale();
   const dateLocale = locale === 'fr' ? 'fr-FR' : 'en-US';
-  const {
-    vulgarization_fr: vf,
-    vulgarization_en: ve,
-    sharpened,
-    domains,
-    grounding,
-    panel,
-    brief_id,
-    generated_at,
-    is_stub,
-  } = brief;
+  const { domains, grounding, panel, brief_id, generated_at, is_stub } = brief;
 
   // Cards follow the page locale, falling back across languages when
   // the preferred payload is missing (rare in prod after S7.4 Phase 2).
   // The two-level fallback keeps the card usable for legacy briefs:
-  // /en card -> ve.title -> vf.title_fr -> sharpened.title.
-  const title =
-    (locale === 'en' ? ve?.title : vf?.title_fr) ||
-    ve?.title ||
-    vf?.title_fr ||
-    sharpened.title;
-  const hook =
-    (locale === 'en' ? ve?.imagine_that : vf?.imagine_that) ||
-    ve?.imagine_that ||
-    vf?.imagine_that ||
-    sharpened.formal_statement;
+  // /en card -> ve.title -> vf.title_fr -> sharpened.title. Stubs skip
+  // the vulgarisation entirely — see lib/seo.ts.
+  const title = briefCardTitle(brief, locale);
+  const hook = briefCardHook(brief, locale);
   // Hook comes in the form "Imaginez que…" — keep the flavour without
   // repeating the lead-in on each card; trim to ~180 chars.
   const hookTrimmed = hook.length > 180 ? hook.slice(0, 177).trimEnd() + '…' : hook;
 
+  // S2c/C14 — the scores rendered here are NOT the DB values: a stub has
+  // novelty_score and panel_consensus_score NULL, and briefRowToBrief's
+  // defaultGrounding/defaultPanel collapse that to 0, which the card then
+  // printed as "nouveauté 0.00 · panel 0.0". A stub was never evaluated;
+  // zero is a claim about quality it never earned. The whole row is
+  // hidden rather than labelled "non évalué" — the card already carries
+  // the `nonProductive` badge, so a second disclaimer is redundant.
   const novelty = grounding.novelty_assessment.score;
   const panelScore = panel.meta_review.consensus_score;
-  const isPublished = panel.meta_review.verdict === 'publish_brief';
+  const isPublished = !is_stub && panel.meta_review.verdict === 'publish_brief';
 
   return (
     <motion.div
@@ -100,21 +96,25 @@ export default function EditorialBriefCard({ brief, index = 0 }: Props) {
           {/* Footer — metrics + date */}
           <div className="mt-auto flex items-center justify-between border-t border-ink-500/70 pt-4 text-xs">
             <div className="flex items-center gap-4">
-              <span className="flex items-center gap-1.5 text-mist-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-glow" />
-                <span className="font-mono">{t('novelty')} {novelty.toFixed(2)}</span>
-              </span>
-              <span
-                className={`font-mono ${
-                  panelScore >= 7
-                    ? 'text-emerald-glow'
-                    : panelScore >= 5.5
-                      ? 'text-amber-glow'
-                      : 'text-mist-500'
-                }`}
-              >
-                panel {panelScore.toFixed(1)}
-              </span>
+              {!is_stub && (
+                <>
+                  <span className="flex items-center gap-1.5 text-mist-400">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-glow" />
+                    <span className="font-mono">{t('novelty')} {novelty.toFixed(2)}</span>
+                  </span>
+                  <span
+                    className={`font-mono ${
+                      panelScore >= 7
+                        ? 'text-emerald-glow'
+                        : panelScore >= 5.5
+                          ? 'text-amber-glow'
+                          : 'text-mist-500'
+                    }`}
+                  >
+                    panel {panelScore.toFixed(1)}
+                  </span>
+                </>
+              )}
               {isPublished && (
                 <span className="rounded-full bg-emerald-bio/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-emerald-glow">
                   {tVerdicts('publish_brief')}

@@ -12,7 +12,7 @@ import {
 } from '@/lib/db';
 import type { Brief } from '@/lib/types';
 import { localeAlternates } from '@/lib/i18n-seo';
-import { SITE_URL } from '@/lib/seo';
+import { SITE_URL, briefCardHook, briefCardTitle } from '@/lib/seo';
 
 export async function generateMetadata({
   params,
@@ -233,28 +233,20 @@ function FeaturedHero({
   verdictNoveltySub: string;
   verdictPanelSub: string;
 }) {
-  const {
-    vulgarization_fr: vFr,
-    vulgarization_en: vEn,
-    sharpened,
-    domains,
-    grounding,
-    panel,
-    brief_id,
-    generated_at,
-  } = brief;
+  const { domains, grounding, panel, brief_id, generated_at, is_stub } = brief;
 
   // Locale-aware title + hook. On /en we prefer the EN translation
   // (S7.4 Phase 2 backfill), falling back to the FR vulgarisation, then
-  // to the formal sharpened title for legacy briefs.
-  const title =
-    locale === 'en'
-      ? vEn?.title || vFr?.title_fr || sharpened.title
-      : vFr?.title_fr || sharpened.title;
-  const hook =
-    locale === 'en'
-      ? vEn?.imagine_that || vFr?.imagine_that || sharpened.formal_statement
-      : vFr?.imagine_that || sharpened.formal_statement;
+  // to the formal sharpened title for legacy briefs. Stubs bypass the
+  // vulgarisation and take both from their Markdown body — see
+  // lib/seo.ts. getFeaturedBrief now skips stubs on its first two tiers,
+  // but tier 3 is an unconditional "most recent brief", so the hero
+  // still has to be stub-safe on its own.
+  const title = briefCardTitle(brief, locale);
+  const hook = briefCardHook(brief, locale);
+  // S2c/C14 — NULL scores surface as 0 through the db adapter defaults.
+  // A stub was never evaluated, so its score pills are hidden rather
+  // than printed as a fabricated 0.00 / 0.0.
   const novelty = grounding.novelty_assessment.score;
   const panelScore = panel.meta_review.consensus_score;
 
@@ -318,19 +310,23 @@ function FeaturedHero({
 
         <div className="mt-12 flex flex-col items-start gap-8 md:flex-row md:items-end md:justify-between">
           <div className="flex flex-wrap gap-6">
-            <HeroBadge
-              label={noveltyLabel}
-              value={novelty.toFixed(2)}
-              sub={verdictNoveltySub}
-              accent="emerald"
-              labelTooltip={<NoveltyScoreTooltip />}
-            />
-            <HeroBadge
-              label={panelLabel}
-              value={`${panelScore.toFixed(1)}/10`}
-              sub={verdictPanelSub}
-              accent="cyan"
-            />
+            {!is_stub && (
+              <>
+                <HeroBadge
+                  label={noveltyLabel}
+                  value={novelty.toFixed(2)}
+                  sub={verdictNoveltySub}
+                  accent="emerald"
+                  labelTooltip={<NoveltyScoreTooltip />}
+                />
+                <HeroBadge
+                  label={panelLabel}
+                  value={`${panelScore.toFixed(1)}/10`}
+                  sub={verdictPanelSub}
+                  accent="cyan"
+                />
+              </>
+            )}
           </div>
 
           <Link

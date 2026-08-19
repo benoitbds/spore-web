@@ -47,11 +47,78 @@ export function toIsoUtc(timestamp: string): string {
   return timestamp.replace(' ', 'T') + 'Z';
 }
 
+// ── Stub briefs: body-derived title and excerpt (S2c/C13) ──────────
+//
+// A stub brief is the honest "this collision produced no bridge"
+// analysis. It has no hypothesis, therefore no vulgarisation: the
+// vulgarisation agent's prompt presupposes a hypothesis to popularise,
+// so anything it wrote for a stub is fabricated (it invented titles
+// like « Et si les muscles savaient guérir le cancer ? » for a page
+// whose own body explains that no bridge was found).
+//
+// Every public surface therefore derives a stub's title and excerpt
+// from ``body_markdown``, which is already accessible prose. This is a
+// STRUCTURAL guarantee, not a consequence of clearing the column: the
+// branch fires on ``is_stub`` and returns before the vulgarisation
+// chain is ever consulted, so it holds whether the payload is NULL or
+// not. Do not reorder it below the vulgarisation lookups.
+//
+// Bilingual note: there is no ``body_markdown_en`` column, so the EN
+// locale derives from the same FR body. Those pages are noindex on EN
+// (see briefs/[id]/page.tsx), so snippet language is not an issue yet.
+
+/** First top-level ``# `` heading of a markdown body, or ''. */
+export function markdownTitle(md: string | null | undefined): string {
+  if (!md) return '';
+  for (const rawLine of md.split('\n')) {
+    const line = rawLine.trim();
+    if (line.startsWith('# ')) return line.slice(2).trim();
+  }
+  return '';
+}
+
+/** First real paragraph of a markdown body — the first non-empty block
+ *  that is not a heading, a list item, a quote or a rule. A stub body
+ *  opens with ``# Analyse…`` then ``## Pourquoi…`` then the prose, so a
+ *  naive first-block read would return a heading. Inline emphasis and
+ *  link syntax are stripped so the text is usable in a meta tag. */
+export function markdownLead(md: string | null | undefined): string {
+  if (!md) return '';
+  for (const block of md.split(/\n\s*\n/)) {
+    const lines = block
+      .split('\n')
+      .map((l) => l.trim())
+      .filter(Boolean)
+      .filter((l) => !/^(#{1,6}\s|[-*+]\s|\d+\.\s|>|\||```|---|===)/.test(l));
+    const text = lines.join(' ').trim();
+    if (!text) continue;
+    return text
+      .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1')
+      .replace(/[*_`]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+  return '';
+}
+
+/** Title + description for a stub, taken from the body only. Never
+ *  reads ``vulgarization_fr`` / ``vulgarization_en``. */
+function _stubSummary(brief: Brief) {
+  return {
+    title: markdownTitle(brief.body_markdown) || brief.sharpened.title || brief.brief_id,
+    description:
+      markdownLead(brief.body_markdown) || brief.sharpened.formal_statement || '',
+  };
+}
+
 /** Pick the locale-appropriate vulgarisation prose, falling back across
  *  layers: ``en`` row → ``fr`` row → sharpened formal_statement →
  *  empty. The function returns objects with the same shape the helpers
- *  below need, so each helper just pulls the field it cares about. */
+ *  below need, so each helper just pulls the field it cares about.
+ *
+ *  Stubs short-circuit to ``_stubSummary`` before any of that. */
 function _localisedSummary(brief: Brief, locale: string) {
+  if (brief.is_stub) return _stubSummary(brief);
   const ve = brief.vulgarization_en;
   const vf = brief.vulgarization_fr;
   const fallbackSharpened = brief.sharpened.formal_statement || '';
@@ -97,4 +164,37 @@ export function briefOgDescription(brief: Brief, locale: string = 'fr'): string 
 /** The title to use in meta tags for a brief — locale-aware. */
 export function briefMetaTitle(brief: Brief, locale: string = 'fr'): string {
   return _localisedSummary(brief, locale).title;
+}
+
+/** Card title for a brief — the same stub-first rule as the meta
+ *  helpers, but with the cards' cross-language fallback chain for
+ *  non-stubs (preferred locale → other locale → sharpened title).
+ *
+ *  Shared by ``EditorialBriefCard`` and the homepage ``FeaturedHero``
+ *  so a stub can never surface a fabricated hypothesis title in a grid
+ *  or a hero, whatever the state of the vulgarisation columns. */
+export function briefCardTitle(brief: Brief, locale: string): string {
+  if (brief.is_stub) return _stubSummary(brief).title;
+  const ve = brief.vulgarization_en;
+  const vf = brief.vulgarization_fr;
+  return (
+    (locale === 'en' ? ve?.title : vf?.title_fr) ||
+    ve?.title ||
+    vf?.title_fr ||
+    brief.sharpened.title
+  );
+}
+
+/** Card hook (the "Imaginez que…" line) for a brief. Stubs get the
+ *  first paragraph of their body instead — see ``briefCardTitle``. */
+export function briefCardHook(brief: Brief, locale: string): string {
+  if (brief.is_stub) return _stubSummary(brief).description;
+  const ve = brief.vulgarization_en;
+  const vf = brief.vulgarization_fr;
+  return (
+    (locale === 'en' ? ve?.imagine_that : vf?.imagine_that) ||
+    ve?.imagine_that ||
+    vf?.imagine_that ||
+    brief.sharpened.formal_statement
+  );
 }

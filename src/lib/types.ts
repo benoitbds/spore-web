@@ -219,6 +219,17 @@ export interface Brief {
    * with any mock/fixture payloads that predate the stub flow.
    */
   is_stub?: boolean;
+  /**
+   * Markdown body mirrored from ``briefs.body_markdown``. Set by the db
+   * adapter (``briefRowToBrief``) whenever the column is non-NULL, so it
+   * is present at runtime on every brief the app builds from SQLite.
+   *
+   * Declared here — not only on ``BriefWithBody`` — because the stub
+   * fallbacks in ``lib/seo.ts`` derive a stub's title and excerpt from
+   * this body, and those helpers run on both the server (metadata) and
+   * the client (cards), which only ever see the plain ``Brief`` type.
+   */
+  body_markdown?: string;
 }
 
 /**

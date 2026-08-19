@@ -17,6 +17,7 @@ import {
   briefMetaTitle,
   briefMetaDescription,
   briefOgDescription,
+  briefCardTitle,
 } from '@/lib/seo';
 import { localeAlternates, localeUrl } from '@/lib/i18n-seo';
 import BriefDetailClient from './BriefDetailClient';
@@ -122,6 +123,7 @@ export default async function BriefDetailPage({ params }: RouteParams) {
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'briefDetailPage' });
   const tVerdicts = await getTranslations({ locale, namespace: 'verdicts' });
+  const tBriefCard = await getTranslations({ locale, namespace: 'briefCard' });
 
   const row = getBriefById(id);
   if (!row) notFound();
@@ -175,6 +177,12 @@ export default async function BriefDetailPage({ params }: RouteParams) {
     }
   };
 
+  // A stub never went through the panel: show the "non productive" chip
+  // instead of the default-object verdict. See neighborTitle below.
+  const nonProductiveLabel = tBriefCard('nonProductive');
+  const neighborVerdict = (b: Brief): string =>
+    b.is_stub ? nonProductiveLabel : verdictLabel(b.panel.meta_review.verdict);
+
   // Locale-translated verdict tokens for the JSON-LD keywords blob — keeps
   // SEO copy in the active locale instead of leaking FR-only labels.
   const verdictKeywords = [
@@ -219,22 +227,21 @@ export default async function BriefDetailPage({ params }: RouteParams) {
         previousLabel={t('previousBrief')}
         nextLabel={t('nextBrief')}
         ariaLabel={t('neighborsAria')}
-        verdictLabel={verdictLabel}
+        verdictLabel={neighborVerdict}
         locale={locale}
       />
     </div>
   );
 }
 
+// S2c/C13-C14 — getBriefNeighbors doesn't filter stubs, so the prev/next
+// cards of an ordinary brief page can point at one. Both surfaces were
+// wrong there: the title came from the fabricated vulgarisation payload,
+// and the sub-line printed "rejeté" because defaultPanel() fills in
+// verdict='reject' for a brief that was never reviewed. briefCardTitle
+// handles the first; neighborVerdict handles the second.
 function neighborTitle(b: Brief, locale: string): string {
-  if (locale === 'en') {
-    return (
-      b.vulgarization_en?.title ||
-      b.vulgarization_fr?.title_fr ||
-      b.sharpened.title
-    );
-  }
-  return b.vulgarization_fr?.title_fr || b.sharpened.title;
+  return briefCardTitle(b, locale);
 }
 
 function BriefNeighbors({
@@ -251,7 +258,7 @@ function BriefNeighbors({
   previousLabel: string;
   nextLabel: string;
   ariaLabel: string;
-  verdictLabel: (v: string | null | undefined) => string;
+  verdictLabel: (b: Brief) => string;
   locale: string;
 }) {
   if (!prev && !next) return null;
@@ -274,7 +281,7 @@ function BriefNeighbors({
           </div>
           <div className="mt-1 text-xs text-mist-500">
             {prev.domains[0]} × {prev.domains[1] || '—'} ·{' '}
-            {verdictLabel(prev.panel.meta_review.verdict)}
+            {verdictLabel(prev)}
           </div>
         </Link>
       ) : (
@@ -295,7 +302,7 @@ function BriefNeighbors({
           </div>
           <div className="mt-1 text-xs text-mist-500">
             {next.domains[0]} × {next.domains[1] || '—'} ·{' '}
-            {verdictLabel(next.panel.meta_review.verdict)}
+            {verdictLabel(next)}
           </div>
         </Link>
       ) : (

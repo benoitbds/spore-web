@@ -215,16 +215,26 @@ function extractDomainsFromBrief(row: BriefRow): string[] {
 }
 
 function extractTitle(row: BriefRow): string | null {
+  // S2c/C13 — stubs first: their title is the H1 of the Markdown body.
+  // (The comment that used to sit at the bottom of this function claimed
+  // stubs "carry their title in vulgarization-like shape". They don't —
+  // that misreading is what let fabricated vulgarisation titles reach
+  // the public surfaces in the first place.)
+  if (row.is_stub === 1) {
+    return extractMarkdownTitle(row.body_markdown) || row.formal_statement || null;
+  }
   const sharpened = row.sharpened_data as { title?: unknown } | null;
   if (sharpened && typeof sharpened === 'object' && typeof sharpened.title === 'string') {
     return sharpened.title;
   }
-  // Stubs carry their title in vulgarization-like shape; fall back to formal_statement.
   if (row.formal_statement) return row.formal_statement;
   return null;
 }
 
 function extractImagineThat(row: BriefRow): string | null {
+  // Stubs have no hypothesis and therefore no "imagine that" hook.
+  // Callers render the body excerpt instead (see lib/seo.ts).
+  if (row.is_stub === 1) return null;
   const v = row.vulgarization_data as { imagine_that?: unknown } | null;
   if (v && typeof v === 'object' && typeof v.imagine_that === 'string') {
     return v.imagine_that;
@@ -793,10 +803,17 @@ export function getStats(): Stats | null {
 
 /**
  * Replacement for ``briefs.ts::getFeaturedBrief`` — three-tier preference:
- *   1. brief with vulgarization_data AND panel_verdict='publish_brief'
- *   2. brief with vulgarization_data (any verdict)
+ *   1. non-stub brief with vulgarization_data AND panel_verdict='publish_brief'
+ *   2. non-stub brief with vulgarization_data (any verdict)
  *   3. most recent brief overall
  * Each tier is a single-row LIMIT 1 query, evaluated in order.
+ *
+ * S2c/C13 — tiers 1 and 2 exclude stubs. A stub is a "this collision
+ * produced nothing" analysis; it has no business being the homepage
+ * hero, and it only ever qualified for tier 2 because it carried a
+ * fabricated vulgarization payload. Tier 3 stays unconditional so the
+ * hero is never empty, which is why FeaturedHero also guards on
+ * ``is_stub`` for its title, hook and score badges.
  */
 export function getFeaturedBrief(): BriefWithBody | null {
   const conn = db();
@@ -806,6 +823,7 @@ export function getFeaturedBrief(): BriefWithBody | null {
         `SELECT * FROM briefs
          WHERE vulgarization_data IS NOT NULL
            AND panel_verdict = 'publish_brief'
+           AND is_stub = 0
          ORDER BY created_at DESC LIMIT 1`,
       )
       .get() as Record<string, unknown> | undefined;
@@ -815,6 +833,7 @@ export function getFeaturedBrief(): BriefWithBody | null {
       .prepare(
         `SELECT * FROM briefs
          WHERE vulgarization_data IS NOT NULL
+           AND is_stub = 0
          ORDER BY created_at DESC LIMIT 1`,
       )
       .get() as Record<string, unknown> | undefined;
