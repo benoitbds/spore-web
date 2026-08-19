@@ -43,6 +43,20 @@ interface Props {
  * surfaces the same concept.
  */
 function briefHaystack(b: Brief): string {
+  // S2c/C13 — a stub's searchable text is its body, never its
+  // vulgarisation. Without this branch, typing "cambrioleurs" or
+  // "guérir le cancer" on /fr/briefs surfaced SPR-2026-BC45, a card whose
+  // visible text contains neither: the filter was matching a fabricated
+  // hypothesis the reader can no longer see anywhere on the page. Like
+  // the rest of the C13 fallbacks this is keyed on ``is_stub`` and holds
+  // whether the payload is NULL or not. ``body_markdown`` is already in
+  // this component's props, so nothing new crosses to the client.
+  if (b.is_stub) {
+    return [b.sharpened?.title, ...(b.domains ?? []), b.body_markdown]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+  }
   const v = b.vulgarization_fr;
   const ve = b.vulgarization_en;
   const pe = b.panel_en;
